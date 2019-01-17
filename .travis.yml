@@ -1,0 +1,76 @@
+# Setup the programming language as generic, since
+# Python is going to be installed through Conda
+language: generic
+
+# Sudo access is turned off, since Docker based architecture is employed
+sudo: false
+
+# Specify in the build matrix, those combinations that are interesting
+# for the build process
+
+# Try several linux and Mac OS X versions, the ones currently supported
+# by Travis
+matrix:
+  include:
+    # Linux environment to test plr with Ubuntu Trusty 14.04 and
+    # the minimum required versions of the packages
+    - os: linux
+      dist: trusty
+      env: PYTHON_VERSION=3.6 LATEST=0
+    # Linux environment to test plr with Ubuntu Trusty 14.04 and
+    # the latest version of the packages
+    - os: linux
+      dist: trusty
+      env: PYTHON_VERSION=* LATEST=1
+    # Linux environment to test plr with Ubuntu Xenial 16.04 and
+    # the minimum required versions of the packages
+    - os: linux
+      dist: xenial
+      env: PYTHON_VERSION=3.6 LATEST=0
+    # Linux environment to test plr with Ubuntu Trusty 16.04 and
+    # the latest version of the packages
+    - os: linux
+      dist: xenial
+      env: PYTHON_VERSION=* LATEST=1
+    # Mac OS X 10.11 environment to test plr with
+    # the minimum required versions of the packages
+    - os: osx
+      osx_image: xcode8.0
+      env: PYTHON_VERSION=3.6 LATEST=0
+    # Mac OS X 10.11 environment to test plr with
+    # the latest versions of the packages
+    - os: osx
+      osx_image: xcode8.0
+      env: PYTHON_VERSION=* LATEST=1
+    # Mac OS X 10.12 environment to test plr with
+    # the minimum required versions of the packages
+    - os: osx
+      osx_image: xcode9.2
+      env: PYTHON_VERSION=3.6 LATEST=0
+    # Mac OS X 10.12 environment to test plr with
+    # the latest versions of the packages
+    - os: osx
+      osx_image: xcode9.2
+      env: PYTHON_VERSION=* LATEST=1
+    # Mac OS X 10.13 environment to test plr with
+    # the minimum required versions of the packages
+    - os: osx
+      osx_image: xcode10.1
+      env: PYTHON_VERSION=3.6 LATEST=0
+    # Mac OS X 10.13 environment to test plr with
+    # the latest versions of the packages
+    - os: osx
+      osx_image: xcode10.1
+      env: PYTHON_VERSION=* LATEST=1
+
+# Script to carry out before the installation
+before_install: source build_tools/travis/before_install.sh
+
+# Script to carry out the installation
+install: bash build_tools/travis/install.sh
+
+# Script to carry out the tests
+script: bash build_tools/travis/script.sh
+
+# Script to be executed after carry out the test
+after_success: bash build_tools/travis/after_success.sh
