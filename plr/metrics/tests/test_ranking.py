@@ -26,12 +26,12 @@ seed = 23473
 Y_1 = np.array([[1, 2, 2, 3, 3],
                 [1, 2, 2, 3, 3],
                 [1, 2, 2, 3, 3]],
-                dtype = np.float64)
+                dtype = np.intp)
 
 Y_2 = np.array([[1, 2, 2, 3, 3],
                 [1, 3, 2, 2, 3],
                 [2, 3, 3, 1, 1]],
-                dtype = np.float64)
+                dtype = np.intp)
 
 # Initialize the sample weights
 sample_weight_1 = None
@@ -40,16 +40,16 @@ sample_weight_3 = np.array([0.5, 0.3, 0.2], dtype = np.float64)
 
 # Obtain the Kendall distances
 kendall_distance_sample_weight_1      = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_1, normalize = False)
-kendall_distance_sample_weight_2      = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_2, normalize = False)
-kendall_distance_sample_weight_3      = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_3, normalize = False)
+kendall_distance_sample_weight_2      = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_2, normalize = False, check_input = False)
+kendall_distance_sample_weight_3      = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_3, normalize = False, check_input = False)
 kendall_distance_sample_weight_1_norm = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_1, normalize = True)
-kendall_distance_sample_weight_2_norm = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_2, normalize = True)
-kendall_distance_sample_weight_3_norm = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_3, normalize = True)
+kendall_distance_sample_weight_2_norm = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_2, normalize = True, check_input = False)
+kendall_distance_sample_weight_3_norm = kendall_distance(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_3, normalize = True, check_input = False)
 
 # Obtain the Tau x scores
 tau_x_score_sample_weight_1 = tau_x_score(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_1)
-tau_x_score_sample_weight_2 = tau_x_score(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_2)
-tau_x_score_sample_weight_3 = tau_x_score(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_3)
+tau_x_score_sample_weight_2 = tau_x_score(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_2, check_input = False)
+tau_x_score_sample_weight_3 = tau_x_score(Y_true = Y_1, Y_pred = Y_2, sample_weight = sample_weight_3, check_input = False)
 
 # =============================================================================
 # Testing methods

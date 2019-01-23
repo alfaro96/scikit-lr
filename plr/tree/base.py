@@ -87,9 +87,9 @@ class BaseDecisionTreePartialLabelRanker(BasePartialLabelRanker):
             sample_weight = None,
             check_input   = True):
         """
-           Build a decision tree classifier from the training set (X, Y).
+            Build a decision tree classifier from the training set (X, Y).
 
-           Parameters
+            Parameters
             ----------
                 X: np.ndarray
                     The training input samples.
@@ -102,6 +102,11 @@ class BaseDecisionTreePartialLabelRanker(BasePartialLabelRanker):
                 
                 check_input: boolean (default = True)
                     Allow to bypass several input checking.
+
+            Returns
+            -------
+                self: BaseDecisionTreePartialLabelRanker
+                    Current object already trained.
         """
         # Check the input parameters (if corresponds)
         if check_input:

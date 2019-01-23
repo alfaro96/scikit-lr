@@ -45,7 +45,7 @@ class BucketOrder(PairOrderMatrix):
         
             Returns
             -------
-                self: object
+                self: BucketOrder
                     Current object already trained.
         """     
         # Call to the fit object of the parent, checking the input (if corresponds)

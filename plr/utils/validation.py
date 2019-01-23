@@ -18,7 +18,8 @@ from ..exceptions import NotFittedError
 # =============================================================================
 
 # Methods
-__all__ = ["check_is_fitted",
+__all__ = ["check_arrays",
+           "check_is_fitted",
            "check_is_type",
            "check_n_features",
            "check_prob_dists",
@@ -34,6 +35,29 @@ __all__ = ["check_is_fitted",
 # =============================================================================
 # Global methods
 # =============================================================================
+
+def check_arrays(u, v, ndim = 1):
+    """
+        Check if the arrays are of the corresponding type and dimension.
+    """
+    # Check that the first array is a NumPy array of the corresponding dimensions
+    if not isinstance(u, np.ndarray):
+        raise TypeError("The first array must be a NumPy array, got '{}'.".format(type(u).__name__))
+    if u.ndim != ndim:
+        raise ValueError("The first array must be a {}-D NumPy array, got {}-D NumPy array.".format(ndim, u.ndim))
+    # Check that the second array is a NumPy array of the corresponding dimensions
+    if not isinstance(v, np.ndarray):
+        raise TypeError("The second array must be a NumPy array, got '{}'.".format(type(v).__name__))
+    if v.ndim != ndim:
+        raise ValueError("The second array must be a {}-D NumPy array, got {}-D NumPy array.".format(ndim, v.ndim))
+    # Check that the length is the same
+    if u.shape[0] != v.shape[0]:
+        raise ValueError("The length of the arrays must be the same, got u = {} and v = {}.".format(u.shape[0], v.shape[0]))
+    # All the tests passed, try to convert to double
+    try:
+        return (u.astype(np.float64), v.astype(np.float64))
+    except:
+        raise ValueError("The data type of the first array ('{}') and the second ('{}') cannot be cast to double. Check the input data types.".format(u.dtype, v.dtype))
 
 def check_is_fitted(instance, desired_property):
     """
@@ -54,7 +78,7 @@ def check_n_features(current_n_features, desired_n_features):
         Check that the current number of features are the desired one.
     """
     if current_n_features != desired_n_features:
-        raise ValueError("Number of features of the model must match the input. Model number of features is {} and input number of features is {}".format(current_n_features, desired_n_features))
+        raise ValueError("Number of features of the model must match the input. Model number of features is '{}' and input number of features is '{}'".format(current_n_features, desired_n_features))
 
 def check_prob_dists(prob_dists, ndim = 2):
     """
@@ -83,12 +107,12 @@ def check_true_pred_sample_weight(true, pred, sample_weight, desired_dtype, true
     """
     # Check that the ground truth is a NumPy array of the corresponding dimensions
     if not isinstance(true, np.ndarray):
-        raise TypeError("The ground truth must be a NumPy array, got '{}'.".format(type(true)))
+        raise TypeError("The ground truth must be a NumPy array, got '{}'.".format(type(true).__name__))
     if true.ndim != true_pred_ndim:
         raise ValueError("The ground truth must be a {}-D NumPy array, got {}-D NumPy array.".format(true_pred_ndim, true.ndim))
     # # Check that the predictions is a NumPy array of the corresponding dimensions
     if not isinstance(pred, np.ndarray):
-        raise TypeError("The predictions must be a NumPy array, got '{}'.".format(type(pred)))
+        raise TypeError("The predictions must be a NumPy array, got '{}'.".format(type(pred).__name__))
     if pred.ndim != true_pred_ndim:
         raise ValueError("The predictions must be a {}-D NumPy array, got {}-D NumPy array.".format(true_pred_ndim, pred.ndim))
     # Ensure that the sample weight is a NumPy array of the corresponding dimensions

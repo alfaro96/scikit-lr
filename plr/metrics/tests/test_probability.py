@@ -40,13 +40,13 @@ sample_weight_3 = np.array([0.5, 0.3, 0.2], dtype = np.float64)
 
 # Obtain the Bhattacharyya distances
 bhat_distance_sample_weight_1 = bhattacharyya_distance(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_1)
-bhat_distance_sample_weight_2 = bhattacharyya_distance(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_2)
-bhat_distance_sample_weight_3 = bhattacharyya_distance(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_3)
+bhat_distance_sample_weight_2 = bhattacharyya_distance(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_2, check_input = False)
+bhat_distance_sample_weight_3 = bhattacharyya_distance(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_3, check_input = False)
 
 # Obtain the Bhattacharyya scores
 bhat_score_sample_weight_1 = bhattacharyya_score(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_1)
-bhat_score_sample_weight_2 = bhattacharyya_score(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_2)
-bhat_score_sample_weight_3 = bhattacharyya_score(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_3)
+bhat_score_sample_weight_2 = bhattacharyya_score(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_2, check_input = False)
+bhat_score_sample_weight_3 = bhattacharyya_score(probs_true = prob_dists_1, probs_pred = prob_dists_2, sample_weight = sample_weight_3, check_input = False)
 
 # =============================================================================
 # Testing methods
@@ -98,18 +98,18 @@ def test_probs_dists_check_input():
     """
     # The probability distributions are not a NumPy array
     with pytest.raises(TypeError):
-        bhattacharyya_distance(probs_true = None, probs_pred = None)
+        bhattacharyya_distance(probs_true = None, probs_pred = None, check_input = True)
     with pytest.raises(TypeError):
-        bhattacharyya_score(probs_true = None, probs_pred = None)
+        bhattacharyya_score(probs_true = None, probs_pred = None, check_input = True)
 
     # The probability distributions are not a 2-D NumPy array
     with pytest.raises(ValueError):
-        bhattacharyya_distance(probs_true = prob_dists_1[0], probs_pred = prob_dists_2[0])
+        bhattacharyya_distance(probs_true = prob_dists_1[0], probs_pred = prob_dists_2[0], check_input = True)
     with pytest.raises(ValueError):
-        bhattacharyya_score(probs_true = prob_dists_1[0], probs_pred = prob_dists_2[0])
+        bhattacharyya_score(probs_true = prob_dists_1[0], probs_pred = prob_dists_2[0], check_input = True)
 
     # The probability distributions do not sum one
     with pytest.raises(ValueError):
-        bhattacharyya_distance(probs_true = prob_dists_1 * 2, probs_pred = prob_dists_2 * 2)
+        bhattacharyya_distance(probs_true = prob_dists_1 * 2, probs_pred = prob_dists_2 * 2, check_input = True)
     with pytest.raises(ValueError):
-        bhattacharyya_score(probs_true = prob_dists_1 * 2, probs_pred = prob_dists_2 * 2)
+        bhattacharyya_score(probs_true = prob_dists_1 * 2, probs_pred = prob_dists_2 * 2, check_input = True)

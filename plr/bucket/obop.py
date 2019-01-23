@@ -73,7 +73,7 @@ class OptimalBucketOrderProblem:
         
             Returns
             -------
-                self: object
+                self: OptimalBucketOrderProblem
                     Current object initialized.
         """
         # Initialize the hyperparameters of the current object
@@ -97,7 +97,7 @@ class OptimalBucketOrderProblem:
         
             Returns
             -------
-                self: object
+                self: OptimalBucketOrderProblem
                     Current object already trained.
         """
         # Check the input parameters (if corresponds)

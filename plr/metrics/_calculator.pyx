@@ -8,7 +8,7 @@
 # =============================================================================
 
 # C
-from libc.math cimport sqrt, log
+from libc.math cimport sqrt, log, pow, fabs
 
 # =============================================================================
 # Global methods
@@ -16,7 +16,8 @@ from libc.math cimport sqrt, log
 
 cpdef DTYPE_t bhattacharyya_distance_calculator(DTYPE_t[:, :] probs_true,
                                                 DTYPE_t[:, :] probs_pred,
-                                                DTYPE_t[:]    sample_weight) nogil:
+                                                DTYPE_t[:]    sample_weight,
+                                                DTYPE_t[:]    fake_sample_weight) nogil:
     """
         Calculator for the Bhattacharyya distance.
     """
@@ -39,7 +40,7 @@ cpdef DTYPE_t bhattacharyya_distance_calculator(DTYPE_t[:, :] probs_true,
         if sample_weight[sample] != 0:
             distance += sample_weight[sample] * -log(bhattacharyya_score_calculator(probs_true    = probs_true[sample, None],
                                                                                     probs_pred    = probs_pred[sample, None],
-                                                                                    sample_weight = sample_weight[sample, None]))
+                                                                                    sample_weight = fake_sample_weight))
     
     # Return the obtained distance
     return distance
@@ -132,7 +133,7 @@ cpdef DTYPE_t tau_x_score_calculator(SIZE_t[:, :] Y_true,
                                      SIZE_t[:, :] Y_pred,
                                      DTYPE_t[:]   sample_weight) nogil:
     """
-        Calculator for the tau x score.
+        Calculator for the Tau x score.
     """
     # Initialize some values from the input arrays
     cdef SIZE_t n_samples = Y_true.shape[0]
@@ -175,6 +176,29 @@ cpdef DTYPE_t tau_x_score_calculator(SIZE_t[:, :] Y_true,
 
     # Return the obtained coefficient
     return coefficient
+
+cpdef DTYPE_t minkowski_calculator(DTYPE_t[:] u,
+                                   DTYPE_t[:] v,
+                                   SIZE_t     p) nogil:
+    """
+        Calculator for the Minkowski distance.
+    """
+    # Initialize some values from the input arrays
+    cdef SIZE_t n_elements = u.shape[0]
+
+    # Initialize some values to be employed
+    cdef DTYPE_t distance = 0.0
+
+    # Define the indexes
+    cdef SIZE_t element 
+
+    # Iterate all the elements to obtain the corresponding distance
+    for element in range(n_elements):
+        distance += pow(fabs(u[element] - v[element]), p)
+    distance = pow(distance, 1.0 / p)
+
+    # Return the obtained distance
+    return distance
 
 cdef void normalize_sample_weight(DTYPE_t[:] sample_weight) nogil:
     """

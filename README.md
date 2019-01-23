@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.com/alfaro96/PLR.svg?branch=master)](https://travis-ci.com/alfaro96/PLR)
+![](https://img.shields.io/pypi/pyversions/plr.svg)
+[![PyPI version](https://badge.fury.io/py/plr.svg)](https://badge.fury.io/py/plr)
+
 # plr
 
 `plr` is a Python module for dealing with the Partial Label Ranking problem.

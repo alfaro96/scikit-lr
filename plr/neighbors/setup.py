@@ -27,6 +27,17 @@ def configuration(parent_package = "",
     if os.name == "posix":
         libraries.append("m")
 
+    # Add the extension modules
+    config.add_extension("_builder",
+                         sources            = ["_builder.pyx"],
+                         language           = "c++",
+                         include_dirs       = [numpy.get_include()],
+                         libraries          = libraries,
+                         extra_compile_args = ["-O3"])
+
+    # Add the data files
+    config.add_data_files("_builder.pxd")
+    
     # Add the tests subpackage
     config.add_subpackage("tests")
 

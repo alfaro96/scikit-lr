@@ -98,7 +98,7 @@ class PairOrderMatrix(Matrix):
         
             Returns
             -------
-                self: object
+                self: PairOrderMatrix
                     Current object already trained.
         """
         # Check the input parameters (if corresponds)
@@ -173,7 +173,7 @@ class UtopianMatrix(Matrix):
         
             Returns
             -------
-                self: object
+                self: UtopianMatrix
                     Current object already trained.
         """
         # Check the input parameters (if corresponds)
@@ -222,7 +222,7 @@ class AntiUtopianMatrix(Matrix):
         
             Returns
             -------
-                self: object
+                self: AntiUtopianMatrix
                     Current object already trained.
         """
         # Check the input parameters (if corresponds)

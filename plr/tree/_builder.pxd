@@ -14,6 +14,9 @@ from .._types   cimport BOOL_t, DTYPE_t, SIZE_t
 from ._types    cimport REMOVED_ATTS_t, USEFUL_ATTS_t
 from ._types    cimport Parameters
 
+# Cython
+from cpython.list cimport list
+
 # =============================================================================
 # Base builder
 # =============================================================================

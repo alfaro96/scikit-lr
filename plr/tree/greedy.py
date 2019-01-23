@@ -91,7 +91,7 @@ class DecisionTreePartialLabelRanker(BaseDecisionTreePartialLabelRanker):
 
             Returns
             -------
-                self: object
+                self: DecisionTreePartialLabelRanker
                     Current object initialized.
         """
         # Call to the constructor of the parent

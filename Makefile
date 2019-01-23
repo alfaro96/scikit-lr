@@ -40,12 +40,12 @@ cython:
 
 # Code
 test-code:
-	$(PYTEST) -l -v --pyargs plr
+	$(PYTEST) -l -v plr
 
 # Coverage
 test-coverage:
 	rm -rf coverage .coverage
-	$(PYTEST) -l -v --cov=plr --cov-report=html:coverage --pyargs plr
+	$(PYTEST) -l -v --cov=plr --cov-report=html:coverage
 
 # All
 test: test-code test-coverage

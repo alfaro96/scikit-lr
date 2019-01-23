@@ -10,15 +10,26 @@
 import numpy as np
 
 # Scipy
-from scipy.spatial          import KDTree
-from scipy.spatial.distance import minkowski
+from scipy.spatial import KDTree
 
 # PLR
-from ..base             import BasePartialLabelRanker
-from ..utils.validation import check_random_state, check_X_Y_sample_weight
+from ..base                import BasePartialLabelRanker
+from ..bucket.obop         import ALGORITHMS as OBOP_ALGORITHMS
+from ._builder             import KNeighborsBuilder
+from ..metrics._calculator import minkowski_calculator
+from ..utils.validation    import check_random_state, check_X_Y_sample_weight
 
 # Misc
 from abc import abstractmethod
+
+# =============================================================================
+# Public objects
+# =============================================================================
+
+# Builders
+BUILDERS = {
+                "knn": KNeighborsBuilder
+           }
 
 # =============================================================================
 # Base nearest neighbors
@@ -31,13 +42,14 @@ class BaseNeighborsPartialLabelRanker(BasePartialLabelRanker):
     @abstractmethod    
     def __init__(self,
                  algorithm,
+                 builder,
                  bucket,
                  beta,                 
                  p,
                  leaf_size,
                  random_state):
         """
-            Base constructor for the nearest-neighbors paradigm.
+            Base constructor for the BaseNeighborsPartialLabelRanker class.
         """
         # Call to the constructor of the parent
         super().__init__(bucket       = bucket,
@@ -46,6 +58,7 @@ class BaseNeighborsPartialLabelRanker(BasePartialLabelRanker):
 
         # Initialize other hyperparameters of the current object
         self.algorithm   = algorithm
+        self.builder     = builder
         self.p           = p
         self.leaf_size   = leaf_size
 
@@ -55,9 +68,9 @@ class BaseNeighborsPartialLabelRanker(BasePartialLabelRanker):
             sample_weight = None,
             check_input   = True):
         """
-           Fit the corresponding nearest-neighbors model.
+            Fit the corresponding nearest-neighbors model.
 
-           Parameters
+            Parameters
             ----------
                 X: np.ndarray
                     The training input samples.
@@ -65,15 +78,15 @@ class BaseNeighborsPartialLabelRanker(BasePartialLabelRanker):
                 Y: np.ndarray
                     The target values (bucket orders) as array.
 
-                sample_weight: {None, np.ndarray} (default = None)
-                    The sample weight of each instance. If "None", the samples are equally weighted.
-
+                sample_weight: {None, np.ndarray}, optional (default = None)
+                    Weights already sorted by distance.
+                
                 check_input: boolean (default = True)
                     Allow to bypass several input checking.
 
             Returns
             -------
-                self:
+                self: BaseNeighborsPartialLabelRanker
                     Current object already trained.
         """
         # Check the input parameters (if corresponds)
@@ -85,8 +98,11 @@ class BaseNeighborsPartialLabelRanker(BasePartialLabelRanker):
         self.n_classes_                         = Y.shape[1]
         (self.X_, self.Y_, self.sample_weight_) = (X, Y, sample_weight)
 
-        # Initialize the random state
-        self.random_state_ = check_random_state(self.random_state)
+        # Obtain the random state
+        random_state = check_random_state(self.random_state)
+
+        # Initialize the builder for the current object
+        self.builder_ = BUILDERS[self.builder](bucket = OBOP_ALGORITHMS[self.bucket], beta = self.beta, random_state = random_state).init(self.n_classes_)
 
         # Obtain the data structure to store the training instances
         # Brute-force algorithm has not underlyling structure
@@ -112,56 +128,20 @@ class BaseKNeighborsPartialLabelRanker(BaseNeighborsPartialLabelRanker):
     """
     
     def __init__(self,       
-                 n_neighbors  = 5,
-                 algorithm    = "kd_tree",
-                 bucket       = "bpa_lia_mp2",
-                 beta         = 0.25,
-                 p            = 2,
-                 leaf_size    = 30,
-                 random_state = None):
+                 n_neighbors,
+                 algorithm,
+                 builder,
+                 bucket,
+                 beta,
+                 p,
+                 leaf_size,
+                 random_state):
         """
-            Constructor of BaseKNearestNeighborsPartialLabelRanker class.
-            
-            Parameters
-            ----------
-                n_neighbors: int, optional (default = 5)
-                    Number of neighbors to use.
-                       
-                algorithm: string, optional (default = "kd_tree")
-                    Algorithm used to compute the nearest neighbors:
-                        - "brute" will use a brute-force search.
-                        - "kd_tree" will use a KD-Tree.
-
-                bucket: string, optional (default = "bpa_lia_mp2")
-                    Algorithm that will be applied to the OBOP problem, i.e., the algorithm employed
-                    to aggregate the bucket orders.
-
-                beta: float, optional (default = 0.25)
-                    The parameter to decide the precedence relation of each item w.r.t. the pivot.
-            
-                p: int, optional (default = 2)
-                    Power parameter for the Minkowski metric.
-                    When p = 1, this is equivalent to using Manhattan distance,
-                    and Euclidean distance for p = 2. 
-                    For arbitrary p, Minkowski distance is used.
-
-                leaf_size: int, optional (default = 30)
-                    Leaf size passed to KDTree. This can affect the speed of the construction and query,
-                    as well as the memory required to store the tree. The optimal value depends on the nature of the problem.
-
-                random_state: {None, int, RandomState instance}, optional (default = None)
-                    - If int, random_state is the seed used by the random number generator.
-                    - If RandomState instance, random_state is the random number generator.
-                    - If None, the random number generator is the RandomState instance used
-                      by np.random.
-        
-            Returns
-            -------
-                self: object
-                    Current object initialized.
+            Base constructor of BaseKNearestNeighborsPartialLabelRanker class.
         """
         # Call to the constructor of the parent
         super().__init__(algorithm    = algorithm,
+                         builder      = builder,
                          bucket       = bucket,
                          beta         = beta,
                          p            = p,
@@ -192,9 +172,9 @@ class BaseKNeighborsPartialLabelRanker(BaseNeighborsPartialLabelRanker):
         # Obtain the nearest neighbors using the corresponding algorithm
         # If it is None, use the brute-force search
         if isinstance(self.tree_, type(None)):
-            neighbors = np.array([np.argsort(np.array([minkowski(X[i],
-                                                                 self.X_[j],
-                                                                 self.p)
+            neighbors = np.array([np.argsort(np.array([minkowski_calculator(X[i],
+                                                                            self.X_[j],
+                                                                            self.p)
                                                        for j in range(self.n_samples_)]))[:self.n_neighbors]
                                   for i in range(n_samples)])
         # Otherwise, use the KD-Tree

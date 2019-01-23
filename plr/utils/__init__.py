@@ -23,7 +23,8 @@ __all__ = ["ClusterProbability",
            "TopK"]
 
 # Methods
-__all__ += ["check_is_fitted",
+__all__ += ["check_arrays",
+            "check_is_fitted",
             "check_is_type",
             "check_n_features",
             "check_prob_dists",

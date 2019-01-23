@@ -78,9 +78,9 @@ DESCRIPTION      = "A set of Python modules for the Partial Label Ranking proble
 MAINTAINER       = "Juan Carlos Alfaro Jiménez"
 MAINTAINER_EMAIL = "JuanCarlos.Alfaro@uclm.es"
 URL              = "https://github.com/alfaro96/PLR"
-DOWNLOAD_URL     = "https://github.com/alfaro96/PLR/archive/1.0.0.tar.gz"
+DOWNLOAD_URL     = "https://github.com/alfaro96/PLR/archive/1.0.1.tar.gz"
 LICENSE          = "MIT"
-VERSION          = "1.0.0"
+VERSION          = "1.0.1"
 
 CLASSIFIERS      = ["Development Status :: 5 - Production/Stable",
                     "Intended Audience :: Science/Research",
@@ -92,6 +92,7 @@ CLASSIFIERS      = ["Development Status :: 5 - Production/Stable",
                     "Programming Language :: C",
                     "Programming Language :: C++",
                     "Programming Language :: Python :: 3.6",
+                    "Programming Language :: Python :: 3.7",
                     "Programming Language :: Python :: Implementation :: CPython",
                     "Topic :: Scientific/Engineering :: Artificial Intelligence"]
 

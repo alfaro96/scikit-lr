@@ -28,7 +28,8 @@ __all__ = ["kendall_distance",
 def kendall_distance(Y_true,
                      Y_pred,
                      sample_weight = None,
-                     normalize     = False):
+                     normalize     = False,
+                     check_input   = True):
     """
         Computes the Kendall distance between two bucket orders using a penalization factor.
         It measures the spread between bucket orders.
@@ -46,14 +47,18 @@ def kendall_distance(Y_true,
 
             normalize: bool (default = False)
                 Whether to normalize the distance.
+
+            check_input: boolean (default = True)
+                    Allow to bypass several input checking.
                 
         Returns
         -------
             distance: double
                 Mean Kendall distance for the given rankings.
     """
-    # Check the input parameters
-    (Y_true, Y_pred, sample_weight) = check_true_pred_sample_weight(Y_true, Y_pred, sample_weight, np.intp)
+    # Check the input parameters (if corresponds)
+    if check_input:
+        (Y_true, Y_pred, sample_weight) = check_true_pred_sample_weight(Y_true, Y_pred, sample_weight, np.intp)
 
     # Obtain the distance
     distance = kendall_distance_calculator(Y_true = Y_true, Y_pred = Y_pred, sample_weight = sample_weight, normalize = normalize)
@@ -63,7 +68,8 @@ def kendall_distance(Y_true,
 
 def tau_x_score(Y_true,
                 Y_pred,
-                sample_weight = None):
+                sample_weight = None,
+                check_input   = True):
     """
         Computes the Kendall's Tau x rank correlation coefficient. It measures
         the amount of overlap between rankings.
@@ -78,14 +84,18 @@ def tau_x_score(Y_true,
 
             sample_weight: {None, np.ndarray} (default = None)
                 The sample weight of each instance. If "None", the samples are equally weighted.
-                
+            
+            check_input: boolean (default = True)
+                    Allow to bypass several input checking.
+
         Returns
         -------
             coefficient: double
                 Mean Kendall's Tau x rank correlation coefficient for the given rankings.
     """ 
-    # Check the input parameters
-    (Y_true, Y_pred, sample_weight) = check_true_pred_sample_weight(Y_true, Y_pred, sample_weight, np.intp)
+    # Check the input parameters (if corresponds)
+    if check_input:
+        (Y_true, Y_pred, sample_weight) = check_true_pred_sample_weight(Y_true, Y_pred, sample_weight, np.intp)
     
     # Obtain the coefficient
     coefficient = tau_x_score_calculator(Y_true = Y_true, Y_pred = Y_pred, sample_weight = sample_weight)
