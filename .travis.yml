@@ -11,6 +11,11 @@ cache:
 # Set the Linux environment to Ubuntu Xenial 16.04
 dist: xenial
 
+# Enviromental variables
+env:
+  global:
+    - TEST_DIR=/tmp/plr
+
 # Specify in the build matrix
 matrix:
   include:
@@ -21,7 +26,7 @@ matrix:
        env: COVERAGE="true"
 
 # Install the packages
-install: bash build_tools/travis/install.sh
+install: source bash build_tools/travis/install.sh
 
 # Execute the tests
 script: bash build_tools/travis/script.sh
