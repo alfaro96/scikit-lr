@@ -1,19 +1,30 @@
 """
-    The module "plr.neighbors" includes estimators
-    to solve the Partial Label Ranking Problem with the
-    nearest neighbors paradigm.
+The :mod:`plr.neighbors` module implements
+the k-nearest neighbors algorithm.
 """
+
 
 # =============================================================================
 # Imports
 # =============================================================================
 
-# Nearest neighbors
-from .partial_label_ranking import KNeighborsPartialLabelRanker
+# Local application
+from ._base import VALID_METRICS
+from ._dist_metrics import DistanceMetric
+from ._label_ranking import KNeighborsLabelRanker
+from ._partial_label_ranking import KNeighborsPartialLabelRanker
+
 
 # =============================================================================
 # Public objects
 # =============================================================================
 
-# Classes
-__all__ = ["KNeighborsPartialLabelRanker"]
+# All classes
+__all__ = [
+    "DistanceMetric",
+    "KNeighborsLabelRanker",
+    "KNeighborsPartialLabelRanker"
+]
+
+# All constants
+__all__ += ["VALID_METRICS"]

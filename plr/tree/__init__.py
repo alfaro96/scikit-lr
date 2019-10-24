@@ -1,19 +1,23 @@
 """
-    The module "plr.tree" includes estimators
-    to solve the Partial Label Ranking Problem with
-    decision trees.
+The :mod:`plr.tree` module includes decision tree-based models for
+Label Ranking and Partial Label Ranking.
 """
 
 # =============================================================================
 # Imports
 # =============================================================================
 
-# Greedy
-from .greedy import DecisionTreePartialLabelRanker
+# Local application
+from ._classes import (
+    BaseDecisionTree, DecisionTreeLabelRanker, DecisionTreePartialLabelRanker)
+
 
 # =============================================================================
 # Public objects
 # =============================================================================
 
-# Classes
-__all__ = ["DecisionTreePartialLabelRanker"]
+# Available classes
+__all__ = [
+    "BaseDecisionTree",
+    "DecisionTreeLabelRanker", "DecisionTreePartialLabelRanker"
+]

@@ -1,24 +1,24 @@
 """
-    The module "plr.metrics" includes several metrics
-    for different kind of data.
+The :mod:`plr.metrics` module includes score functions, performance metrics
+and distance computations.
 """
+
 
 # =============================================================================
 # Imports
 # =============================================================================
 
-# Probability distributions
-from .probability import bhattacharyya_distance, bhattacharyya_score
+# Local application
+from .label_ranking import kendall_distance, tau_score
+from .partial_label_ranking import penalized_kendall_distance, tau_x_score
 
-# Rankings
-from .ranking import kendall_distance, tau_x_score
 
-# Spatial
-from .spatial import minkowski
+# =============================================================================
+# Public objects
+# =============================================================================
 
-# Define the objects to be exported
-__all__ = ["bhattacharyya_distance",
-           "bhattacharyya_score",
-           "kendall_distance",
-           "tau_x_score",
-           "minkowski"]
+# All methods
+__all__ = [
+    "kendall_distance", "tau_score",
+    "penalized_kendall_distance", "tau_x_score"
+]

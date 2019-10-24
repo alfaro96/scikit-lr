@@ -2,49 +2,53 @@
 # Imports
 # =============================================================================
 
-# NumPy
-import numpy
-from   numpy.distutils.core      import setup
-from   numpy.distutils.misc_util import Configuration
+# Standard
+from os import name
 
-# Operating System
-import os
+# Third party
+from numpy import get_include
+from numpy.distutils.core import setup
+from numpy.distutils.misc_util import Configuration
+
 
 # =============================================================================
-# Global methods
+# Methods
 # =============================================================================
 
-def configuration(parent_package = "",
-                  top_path       = None):
-    """
-        Configure "neighbors" package.
-    """
-    # Initialize the configuration for the "neighbors" package
+def configuration(parent_package="", top_path=None):
+    """Configure the plr.neighbors module."""
+    # Create the configuration file for the plr.neighbors module
     config = Configuration("neighbors", parent_package, top_path)
+
+    # Initialize the libraries
     libraries = []
 
-    # Fix posix operating system 
-    if os.name == "posix":
+    # Fix POSIX Operating Systems including the macros in the library
+    if name == "posix":
         libraries.append("m")
 
-    # Add the extension modules
-    config.add_extension("_builder",
-                         sources            = ["_builder.pyx"],
-                         language           = "c++",
-                         include_dirs       = [numpy.get_include()],
-                         libraries          = libraries,
-                         extra_compile_args = ["-O3"])
+    # Add the extension modules
+    config.add_extension(
+        "_dist_metrics",
+        sources=["_dist_metrics.pyx"],
+        include_dirs=[get_include()],
+        libraries=libraries,
+        extra_compile_args=["-O3"])
 
     # Add the data files
-    config.add_data_files("_builder.pxd")
-    
-    # Add the tests subpackage
+    config.add_data_files("_dist_metrics.pxd")
+
+    # Add the tests subpackage
     config.add_subpackage("tests")
 
-    # Return the configuration for the "neighbors" package
+    # Return the configuration of the plr.neighbors module
     return config
 
-# Only called if this file is the main one
+
+# =============================================================================
+# Main
+# =============================================================================
 if __name__ == "__main__":
-    # Setup the files
+    """Only called when this file is the "main" one."""
+    # Setup the modules
     setup(**configuration().todict())

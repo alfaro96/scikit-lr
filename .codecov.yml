@@ -1,12 +1,25 @@
 # Disable the comments of the coverage
 comment: off
 
-# Configuration, requiring, at least, a 90% of coverage
+# Coverage configuration
 coverage:
   status:
     project:
       default:
-        target: 90
+        # Commits pushed to master should not make the
+        # overall project coverage decrease by more than 1%
+        target: auto
+        threshold: 1%
     patch:
       default:
-        target: 90
+        # Be tolerant on slight code coverage diff on PRs to limit noisy red coverage
+        # status on Github PRs. Note the coverage stats are still uploaded to codecov
+        # so that PR reviewers can see uncovered lines in the Github diff if they install
+        # the codecov browser extension: https://github.com/codecov/browser-extension
+        target: auto
+        threshold: 1%
+
+# Directories and files to ignore in the coverage
+ignore:
+- "plr/_build_utils"
+- "**/setup.py"

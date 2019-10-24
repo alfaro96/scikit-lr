@@ -1,27 +1,31 @@
-[![Build Status](https://travis-ci.com/alfaro96/PLR.svg?branch=master)](https://travis-ci.com/alfaro96/PLR)
-![](https://img.shields.io/pypi/pyversions/plr.svg)
-[![PyPI version](https://badge.fury.io/py/plr.svg)](https://badge.fury.io/py/plr)
+[![Travis](https://travis-ci.com/alfaro96/plr.svg?branch=master)](https://travis-ci.com/alfaro96/plr)
+[![Codecov](https://codecov.io/gh/alfaro96/plr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/plr)
+[![PyPI](https://badge.fury.io/py/plr.svg)](https://badge.fury.io/py/plr)
+![Python](https://img.shields.io/pypi/pyversions/plr.svg)
+[![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 
 # plr
 
-`plr` is a Python module for dealing with the Partial Label Ranking problem.
+`plr` is a Python module integrating Machine Learning algorithms for Label Ranking problems and distributed under MIT license.
 
-## Prerequisites
+## Installation
+
+### Dependencies
 
 `plr` requires:
 
-    * Python (>= 3.6)
-    * Numpy (>= 1.15.2)
-    * Scipy (>= 1.1.0)
+    * Python>=3.6
+    * Numpy>=1.15.2
+    * SciPy>=1.1.0
 
-and `Linux` or `Mac OS X` operating systems. `Windows` is not currently supported.
+`Linux` or `Mac OS X` operating systems. `Windows` is not currently supported.
 
-## Installation
+### User installation
 
 The easiest way to install `plr` is using `pip` package:
 
 ```
-pip install plr
+pip install -U plr
 ```
 
 ## Development
@@ -38,50 +42,16 @@ git clone https://github.com/alfaro96/plr.git
 
 ### Setting up a development environment
 
-To setup the development environment, it is strongly recommended to use `docker` tools (from outside the source directory). First, the image must be built.
-
-```
-docker build -t alfaro96/plr:development .
-```
-
-Or:
-
-```
-make docker-build
-```
-
-Then, the `docker` container is executed (from outside the source directory) with:
-
-```
-docker run -ti -v $(pwd)/:/home/plr/workspace/ --rm alfaro96/plr:development
-```
-
-Or:
-
-```
-make docker-run
-```
-
-In fact, both commands can be executed at once with:
-
-```
-make docker
-```
+To setup the development environment, it is strongly recommended to use `docker` tools (see [https://github.com/alfaro96/docker-plr]) 
 
 Alternatively, one can use `Python` virtual environments (see [https://docs.python.org/3/library/venv.html] for details).
 
-## Testing
+### Testing
 
-After installation, the test suite can be executed, from outside the source directory, with:
+After installation the test suite can be executed from outside the source directory, with (you will need to have `pytest>=4.0.1` installed):
 
 ```
 pytest plr
-```
-
-or 
-
-```
-make test-code
 ```
 
 ## Authors

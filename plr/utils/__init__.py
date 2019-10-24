@@ -1,38 +1,33 @@
-"""
-    The module "plr.utils" includes utils
-    for different kind of operations.
-"""
+"""The :mod:`plr.utils` module includes various utilities."""
+
 
 # =============================================================================
 # Imports
 # =============================================================================
 
-# Datasets
-from .datasets import ClusterProbability, TopK, MissRandom
+# Local application
+from .bunch import Bunch
+from .ranking import (
+    unique_rankings, check_label_ranking_targets,
+    check_partial_label_ranking_targets, type_of_targets,
+    is_ranking_without_ties, is_ranking_with_ties, rank_data)
+from .validation import (
+    check_array, check_is_fitted, check_consistent_length,
+    check_random_state, check_X_Y, has_fit_parameter)
 
-# Validation
-from .validation import check_n_features, check_is_fitted, check_is_type, check_prob_dists, check_random_state, check_true_pred_sample_weight, check_X, check_X_Y, check_Y, check_Y_prob_dists, check_X_Y_sample_weight
 
 # =============================================================================
 # Public objects
 # =============================================================================
 
-# Classes
-__all__ = ["ClusterProbability",
-           "MissRandom",
-           "TopK"]
+# All classes
+__all__ = ["Bunch"]
 
-# Methods
-__all__ += ["check_arrays",
-            "check_is_fitted",
-            "check_is_type",
-            "check_n_features",
-            "check_prob_dists",
-            "check_random_state",
-            "check_true_pred_sample_weight",
-            "check_X",
-            "check_X_Y",
-            "check_X_Y_sample_weight",
-            "check_Y",
-            "check_Y_prob_dists",
-            "check_Y_sample_weight"]
+# All methods
+__all__ += [
+    "check_array", "check_consistent_length",
+    "check_is_fitted", "check_label_ranking_targets",
+    "check_partial_label_ranking_targets", "check_random_state",
+    "check_X_Y", "has_fit_parameter", "is_ranking_without_ties",
+    "is_ranking_with_ties", "rank_data", "type_of_targets", "unique_rankings"
+]
