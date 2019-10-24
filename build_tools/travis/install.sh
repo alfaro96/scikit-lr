@@ -20,9 +20,20 @@ echo "List files from cached directories"
 echo "pip: "
 ls $HOME/.cache/pip
 
+# Install gcc-6 and g++-6, since it is needed by some extension modules of Cython
+
+# Add the repository
+sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
+
+# Update the repositories
+sudo apt-get update
+
+# Install the packages
+sudo apt-get install -y gcc-6 g++-6
+
 # Set the default compilers
-export CC=/usr/lib/ccache/gcc
-export CXX=/usr/lib/ccache/g++
+export CC=/usr/bin/gcc-6
+export CXX=/usr/bin/g++-6
 
 # Deactivate the Travis-provided virtual environment and
 # setup a Conda-based environment instead. If Travis has
