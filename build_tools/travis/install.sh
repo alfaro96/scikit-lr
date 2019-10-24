@@ -74,6 +74,10 @@ pip install --upgrade cython
 echo "Installing pytest"
 pip install pytest==4.6.4 pytest-cov
 
+# Codecov
+echo "Installing codecov"
+pip install --upgrade codecov
+
 # Print the Python, NumPy and Scipy versions
 python --version
 python -c 'import numpy; print("NumPy {}".format(numpy.__version__))'
