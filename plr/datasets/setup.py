@@ -29,6 +29,9 @@ def configuration(parent_package="", top_path=None):
     # Add the tests subpackage
     config.add_subpackage("tests")
 
+    # Add the data folder
+    config.add_data_dir("data")
+
     # Return the configuration of the plr.datasets module
     return config
 
