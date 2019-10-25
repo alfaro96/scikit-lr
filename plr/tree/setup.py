@@ -34,7 +34,8 @@ def configuration(parent_package="", top_path=None):
         include_dirs=[get_include()],
         libraries=libraries,
         language="c++",
-        extra_compile_args=["-O3"])
+        extra_compile_args=["-O3", "-std=c++11"],
+        extra_link_args=["-std=c++11"])
 
     config.add_extension(
         "_splitter",
@@ -42,7 +43,8 @@ def configuration(parent_package="", top_path=None):
         include_dirs=[get_include()],
         libraries=libraries,
         language="c++",
-        extra_compile_args=["-O3"])
+        extra_compile_args=["-O3", "-std=c++11"],
+        extra_link_args=["-std=c++11"])
 
     config.add_extension(
         "_tree",
@@ -50,7 +52,8 @@ def configuration(parent_package="", top_path=None):
         include_dirs=[get_include()],
         libraries=libraries,
         language="c++",
-        extra_compile_args=["-O3"])
+        extra_compile_args=["-O3", "-std=c++11"],
+        extra_link_args=["-std=c++11"])
 
     # Add the data files
     config.add_data_files("_criterion.pxd")
