@@ -170,7 +170,7 @@ cdef class TreeBuilder:
         useful_features = &self.splitter.useful_features
 
         # Check whether to create a leaf node
-        is_leaf = (depth >= self.max_depth or
+        is_leaf = (depth == self.max_depth or
                    n_samples < self.min_samples_split or
                    are_features_equal(X, samples, useful_features) or
                    are_rankings_equal(Y, samples))
@@ -497,18 +497,53 @@ cdef BOOL_t are_rankings_equal(INT64_t_2D Y, SIZE_t_1D samples) nogil:
 
     # Define some values to be employed
     cdef BOOL_t equal
+    cdef INT64_t relation
 
     # Define the indexes
     cdef SIZE_t sample
-    cdef SIZE_t label
+    cdef SIZE_t f_class
+    cdef SIZE_t s_class
 
     # The rankings are initialize equal
     equal = True
 
     # Check whether all the rankings are equal
-    for label in range(n_classes):
-        for sample in range(n_samples):
-            equal = Y[samples[0], label] == Y[samples[sample], label]
+    for f_class in range(n_classes - 1):
+        for s_class in range(f_class + 1, n_classes):
+            # Initialize the precedence relation between the
+            # pair of classes being tested for consistency
+            relation = RANK_TYPE.RANDOM
+            # Check the precedence relation of all the samples
+            for sample in range(n_samples):
+                # Found one sample where both pair of classes occur
+                if (Y[samples[sample], f_class] != RANK_TYPE.RANDOM and
+                        Y[samples[sample], s_class] != RANK_TYPE.RANDOM):
+                    # Check whether this sample is the first one
+                    # where both pair of classes ocurr. If it is,
+                    # store the precedence relation
+                    if relation == RANK_TYPE.RANDOM:
+                        if (Y[samples[sample], f_class] <
+                                Y[samples[sample], s_class]):
+                            relation = -1
+                        elif (Y[samples[sample], f_class] ==
+                                Y[samples[sample], s_class]):
+                            relation = 0
+                        else:
+                            relation = 1
+                    # Otherwise, check the precedence relation
+                    # of the sample taking into account this one
+                    else:
+                        if relation == -1:
+                            equal = (Y[samples[sample], f_class] <
+                                     Y[samples[sample], s_class])
+                        elif relation == 0:
+                            equal = (Y[samples[sample], f_class] ==
+                                     Y[samples[sample], s_class])
+                        else:
+                            equal = (Y[samples[sample], f_class] >
+                                     Y[samples[sample], s_class])
+                if not equal:
+                    break
             if not equal:
                 break
         if not equal:

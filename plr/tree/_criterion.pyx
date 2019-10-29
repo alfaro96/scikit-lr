@@ -21,13 +21,13 @@ from ..metrics._label_ranking_fast cimport _kendall_distance_fast
 
 
 # =============================================================================
-# Public objects
+# Constants
 # =============================================================================
 
-# Constants
-cdef INT64_t N_ITERS = 10
-cdef DTYPE_t LOWER_THETA = -10.0
-cdef DTYPE_t UPPER_THETA = 5.0
+# Mallows
+cdef INT64_t N_ITERS = 20
+cdef DTYPE_t LOWER_THETA = -20.0
+cdef DTYPE_t UPPER_THETA = 10.0
 cdef DTYPE_t EPSILON = 1e-10
 
 # Distances
@@ -656,7 +656,7 @@ cdef class Mallows(LabelRankingCriterion):
                              * _kendall_distance_fast(
                                  y_true=Y[sample],
                                  y_pred=consensus,
-                                 normalize=True))
+                                 normalize=False))
 
         # Compute the impurity (inverse of theta)
         # using the Netwon-Raphson method

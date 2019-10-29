@@ -299,9 +299,15 @@ class AdaBoostLabelRanker(LabelRankerMixin, BaseWeightBoosting):
         # Obtain the predictions of the estimator over the training dataset
         Y_predict = estimator.predict(X)
 
+        # Complete the rankings since the error measure needs
+        # that the input rankings have not missed classes
+        Y_completed = self._rank_algorithm.aggregate(
+            Y, sample_weight, apply_mle=True, return_Yt=True)[1]
+
         # For each instance on the training dataset, obtain the error
         (estimator_error, instances_error) = error_lr(
-            Y, Y_predict, sample_weight=sample_weight, return_dists=True)
+            Y_completed, Y_predict,
+            sample_weight=sample_weight, return_dists=True)
 
         # Early termination if the estimator has achieved a
         # perfect fit or the estimator is not good enough

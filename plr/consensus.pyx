@@ -233,27 +233,37 @@ cdef class RankAggregationAlgorithm:
         ranking with a MLE process using the Rank Aggregation algorithm."""
         pass
 
-    def aggregate(self, Y, sample_weight=None, apply_mle=False):
+    def aggregate(self, Y, sample_weight=None,
+                  apply_mle=False, return_Yt=False):
         """Aggregate the rankings in Y according to the sample weights.
 
         Parameters
         ----------
-        Y: np.ndarray of shape (n_samples, n_classes)
+        Y : np.ndarray of shape (n_samples, n_classes)
             Input rankings.
 
-        sample_weight: {None, np.ndarray} of shape (n_samples,),
+        sample_weight : {None, np.ndarray} of shape (n_samples,),
                 optional (default=None)
             Sample weights.
 
-        apply_mle: bool, optional (default=False)
+        apply_mle : bool, optional (default=False)
             If True, apply a MLE process to complete the
             rankings before obtaining the consensus ranking,
             else aggregate the rankings without completing.
 
+        return_Yt : bool, optional (default=False)
+            If ``apply_mle`` and True, return the completed rankings
+            according to the MLE process carry out to obtain the
+            consensus ranking.
+
         Returns
         -------
-        consensus: np.ndarray of shape (n_classes,)
+        consensus : np.ndarray of shape (n_classes,)
             The consensus ranking of the ones in Y.
+
+        Yt : np.ndarray of shape (n_samples, n_classes)
+            If ``apply_mle and return_Y``, return the
+            completed rankings according to the MLE process.
 
         Raises
         ------
@@ -273,9 +283,9 @@ cdef class RankAggregationAlgorithm:
 
         # Check whether the MLE process must be applied
         if apply_mle and self.__class__ is BPALIAMP2Algorithm:
-            raise NotImplementedError(
-                "The MLE process cannot be applied "
-                "to Partial Label Ranking targets.")
+            raise NotImplementedError("The MLE process cannot be carried out "
+                                      "with Bucket Pivot Algorithm with "
+                                      "multiple pivots and two-stages.")
 
         # Initialize some values from the input arrays
         cdef INT64_t n_samples = Y.shape[0]
@@ -285,7 +295,7 @@ cdef class RankAggregationAlgorithm:
         if sample_weight is None:
             sample_weight = np.ones(n_samples, dtype=np.float64)
         # Otherwise, check their format, ensuring that they are
-        # a 1-D array with the same number of samples than the data
+        # a 1-D array with the same number of samples than the rankings
         else:
             # Check the format of the sample weights
             sample_weight = check_array(
@@ -300,7 +310,7 @@ cdef class RankAggregationAlgorithm:
             check_consistent_length(Y, sample_weight)
 
         # Transform the rankings for properly handle them in Cython
-        Y = _transform_rankings(Y)
+        Yt = _transform_rankings(Y)
 
         # Initialize the consensus ranking
         cdef np.ndarray[INT64_t, ndim=1] consensus = np.zeros(
@@ -311,12 +321,22 @@ cdef class RankAggregationAlgorithm:
 
         # Aggregate the rankings to build the consensus one
         if apply_mle:
-            self.aggregate_mle(Y, sample_weight, consensus)
+            self.aggregate_mle(Yt, sample_weight, consensus)
         else:
-            self.aggregate_rankings(Y, sample_weight, consensus)
+            self.aggregate_rankings(Yt, sample_weight, consensus)
 
-        # Return the built consensus ranking
-        return consensus
+        # Revert the top-k missed classes to their original value,
+        # since they must be fixed to be managed by Python methods
+        if apply_mle and return_Yt:
+            Yt = Yt.astype(np.float64)
+            Yt[np.isinf(Y)] = np.inf
+
+        # Return the built consensus ranking and, if
+        # specified, also return the completed rankings
+        if apply_mle and return_Yt:
+            return (consensus, Yt)
+        else:
+            return consensus
 
 
 # =============================================================================

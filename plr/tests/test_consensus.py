@@ -43,49 +43,49 @@ def test_get_algorithm(algorithm):
 
 
 @pytest.mark.aggregate_borda_count
-def test_borda_count():
+def test_aggregate_borda_count():
     """Test the aggregate method for BordaCountAlgorithm."""
     # Initialize the BordaCountAlgorithm object to be tested
-    borda = RankAggregationAlgorithm.get_algorithm("borda_count")
+    borda_count = RankAggregationAlgorithm.get_algorithm("borda_count")
 
     # Assert that the consensus ranking obtained from complete ones is correct
     np.testing.assert_array_equal(
-        x=borda.aggregate(Y),
-        y=np.array([1, 3, 2]))
+        borda_count.aggregate(Y),
+        np.array([1, 3, 2]))
 
     # Assert that the consensus ranking obtained
     # from randomly missed items is correct
     np.testing.assert_array_equal(
-        x=borda.aggregate(Y_random),
-        y=np.array([2, 3, 1]))
+        borda_count.aggregate(Y_random),
+        np.array([2, 3, 1]))
 
     # Assert that the consensus ranking obtained from top-k items is correct
     np.testing.assert_array_equal(
-        x=borda.aggregate(Y_top),
-        y=np.array([1, 3, 2]))
+        borda_count.aggregate(Y_top),
+        np.array([1, 3, 2]))
 
 
 @pytest.mark.aggregate_bpa_lia_mp2
-def test_bpa_lia_mp2():
+def test_aggregate_bpa_lia_mp2():
     """Test the aggregate method for BPALIAMP2Algorithm."""
     # Initialize the BPALIAMP2Algorithm object to be tested
     bpa_lia_mp2 = RankAggregationAlgorithm.get_algorithm("bpa_lia_mp2")
 
     # Assert that the consensus ranking obtained from complete ones is correct
     np.testing.assert_array_equal(
-        x=bpa_lia_mp2.aggregate(Y),
-        y=np.array([1, 2, 1]))
+        bpa_lia_mp2.aggregate(Y),
+        np.array([1, 2, 1]))
 
     # Assert that the consensus ranking obtained
     # from randomly missed items is correct
     np.testing.assert_array_equal(
-        x=bpa_lia_mp2.aggregate(Y_random),
-        y=np.array([1, 1, 1]))
+        bpa_lia_mp2.aggregate(Y_random),
+        np.array([1, 1, 1]))
 
     # Assert that the consensus ranking obtained from top-k items is correct
     np.testing.assert_array_equal(
-        x=bpa_lia_mp2.aggregate(Y_top),
-        y=np.array([1, 2, 1]))
+        bpa_lia_mp2.aggregate(Y_top),
+        np.array([1, 2, 1]))
 
 
 @pytest.mark.sample_weight_invalid

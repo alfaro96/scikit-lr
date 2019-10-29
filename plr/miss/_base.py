@@ -174,9 +174,9 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
 
         # Miss the rankings
         for sample in range(n_samples):
-            # For efficiency purposes, check
-            # whether any ranking must be missed
-            if np.any(masks[sample]):
+            # For efficiency purposes, only miss classes
+            # on the rankings where any class must be missed
+            if masks[sample].shape[0] != 0:
                 # For the random strategy, rank the data
                 # to mantain a properly formatted ranking
                 if self.strategy == "random":

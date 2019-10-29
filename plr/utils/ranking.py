@@ -333,11 +333,25 @@ def rank_data(data, method="ordinal", check_input=True):
 
 def _transform_rankings(Y):
     """Transform the rankings for properly handled them in Cython."""
-    # Set the np.nan values as randomly missed
-    Y[np.isnan(Y)] = _RANK_TYPES["random"]
+    # Initialize the transformed rankings. Even if
+    # the transformation can be directly done over
+    # the input rankings, it is not desired that
+    # they are modified, since they may be used
+    Yt = np.zeros(Y.shape, dtype=np.int64)
 
-    # Set the np.inf values as top-k
-    Y[np.isinf(Y)] = _RANK_TYPES["top"]
+    # Copy the finite classes from the input
+    # rankings to the transformed rankings
+    Yt[np.isfinite(Y)] = Y[np.isfinite(Y)]
 
-    # Return the transformed rankings as integer type
-    return Y.astype(np.int64)
+    # Copy the randomly missed classes from the input
+    # rankings to the transformed, taking into account
+    # the value internally used by Cython
+    Yt[np.isnan(Y)] = _RANK_TYPES["random"]
+
+    # Copy the top-k missed classes from the input
+    # rankings to the transformed, taking into account
+    # the value internally used by Cython
+    Yt[np.isinf(Y)] = _RANK_TYPES["top"]
+
+    # Return the transformed rankings
+    return Yt

@@ -24,6 +24,7 @@ from .._types cimport (
     INT64_t, INT64_t_1D, INT64_t_2D,
     SIZE_t, SIZE_t_1D, SIZE_t_2D,
     UINT8_t_1D)
+from .._types cimport RANK_TYPE
 
 
 # =============================================================================
