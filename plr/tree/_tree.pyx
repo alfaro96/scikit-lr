@@ -456,8 +456,7 @@ cdef class LeafNode(Node):
 cdef BOOL_t are_features_equal(DTYPE_t_2D X, SIZE_t_1D samples,
                                USEFUL_FEATURES *useful_features) nogil:
     """Check whether all the samples in X are equal
-    (only considering the useful features).
-    """
+    (only considering the useful features)."""
     # Initialize some values from the input arrays
     cdef INT64_t n_samples = samples.shape[0]
     cdef INT64_t n_features = X.shape[1]
@@ -469,21 +468,24 @@ cdef BOOL_t are_features_equal(DTYPE_t_2D X, SIZE_t_1D samples,
     cdef SIZE_t sample
     cdef SIZE_t feature
 
-    # The features are initialize equal
-    equal = True
-
     # IMPORTANT: BEFORE OBTAINING TEH USEFUL FEATURES, CLEAR THEM
     useful_features.clear()
 
     # Check whether all the features are equal,
     # erasing, at the same time the useless ones
     for feature in range(n_features):
+        # Initialize the feature as if all the samples were equal
+        equal = True
+        # Check whether all the samples for this feature are equal
         for sample in range(n_samples):
             equal = X[samples[0], feature] == X[samples[sample], feature]
             if not equal:
                 break
         if not equal:
             deref(useful_features).push_back(feature)
+
+    # All the features are equal if the size of the useful ones is zero
+    equal = useful_features.size() == 0
 
     # Return whether all the features are equal
     return equal
