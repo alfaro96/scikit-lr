@@ -1,27 +1,31 @@
-# Make it explicit that we favor the new container-based travis workers
+# Make it explicit that we favor the
+# new container-based travis workers
 language: python
 
-# Cache to speedup the build process
+# Cache to speed-up the build process
 cache:
   apt: true
   directories:
   - $HOME/.cache/pip
   - $HOME/.ccache
 
-# Set the Linux environment to Ubuntu Xenial 16.04
+# Run the CI in a Linux environment running Ubuntu Xenial 16.04.3
 dist: xenial
 
 # Enviromental variables
 env:
   global:
-    - TEST_DIR=/tmp/plr
+    - TEST_DIR=/tmp/sklr
 
-# Specify in the build matrix
+# Specify the build matrix
 matrix:
   include:
-    # Linux environment to test plr against NumPy and SciPy
-    # installed from their CI wheels in a virtualenv with
-    # the Python interpreter provided by Travis
+    # Linux environment to test scikit-lr against NumPy and
+    # SciPy installed from their CI wheels in a virtualenv
+    # with the Python interpreter provided by Travis.
+    # In fact, the testing is carried out with the latest
+    # versions of the packages since, during the development
+    # process, the minimum required versions will be employed
     -  python: 3.7
        env: COVERAGE="true"
 

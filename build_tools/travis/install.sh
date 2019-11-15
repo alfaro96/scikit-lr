@@ -3,12 +3,12 @@
 # This script is meant to be called by the "install" step defined in
 # .travis.yml. See https://docs.travis-ci.com/ for more details.
 
-# The behavior of the script is controlled by environment variabled defined
-# in the .travis.yml in the top level folder of the project.
+# The behavior of the script is controlled by environment variabled
+# defined in the .travis.yml in the top level folder of the project.
 
-# Travis clone alfaro96/plr into a local repository.
+# Travis clone alfaro96/scikit-lr into a local repository.
 
-# We use a cached directory with plr repositories (one for each
+# We use a cached directory with scikit-lr repositories (one for each
 # matrix entry) from which we pull from local Travis repository.
 # This allows us to keep build artefact for gcc + Cython, and gain time.
 
@@ -20,7 +20,7 @@ echo "List files from cached directories"
 echo "pip: "
 ls $HOME/.cache/pip
 
-# Install gcc-6 and g++-6, since it is needed by some extension modules of Cython
+# Install gcc-6 and g++-6, since it is needed by some extension modules
 
 # Add the repository
 sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
@@ -35,9 +35,10 @@ sudo apt-get install -y gcc-6 g++-6
 export CC=/usr/bin/gcc-6
 export CXX=/usr/bin/g++-6
 
-# Deactivate the Travis-provided virtual environment and
-# setup a Conda-based environment instead. If Travis has
-# language=generic, deactivate does not exist. `|| :` will pass.
+# Deactivate the Travis-provided virtual environment
+# and setup a Conda-based environment instead. If
+# Travis has language=generic, deactivate does
+# not exist and `|| :` will pass.
 deactivate || :
 
 # Install Conda
@@ -83,6 +84,6 @@ python --version
 python -c 'import numpy; print("NumPy {}".format(numpy.__version__))'
 python -c 'import scipy; print("SciPy {}".format(scipy.__version__))'
 
-# Build plr in the install.sh script to collapse the verbose
-# build output in the Travis output when it succeeds.
+# Build scikit-lr in the install.sh script to collapse the
+# verbose build output in the Travis output when it succeeds.
 python setup.py develop

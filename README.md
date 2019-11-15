@@ -1,18 +1,18 @@
-[![Travis](https://travis-ci.com/alfaro96/plr.svg?branch=master)](https://travis-ci.com/alfaro96/plr)
-[![Codecov](https://codecov.io/gh/alfaro96/plr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/plr)
-[![PyPI](https://badge.fury.io/py/plr.svg)](https://badge.fury.io/py/plr)
-![Python](https://img.shields.io/pypi/pyversions/plr.svg)
+[![Travis](https://travis-ci.com/alfaro96/scikit-lr.svg?branch=master)](https://travis-ci.com/alfaro96/scikit-lr)
+[![Codecov](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
+[![PyPI](https://badge.fury.io/py/scikit-lr.svg)](https://badge.fury.io/py/scikit-lr)
+![Python](https://img.shields.io/pypi/pyversions/scikit-lr.svg)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 
-# plr
+# scikit-lr
 
-`plr` is a Python module integrating Machine Learning algorithms for Label Ranking problems and distributed under MIT license.
+`scikit-lr` is a Python module integrating Machine Learning algorithms for Label Ranking problems and distributed under MIT license.
 
 ## Installation
 
 ### Dependencies
 
-`plr` requires:
+`scikit-lr` requires:
 
     * Python>=3.6
     * Numpy>=1.15.2
@@ -22,10 +22,10 @@
 
 ### User installation
 
-The easiest way to install `plr` is using `pip` package:
+The easiest way to install `scikit-lr` is using `pip` package:
 
 ```
-pip install -U plr
+pip install -U scikit-lr
 ```
 
 ## Development
@@ -37,21 +37,21 @@ Feel free to contribute to the package, but be sure that the standards are follo
 The latest sources can be obtained with the command:
 
 ```
-git clone https://github.com/alfaro96/plr.git
+git clone https://github.com/alfaro96/scikit-lr.git
 ```
 
 ### Setting up a development environment
 
-To setup the development environment, it is strongly recommended to use `docker` tools (see [https://github.com/alfaro96/docker-plr]) 
+To setup the development environment, it is strongly recommended to use `docker` tools (see [https://github.com/alfaro96/docker-scikit-lr]) 
 
 Alternatively, one can use `Python` virtual environments (see [https://docs.python.org/3/library/venv.html] for details).
 
 ### Testing
 
-After installation the test suite can be executed from outside the source directory, with (you will need to have `pytest>=4.0.1` installed):
+After installation the test suite can be executed from outside the source directory, with (you will need to have `pytest>=4.6.4` installed):
 
 ```
-pytest plr
+pytest sklr
 ```
 
 ## Authors
@@ -62,4 +62,4 @@ pytest plr
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/alfaro96/PLR/blob/master/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/alfaro96/scikit-lr/blob/master/LICENSE) file for details.

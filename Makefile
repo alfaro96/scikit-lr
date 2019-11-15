@@ -1,10 +1,10 @@
 # Makefile to simplify repetitive tasks
 
-# All clean the files, install the package
-# (in place) and run the tests (code and coverage)
+# All command clean useless files and directories, install
+# the package (in place) and run the tests (code and coverage)
 all: clean inplace test
 
-# Clean
+# Remove useless files and directories
 clean:
 	python setup.py clean
 
@@ -24,14 +24,14 @@ cython:
 
 # Testing
 
-# Code
+# Test the code
 test-code: inplace
-	pytest -l -v plr --durations=20
+	pytest -l -v sklr --durations=20
 
-# Coverage
+# Test the coverage
 test-coverage:
 	rm -rf coverage .coverage
-	pytest -l -v --cov=plr --cov-report=html:coverage
+	pytest -l -v --cov=sklr --cov-report=html:coverage
 
-# All
+# Test the code and the coverage
 test: test-code test-coverage
