@@ -32,6 +32,3 @@ set -x
 
 # Test scikit-lr
 $TEST_CMD sklr
-
-# Just for testing
-ls -al $GITHUB_WORKSPACE/
