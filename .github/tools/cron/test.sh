@@ -20,7 +20,7 @@ python -c 'import scipy; print("SciPy {}".format(scipy.__version__))'
 TEST_CMD="pytest --showlocals --durations=20 --pyargs"
 
 # Include the coverage in the test
-TEST_CMD="$TEST_CMD --cov=sklr --cov-report=xml"
+TEST_CMD="$TEST_CMD --cov=sklr"
 
 # Include deprecation warnings
 # and future warnings in the test
@@ -32,3 +32,6 @@ set -x
 
 # Test scikit-lr
 $TEST_CMD sklr
+
+# Just for testing
+ls -l $GITHUB_WORKSPACE/
