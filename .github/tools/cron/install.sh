@@ -16,11 +16,6 @@
 # exits with a non-zero status
 set -e
 
-# List files from the directories that have been cached
-echo "List files from cached directories"
-echo "pip: "
-ls $HOME/.cache/pip
-
 # Install gcc-6 and g++-6, since it
 # is needed by some extension modules
 
