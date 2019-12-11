@@ -35,21 +35,16 @@ jobs:
           python-version: 3.8
 
       # Checkout the master branch
-      # - name: Checkout master branch
-        # uses: actions/checkout@master
-      
-      # Just for testing, checkout
-      # the github_actions branch
-      - name: Checkout github_actions branch
-        uses: actions/checkout@github_actions
+      - name: Checkout master branch
+        uses: actions/checkout@v1
 
       # Install the dependencies
       - name: Install dependencies
-        run: source .github/tools/scheduled/install.sh
+        run: source ./.github/tools/scheduled/install.sh
 
       # Execute the tests
       - name: Execute tests
-        run: bash .github/tools/scheduled/tests.sh
+        run: bash ./.github/tools/scheduled/tests.sh
 
       # Upload the code coverage
       - name: Upload code coverage
