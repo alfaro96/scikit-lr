@@ -40,17 +40,17 @@ jobs:
 
       # Install the dependencies
       - name: Install dependencies
-        run: source ${{ GITHUB_WORKSPACE }}/.github/tools/cron/install.sh
+        run: source $GITHUB_WORKSPACE/.github/tools/cron/install.sh
 
       # Execute the tests
       - name: Execute tests
-        run: bash ${{ GITHUB_WORKSPACE }}/.github/tools/cron/test.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/cron/test.sh
 
       # Upload the code coverage
       - name: Upload code coverage
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ${{ GITHUB_WORKSPACE }}/.coverage.xml
-          yml: ${{ GITHUB_WORKSPACE }}/.codecov.yml
+          file: $GITHUB_WORKSPACE/.coverage.xml
+          yml: $GITHUB_WORKSPACE/.codecov.yml
           fail_ci_if_error: true
