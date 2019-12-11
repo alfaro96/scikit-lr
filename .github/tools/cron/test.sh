@@ -34,4 +34,4 @@ set -x
 $TEST_CMD sklr
 
 # Just for testing
-ls -l $GITHUB_WORKSPACE/
+ls -al $GITHUB_WORKSPACE/
