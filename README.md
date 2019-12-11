@@ -42,9 +42,9 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Setting up a development environment
 
-To setup the development environment, it is strongly recommended to use `docker` tools (see [https://github.com/alfaro96/docker-scikit-lr]) 
+To setup the development environment, it is strongly recommended to use `docker` tools (see https://github.com/alfaro96/docker-scikit-lr for details).
 
-Alternatively, one can use `Python` virtual environments (see [https://docs.python.org/3/library/venv.html] for details).
+Alternatively, one can use `Python` virtual environments (see https://docs.python.org/3/library/venv.html for details).
 
 ### Testing
 
