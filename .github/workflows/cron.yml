@@ -1,4 +1,4 @@
-name: CRON tests
+name: Daily wheels tests
 
 # This workflow is triggered every
 # day only on the master branch
@@ -35,8 +35,13 @@ jobs:
           python-version: 3.8
 
       # Checkout the master branch
-      - name: Checkout master branch
-        uses: actions/checkout@master
+      - # name: Checkout master branch
+        # uses: actions/checkout@master
+      
+      # Just for testing, checkout
+      # the github_actions branch
+      name: Checkout github_actions branch
+      uses: actions/checkout@github_actions
 
       # Install the dependencies
       - name: Install dependencies
