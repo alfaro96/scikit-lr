@@ -1,7 +1,6 @@
-[![Travis](https://travis-ci.com/alfaro96/scikit-lr.svg?branch=master)](https://travis-ci.com/alfaro96/scikit-lr)
 [![Codecov](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
-[![PyPI](https://badge.fury.io/py/scikit-lr.svg)](https://badge.fury.io/py/scikit-lr)
-![Python](https://img.shields.io/pypi/pyversions/scikit-lr.svg)
+[![PyPI](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
+[![Python](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 
 # scikit-lr
