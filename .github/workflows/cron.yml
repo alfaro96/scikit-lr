@@ -2,9 +2,13 @@ name: CRON tests
 
 # This workflow is triggered every
 # day only on the master branch
-on:
-  schedule:
-    - cron: "0 0 * * *"
+# on:
+  # schedule:
+    # - cron: "0 0 * * *"
+
+# Just for testing, let us execute
+# this workflow on pull request
+on: pull_request
 
 # Specify the build matrix
 jobs:
@@ -50,23 +54,3 @@ jobs:
           file: ./coverage.xml
           yml: ./codecov.yml
           fail_ci_if_error: true
-
-      # Send a Slack notification to the "github"
-      # channel with the result of the action
-      - name: Slack notification
-        uses: rtCamp/action-slack-notify@master
-        env:
-          SLACK_CHANNEL: github
-          SLACK_USERNAME: GitHub
-          SLACK_ICON: https://ca.slack-edge.com/TR5M1LV7W-UR7B40UTA-93640ef30a1a-48
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        # Manually set the color of the message
-        if: job.status == "success"
-        env:
-          SLACK_COLOR: "#2cbe4e"
-        if: job.status == "failure"
-        env:
-          SLACK_COLOR: "#cb2431"
-        if: job.status == "cancelled"
-        env:
-          SLACK_COLOR: "#ffc107"
