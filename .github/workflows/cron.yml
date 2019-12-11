@@ -20,14 +20,17 @@ jobs:
     runs-on: ubuntu-latest
     # Execute the following steps in the workflow
     steps:
+      # Checkout the master branch
+      - name: Checkout master branch
+        uses: actions/checkout@v1
+
       # Cache dependencies to speed-up the build process
       - name: Cache modules
         uses: actions/cache@v1
         with:
           path: $HOME/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          restore-keys: ${{ runner.os }}-pip-
 
       # Setup the Python 3.8 version
       - name: Setup Python 3.8
@@ -35,23 +38,19 @@ jobs:
         with:
           python-version: 3.8
 
-      # Checkout the master branch
-      - name: Checkout master branch
-        uses: actions/checkout@v1
-
       # Install the dependencies
       - name: Install dependencies
-        run: source ./.github/tools/cron/install.sh
+        run: source ${{ GITHUB_WORKSPACE }}/.github/tools/cron/install.sh
 
       # Execute the tests
       - name: Execute tests
-        run: bash ./.github/tools/cron/test.sh
+        run: bash ${{ GITHUB_WORKSPACE }}/.github/tools/cron/test.sh
 
       # Upload the code coverage
       - name: Upload code coverage
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          yml: ./codecov.yml
+          file: ${{ GITHUB_WORKSPACE }}/.coverage.xml
+          yml: ${{ GITHUB_WORKSPACE }}/.codecov.yml
           fail_ci_if_error: true
