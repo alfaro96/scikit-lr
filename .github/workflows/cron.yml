@@ -25,7 +25,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: $HOME/.cache/pip
-          key: ${{ runner.os }}-pip-{{hashFiles("**/requirements.txt")}}
+          key: ${{ runner.os }}-pip-${{hashFiles("**/requirements.txt")}}
           restore-keys: ${{ runner.os }}-pip-
 
       # Setup the Python 3.8 version
@@ -44,7 +44,7 @@ jobs:
 
       # Execute the tests
       - name: Execute tests
-        run: bash ./.github/tools/cron/tests.sh
+        run: bash ./.github/tools/cron/test.sh
 
       # Upload the code coverage
       - name: Upload code coverage
