@@ -1,0 +1,22 @@
+name: Continuous integration tests
+
+# This workflow is triggered on
+# each push and pull request
+on: [push, pull_request]
+
+jobs:
+  # Enviroments to test that scikit-lr
+  # can be built against minimum and latest
+  # versions of NumPy, SciPy and Cython
+  ci:
+    # Use the specified environment
+    runs-on: ${{ matrix.os }}
+    # Specify the build matrix
+    strategy:
+      # Use the minimum and the latest versions
+      # of the supported environments in Github
+      # Actions and, also, the Python versions
+      # supported by the scikit-lr package
+      matrix:
+        os: ["ubuntu-16.04", "ubuntu-latest", "macos-latest"]
+        python: ["3.5", "3.6", "3.7", "3.8"]
