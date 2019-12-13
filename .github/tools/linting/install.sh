@@ -12,7 +12,7 @@
 set -e
 
 # Update the repositories
-sudo apt-get update
+apt-get update
 
 # Install and update the dependencies
 
