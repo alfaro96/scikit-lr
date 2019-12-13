@@ -22,7 +22,7 @@ esac
 
 # These steps are only required
 # by the Linux environment
-if [[ $OSNAME == "linux" ]]; then
+if [ $OSNAME == "linux" ]; then
     # Install gcc-6 and g++-6, since it
     # is needed by some extension modules
     sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
@@ -31,7 +31,7 @@ if [[ $OSNAME == "linux" ]]; then
 fi
 
 # Set the default compilers
-if [[ $OSNAME == "linux"]]; then
+if [ $OSNAME == "linux"]; then
     export CC=/usr/bin/gcc-6
     export CXX=/usr/bin/g++-6
 fi
