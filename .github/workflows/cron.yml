@@ -16,15 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     # Execute the following steps in the workflow
     steps:
+      # Checkout the master branch
+      - name: Checkout master branch
+        uses: actions/checkout@v1
+
       # Setup the Python 3.8 version
       - name: Setup Python 3.8
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-
-      # Checkout the master branch
-      - name: Checkout master branch
-        uses: actions/checkout@v1
 
       # Install the dependencies
       - name: Install dependencies

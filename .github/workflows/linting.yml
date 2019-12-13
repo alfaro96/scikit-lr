@@ -1,0 +1,43 @@
+name: Linting tests
+
+# This workflow is triggered on
+# each push and pull request
+on: [push, pull_request]
+
+# Specify the build matrix
+jobs:
+  # Linux environment to test that PRs do not add
+  # obvious flake8 violations. It relies on two things:
+  #   - Find common ancestor between branch
+  #     and scikit-lr/scikit-lr remote.
+  #   - run flake8 --diff on the diff between
+  #     the branch and the common ancestor.
+  linting:
+    # Use the latest Ubuntu version
+    runs-on: ubuntu-latest
+    # Execute the following steps in the workflow
+    steps:
+      # Checkout the branch that issue the workflow
+      - name: Checkout $GITHUB_REF branch
+        uses: actions/checkout@v1
+
+      # Checkout the master branch
+      # to check the conflicts
+      - name: Checkout master branch
+        uses: actions/checkout@v1
+        with:
+          ref: master
+
+      # Setup the Python 3.8 version
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      # Install the dependencies
+      - name: Install dependencies
+        run: source $GITHUB_WORKSPACE/.github/tools/linting/install.sh
+
+      # Run the linting
+      - name: Run linting
+        run: bash $GITHUB_WORKSPACE/.github/tools/linting/test.sh

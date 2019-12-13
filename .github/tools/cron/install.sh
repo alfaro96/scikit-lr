@@ -1,16 +1,11 @@
 #!/bin/bash
 
-# This script is meant to be called by the
-# "install" step defined in scheduled.yml
+# This script is meant to be called by
+# the "install" step defined in cron.yml
 
 # The behavior of the script is controlled by
-# the named step defined in the scheduled.yml
-# in the folder .github/workflows of the project
-
-# We use a cached directory with scikit-lr
-# repositories from which we pull from local
-# GitHub Actions repository. This allows us
-# to keep build artefact for gcc + Cython
+# the named step defined in the cron.yml in
+# the folder .github/workflows of the project
 
 # Exit immediately if a command
 # exits with a non-zero status
