@@ -27,6 +27,10 @@ REMOTE_MASTER_REF="$REMOTE/master"
 echo "Last two commits in $LOCAL_BRANCH_REF"
 git --no-pager log -2 $LOCAL_BRANCH_REF
 
+# Make sure that $REMOTE_MASTER_REF is a valid reference
+echo "Fetching $REMOTE_MASTER_REF"
+git fetch $REMOTE master:refs/remotes/$REMOTE_MASTER_REF
+
 # Find the short hash of the latest commits
 LOCAL_BRANCH_SHORT_HASH=$(git rev-parse --short $LOCAL_BRANCH_REF)
 REMOTE_MASTER_SHORT_HASH=$(git rev-parse --short $REMOTE_MASTER_REF)

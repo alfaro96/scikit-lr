@@ -17,15 +17,8 @@ jobs:
     # Execute the following steps in the workflow
     steps:
       # Checkout the branch that issue the workflow
-      - name: Checkout $GITHUB_REF branch
+      - name: Checkout branch
         uses: actions/checkout@v1
-
-      # Checkout the master branch
-      # to check the conflicts
-      - name: Checkout master branch
-        uses: actions/checkout@v1
-        with:
-          ref: master
 
       # Setup the Python 3.8 version
       - name: Setup Python 3.8
