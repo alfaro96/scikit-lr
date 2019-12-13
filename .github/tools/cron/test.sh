@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script is meant to be called by
-# the "test" step defined in scheduled.yml
+# the "test" step defined in cron.yml
 
 # The behavior of the script is controlled by
 # the named step defined in the scheduled.yml
