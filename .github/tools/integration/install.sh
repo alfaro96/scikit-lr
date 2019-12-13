@@ -11,9 +11,18 @@
 # exits with a non-zero status
 set -e
 
+# Obtain the operating system
+case $(uname | tr "[:upper:]" "[:lower:]") in
+    linux*)
+        export OSNAME=linux
+    ;;
+    darwin*)
+        export OSNAME=osx
+esac
+
 # These steps are only required
 # by the Linux environment
-if [[ ${ matrix.os } == "ubuntu-latest" ]]; then
+if [[  == "linux" ]]; then
     # Install gcc-6 and g++-6, since it
     # is needed by some extension modules
     sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
@@ -22,7 +31,7 @@ if [[ ${ matrix.os } == "ubuntu-latest" ]]; then
 fi
 
 # Set the default compilers
-if [[ ${ matrix.os } == "ubuntu-latest"]]; then
+if [[ ${{ matrix.os }} == "linux"]]; then
     export CC=/usr/bin/gcc-6
     export CXX=/usr/bin/g++-6
 fi
