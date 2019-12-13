@@ -18,6 +18,7 @@ set -e
 sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
 
 # Update the repositories
+sudo rm -f /etc/apt/sources.list.d/dotnetdev.list /etc/apt/sources.list.d/microsoft-prod.list
 sudo apt-get update
 
 # Install the packages
