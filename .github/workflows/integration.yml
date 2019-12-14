@@ -1,0 +1,55 @@
+name: Continuous integration tests
+
+# This workflow is triggered on
+# each push and pull request
+on: [push, pull_request]
+
+jobs:
+  # Linux and MacOS environments to test that
+  # scikit-lr can be built against minimum
+  # required versions of NumPy, SciPy and Cython
+  integration:
+    # Use the specified environment in the build matrix
+    runs-on: ${{ matrix.os }}
+    # Specify the build matrix
+    strategy:
+      # Use the latest versions of the supported
+      # environments in Github Actions and, also,
+      # the Python versions supported by scikit-lr
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+        python: ["3.5", "3.6", "3.7"]
+    # Specify the enviroment variables
+    env:
+        NUMPY_VERSION: 1.15.2
+        SCIPY_VERSION: 1.1.0
+        CYTHON_VERSION: 0.29.0
+    # Execute the following steps in the workflow
+    steps:
+      # Checkout the branch that issue the workflow
+      - name: Checkout branch
+        uses: actions/checkout@v1
+
+      # Setup the Python version
+      # specified in the build matrix
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      # Install the dependencies
+      - name: Install dependencies
+        run: source $GITHUB_WORKSPACE/.github/tools/integration/install.sh
+
+      # Execute the tests
+      - name: Execute tests
+        run: bash $GITHUB_WORKSPACE/.github/tools/integration/test.sh
+
+      # Upload the code coverage
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          yml: ./.codecov.yml
+          fail_ci_if_error: true
