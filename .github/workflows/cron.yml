@@ -13,9 +13,6 @@ jobs:
   build:
     # Use the latest Ubuntu version
     runs-on: ubuntu-latest
-    # Specify the environment variables
-    env:
-      TEST_DIR: /tmp/sklr
     # Execute the following steps in the workflow
     steps:
       # Checkout the master branch
@@ -41,6 +38,6 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: $TEST_DIR/coverage.xml
-          yml: .codecov.yml
+          file: ./coverage.xml
+          yml: ./.codecov.yml
           fail_ci_if_error: true
