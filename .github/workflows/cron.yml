@@ -13,6 +13,9 @@ jobs:
   build:
     # Use the latest Ubuntu version
     runs-on: ubuntu-latest
+    # Specify the environment variables
+    env:
+      TEST_DIR: /tmp/sklr
     # Execute the following steps in the workflow
     steps:
       # Checkout the master branch
@@ -35,9 +38,4 @@ jobs:
 
       # Upload the code coverage
       - name: Upload code coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: .coverage
-          yml: .codecov.yml
-          fail_ci_if_error: true
+        run: bash $GITHUB_WORKSPACE/.github/tools/cron/upload.sh

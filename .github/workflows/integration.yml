@@ -24,6 +24,7 @@ jobs:
         NUMPY_VERSION: 1.15.2
         SCIPY_VERSION: 1.1.0
         CYTHON_VERSION: 0.29.0
+        TEST_DIR: /tmp/sklr
     # Execute the following steps in the workflow
     steps:
       # Checkout the branch that issue the workflow
@@ -47,9 +48,4 @@ jobs:
 
       # Upload the code coverage
       - name: Upload code coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: .coverage
-          yml: .codecov.yml
-          fail_ci_if_error: true
+        run: bash $GITHUB_WORKSPACE/.github/tools/cron/upload.sh
