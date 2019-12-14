@@ -1,3 +1,5 @@
+[![Integration](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20integration%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%Continuous+integration+tests%22)
+[![Linting](https://github.com/alfaro96/scikit-lr/workflows/Linting%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Linting+tests%22)
 [![CRON](https://github.com/alfaro96/scikit-lr/workflows/Daily%20wheels%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+wheels+tests%22)
 [![Codecov](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
 [![PyPI](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
