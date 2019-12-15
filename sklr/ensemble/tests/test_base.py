@@ -13,7 +13,6 @@ import numpy as np
 import pytest
 
 # Local application
-from sklr.datasets import load_iris
 from sklr.ensemble import BaggingLabelRanker
 from sklr.ensemble._base import _set_random_states
 from sklr.neighbors import KNeighborsLabelRanker

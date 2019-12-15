@@ -123,7 +123,7 @@ cdef void _extract(INT64_t_1D y, INT64_t *min_class, INT64_t *max_class,
     # Extract the minimum class, the maximum class and the unique
     # classes from the information provided by the input ranking
     for label in range(n_classes):
-        if y[label] != RANK_TYPE.RANDOM:
+        if y[label] != RANK_TYPE.RANDOM and y[label] != RANK_TYPE.TOP:
             # Update the minimum class if this class
             # is less than the previously found
             if y[label] < min_class[0]:

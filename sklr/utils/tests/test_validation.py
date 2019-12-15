@@ -10,7 +10,6 @@ import numpy as np
 import pytest
 
 # Local application
-from sklr.exceptions import NotFittedError
 from sklr.neighbors import KNeighborsLabelRanker
 from sklr.tree import DecisionTreeLabelRanker
 from sklr.utils import (

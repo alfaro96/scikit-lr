@@ -12,7 +12,6 @@ import pytest
 # Local application
 from sklr.neighbors import (
     DistanceMetric, KNeighborsLabelRanker, KNeighborsPartialLabelRanker)
-from sklr.neighbors import VALID_METRICS
 from sklr.utils import check_random_state
 
 

@@ -78,22 +78,26 @@ def test_aggregate_bpa_lia_mp2():
     # Initialize the BPALIAMP2Algorithm object
     bpa_lia_mp2 = RankAggregationAlgorithm.get_algorithm("bpa_lia_mp2")
 
-    # Initialize the rankings
-    # (complete and with randomly missed classes)
+    # Initialize the rankings (complete and
+    # with randomly and top-k missed classes)
     Y = np.array([[1, 2, 2], [2, 2, 1], [2, 1, 1]])
     Y_random = np.array([[1, 2, np.nan], [2, np.nan, 1], [2, 1, 1]])
+    Y_top = np.array([[1, 2, np.inf], [2, np.inf, 1], [np.inf, 1, 1]])
 
     # Initialize the true and predicted consensus rankings
-    # (for the complete rankings and for the
-    # rankings with randomly missed classes)
+    # (for the complete rankings and for the rankings
+    # with randomly and top-k missed classes)
     consensus_true = np.array([1, 1, 1])
     consensus_pred = bpa_lia_mp2.aggregate(Y)
     consensus_random_true = np.array([1, 1, 1])
     consensus_random_pred = bpa_lia_mp2.aggregate(Y_random)
+    consensus_top_true = np.array([1, 1, 1])
+    consensus_top_pred = bpa_lia_mp2.aggregate(Y_top)
 
     # Assert that the consensus rankings are correct
     np.testing.assert_array_equal(consensus_pred, consensus_true)
     np.testing.assert_array_equal(consensus_random_pred, consensus_random_true)
+    np.testing.assert_array_equal(consensus_top_true, consensus_top_pred)
 
     # Assert that a proper error is raised when trying
     # to compute the consensus ranking using the MLE process

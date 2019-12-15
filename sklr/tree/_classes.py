@@ -18,10 +18,8 @@ from numbers import Integral
 import numpy as np
 
 # Local application
-from . import _criterion, _splitter, _tree
-from ._criterion import Criterion
+from . import _criterion, _splitter
 from ._criterion import DISTANCES
-from ._splitter import Splitter
 from ._tree import Tree, TreeBuilder
 from ..base import (
     BaseEstimator, LabelRankerMixin, PartialLabelRankerMixin)

@@ -27,9 +27,9 @@ import numpy as np
 # Local application
 from ._base import BaseEnsemble
 from ._base import MAX_RAND_SEED
-from ..base import LabelRankerMixin, PartialLabelRankerMixin
+from ..base import LabelRankerMixin
 from ..metrics import kendall_distance as error_lr
-from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
+from ..tree import DecisionTreeLabelRanker
 from ..utils.validation import (
     check_is_fitted, check_random_state, has_fit_parameter)
 

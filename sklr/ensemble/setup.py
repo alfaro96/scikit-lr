@@ -6,7 +6,6 @@
 from os import name
 
 # Third party
-from numpy import get_include
 from numpy.distutils.core import setup
 from numpy.distutils.misc_util import Configuration
 

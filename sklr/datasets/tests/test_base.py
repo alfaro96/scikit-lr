@@ -5,9 +5,6 @@
 # Imports
 # =============================================================================
 
-# Standard
-from os.path import dirname
-
 # Third party
 import pytest
 

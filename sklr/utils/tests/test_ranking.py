@@ -13,7 +13,7 @@ import pytest
 # Local application
 from sklr.utils import (
     unique_rankings, check_label_ranking_targets,
-    check_partial_label_ranking_targets, type_of_targets,
+    check_partial_label_ranking_targets,
     is_ranking_without_ties, is_ranking_with_ties, rank_data)
 
 
@@ -27,8 +27,10 @@ from sklr.utils import (
 # extra memory overhead should not be an issue
 Y_lr = np.array([[1, 2, 3], [1, 2, 3], [3, 2, 1]])
 Y_random_lr = np.array([[1, np.nan, 2], [1, np.nan, 2], [1, 2, np.nan]])
+Y_top_lr = np.array([[1, 2, np.inf], [1, 2, np.inf], [np.inf, 2, 1]])
 Y_plr = np.array([[1, 2, 2], [1, 2, 2], [2, 2, 1]])
 Y_random_plr = np.array([[1, np.nan, 2], [1, np.nan, 2], [1, 1, np.nan]])
+Y_top_plr = np.array([[1, 2, np.inf], [1, 2, np.inf], [2, np.inf, 1]])
 Y_unknown = np.array([[1, 2, 4]])
 
 
@@ -77,6 +79,11 @@ def test_check_label_ranking_targets():
     check_label_ranking_targets(Y_lr)
     check_label_ranking_targets(Y_random_lr)
 
+    # Assert that an error is raised for Label
+    # Ranking targets with top-k missed classes
+    with pytest.raises(ValueError):
+        check_label_ranking_targets(Y_top_lr)
+
     # Assert that an error is raised when the
     # rankings are not Label Ranking targets
     # (either Partial Label Ranking targets
@@ -86,19 +93,23 @@ def test_check_label_ranking_targets():
     with pytest.raises(ValueError):
         check_label_ranking_targets(Y_random_plr)
     with pytest.raises(ValueError):
+        check_label_ranking_targets(Y_top_plr)
+    with pytest.raises(ValueError):
         check_label_ranking_targets(Y_unknown)
 
 
 @pytest.mark.check_partial_label_ranking_targets
 def test_check_partial_label_ranking_targets():
     """Test the check_partial_label_ranking_targets method."""
-    # Assert that an error is not raised when
-    # the rankings are Partial Label Ranking targets
-    # (even if some of the classes are randomly missed)
+    # Assert that an error is not raised when the
+    # rankings are Partial Label Ranking targets (even
+    # if some of the classes are randomly or top-k missed)
     check_partial_label_ranking_targets(Y_lr)
     check_partial_label_ranking_targets(Y_random_lr)
+    check_partial_label_ranking_targets(Y_top_lr)
     check_partial_label_ranking_targets(Y_plr)
     check_partial_label_ranking_targets(Y_random_plr)
+    check_partial_label_ranking_targets(Y_top_plr)
 
     # Assert that an error is raised when the
     # rankings are not Partial Label Ranking targets
@@ -116,9 +127,14 @@ def test_is_ranking_without_ties():
     assert not is_ranking_without_ties(Y_lr)
 
     # Assert that a ranking with ties is not a ranking without ties
-    # (use both types of Partial Label Ranking targets)
+    # (use all types of Partial Label Ranking targets)
     assert not is_ranking_without_ties(Y_plr[0])
     assert not is_ranking_without_ties(Y_random_plr[2])
+    assert not is_ranking_without_ties(Y_top_plr[0])
+
+    # Assert that a ranking with top-k missed
+    # classes is not a ranking without ties
+    assert not is_ranking_without_ties(Y_top_lr[0])
 
     # Assert that a ranking without ties is a ranking without ties
     # (use both types of Label Ranking targets)
@@ -134,14 +150,16 @@ def test_is_ranking_with_ties():
     assert not is_ranking_with_ties(Y_plr)
 
     # Assert that a ranking without ties is not a ranking with ties
-    # (use both types of Label Ranking targets)
+    # (use all types of Label Ranking targets)
     assert is_ranking_with_ties(Y_lr[0])
     assert is_ranking_with_ties(Y_random_lr[0])
+    assert is_ranking_with_ties(Y_top_lr[0])
 
     # Assert that a ranking with ties is a ranking with ties
-    # (use both types of Label Ranking targets)
+    # (use all types of Label Ranking targets)
     assert is_ranking_with_ties(Y_plr[0])
     assert is_ranking_with_ties(Y_random_plr[0])
+    assert is_ranking_with_ties(Y_top_plr[0])
 
 
 @pytest.mark.parametrize("method", ["ordinal", "dense", "foo"])
