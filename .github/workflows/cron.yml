@@ -1,0 +1,43 @@
+name: Daily wheels tests
+
+# This workflow is triggered every
+# day only on the master branch
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  # Linux environment to build and test
+  # scikit-lr against NumPy, SciPy and
+  # Cython installed from their CI wheels
+  build:
+    # Use the latest Ubuntu version
+    runs-on: ubuntu-latest
+    # Execute the following steps in the workflow
+    steps:
+      # Checkout the master branch
+      - name: Checkout master branch
+        uses: actions/checkout@v1
+
+      # Setup the Python 3.7 version
+      - name: Setup Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      # Install the dependencies
+      - name: Install dependencies
+        run: source $GITHUB_WORKSPACE/.github/tools/cron/install.sh
+
+      # Execute the tests
+      - name: Execute tests
+        run: bash $GITHUB_WORKSPACE/.github/tools/cron/test.sh
+
+      # Upload the code coverage
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          yml: ./.codecov.yml
+          fail_ci_if_error: true

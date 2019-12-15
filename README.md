@@ -1,7 +1,9 @@
-[![Travis](https://travis-ci.com/alfaro96/scikit-lr.svg?branch=master)](https://travis-ci.com/alfaro96/scikit-lr)
+[![Integration](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20integration%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+integration+tests%22)
+[![Linting](https://github.com/alfaro96/scikit-lr/workflows/Linting%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Linting+tests%22)
+[![CRON](https://github.com/alfaro96/scikit-lr/workflows/Daily%20wheels%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+wheels+tests%22)
 [![Codecov](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
-[![PyPI](https://badge.fury.io/py/scikit-lr.svg)](https://badge.fury.io/py/scikit-lr)
-![Python](https://img.shields.io/pypi/pyversions/scikit-lr.svg)
+[![PyPI](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
+[![Python](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 
 # scikit-lr
@@ -42,9 +44,9 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Setting up a development environment
 
-To setup the development environment, it is strongly recommended to use `docker` tools (see [https://github.com/alfaro96/docker-scikit-lr]) 
+To setup the development environment, it is strongly recommended to use `docker` tools (see https://github.com/alfaro96/docker-scikit-lr for details).
 
-Alternatively, one can use `Python` virtual environments (see [https://docs.python.org/3/library/venv.html] for details).
+Alternatively, one can use `Python` virtual environments (see https://docs.python.org/3/library/venv.html for details).
 
 ### Testing
 
