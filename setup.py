@@ -60,7 +60,6 @@ CLASSIFIERS = [
     "Programming Language :: C",
     "Programming Language :: C++",
     "Programming Language :: Cython",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -147,8 +146,6 @@ SETUPTOOLS_EXTRA_COMMANDS = {
 
 # Import setuptools if at least one of the extra commands have been required
 if SETUPTOOLS_EXTRA_COMMANDS.intersection(sys.argv):
-    # Import
-    import setuptools
     # Optimize
     EXTRA_SETUPTOOLS_ARGS = {
         "zip_false": False,
@@ -256,8 +253,8 @@ def setup_package():
     # configuration method must be imported
     else:
         # Check the Python version installed in the system
-        if sys.version_info < (3, 5):
-            raise RuntimeError("scikit-lr requires Python 3.5 or later. "
+        if sys.version_info < (3, 6):
+            raise RuntimeError("scikit-lr requires Python 3.6 or later. "
                                "The current Python version is {} "
                                "installed in {}."
                                .format(python_version(), sys.executable))

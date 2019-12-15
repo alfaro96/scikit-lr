@@ -16,7 +16,7 @@
 
 `scikit-lr` requires:
 
-    * Python>=3.5
+    * Python>=3.6
     * Numpy>=1.15.2
     * SciPy>=1.1.0
 

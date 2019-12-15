@@ -10,9 +10,9 @@ import numpy as np
 
 # Local application
 from ._base_fast import miss_classes
+from ._base_fast import STRATEGIES
 from ..base import BaseEstimator, TransformerMixin
-from ..utils.ranking import type_of_targets
-from ..utils.validation import check_array, check_is_fitted, check_random_state
+from ..utils.validation import check_is_fitted, check_random_state
 
 
 # =============================================================================
@@ -27,6 +27,11 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
 
     Hyperparameters
     ---------------
+    strategy : str, optional (default="random")
+        The strategy used to miss the classes from the rankings.
+        Supported criteria are "random" for randomly missed classes
+        and "top" to miss the classes outside of the "top-k".
+
     percentage : float, optional (default=0.0)
         The percentage of classes to miss.
 
@@ -36,6 +41,8 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         - If None, the random number generator is the RandomState instance
           used by `np.random`.
 
+        Only employed if ``strategy="random"``.
+
     Attributes
     ----------
     n_samples_ : int
@@ -44,27 +51,38 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
     n_classes_ : int
         The number of classes when ``fit`` is performed.
 
+    n_missed_classes_ : int
+        The number of classes to be missed (only available
+        if ``strategy="top"``).
+
     target_types_ : dict of str
         The target types of the rankings provided at ``fit``.
 
     random_state_: np.random.RandomState instance
-        The random state generator.
+        The random state generator (only available
+        if ``strategy="random"``).
 
     Examples
     --------
     >>> import numpy as np
     >>> from sklr.miss import SimpleMisser
     >>> Y = np.array([[1, 2, 3], [2, 3, 1], [3, 1, 2]])
-    >>> misser = SimpleMisser(percentage=0.6, random_state=0)
+    >>> misser = SimpleMisser("random", percentage=0.6, random_state=0)
     >>> misser.fit_transform(Y)
     array([[nan,  1.,  2.],
            [nan, nan,  1.],
            [nan,  1.,  2.]])
+    >>> misser = SimpleMisser("top", percentage=0.6, random_state=0)
+    >>> misser.fit_transform(Y)
+    array([[ 1.,  2., inf],
+           [ 2., inf,  1.],
+           [inf,  1.,  2.]])
     """
 
-    def __init__(self, percentage=0.0, random_state=None):
+    def __init__(self, strategy="random", percentage=0.0, random_state=None):
         """Constructor."""
         # Initialize the hyperparameters
+        self.strategy = strategy
         self.percentage = percentage
         self.random_state = random_state
 
@@ -90,6 +108,12 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         # Validate the training rankings
         Y = self._validate_training_rankings(Y)
 
+        # Check that the strategy is valid
+        if self.strategy not in {"random", "top"}:
+            raise ValueError("The strategy must be either "
+                             "'random' or 'top'. Got '{}'."
+                             .format(self.strategy))
+
         # Check that the percentage is value greater or
         # equal than zero and less or equal than one
         if self.percentage < 0.0 or self.percentage > 1.0:
@@ -100,7 +124,14 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
 
         # Obtain the random state, since it is needed
         # to miss the rankings in the transform method
-        self.random_state_ = check_random_state(self.random_state)
+        # when the selected strategy is "random"
+        if self.strategy == "random":
+            self.random_state_ = check_random_state(self.random_state)
+        # Otherwise, obtain the number of classes to be
+        # miss on each ranking for the "top" strategy
+        else:
+            self.n_missed_classes_ = int(self.n_classes_
+                                         * self.percentage)
 
         # Return the fitted transformer
         return self
@@ -146,10 +177,19 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         # rank the data when using the fast version of Cython
         Y = np.zeros(Y.shape, dtype=np.int64)
 
-        # Obtain the masks with the classes that have a probability
-        # of being missed less than the specified threshold
-        masks = (self.random_state_.rand(n_samples, n_classes) <
-                 self.percentage) | np.isnan(Yt)
+        # Obtain the masks
+        if self.strategy == "random":
+            # For the random strategy, miss the classes
+            # that have a probability of being missed
+            # less than the specified threshold
+            masks = (self.random_state_.rand(n_samples, n_classes) <
+                     self.percentage) | np.isnan(Yt)
+        else:
+            # For the top-k strategy, miss the classes that are outside
+            # of top-k (in fact, argsort the rankings to properly
+            # miss the classes when some of them are tied)
+            masks = np.argsort(np.argsort(Yt)) + 1 > (self.n_classes_
+                                                      - self.n_missed_classes_)
 
         # Change the data type of the masks to ensure that
         # they can be managed by Cython extension module
@@ -158,7 +198,9 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
 
         # Miss the classes using the
         # optimized version of Cython
-        miss_classes(Y, Yt, masks)
+        miss_classes(
+            Y, Yt, masks,
+            strategy=STRATEGIES[self.strategy])
 
         # Return the transformed rankings
         return Yt

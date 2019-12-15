@@ -11,9 +11,8 @@ import pytest
 
 # Local application
 from sklr.datasets import load_iris
-from sklr.ensemble import AdaBoostLabelRanker, RandomForestLabelRanker
+from sklr.ensemble import AdaBoostLabelRanker
 from sklr.neighbors import KNeighborsLabelRanker
-from sklr.tree import DecisionTreeLabelRanker
 from sklr.utils import check_random_state
 
 

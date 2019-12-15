@@ -6,7 +6,6 @@
 # =============================================================================
 
 # Standard
-from abc import abstractmethod
 from collections import defaultdict
 from inspect import signature
 
@@ -21,9 +20,7 @@ from .utils.ranking import (
     check_label_ranking_targets, check_partial_label_ranking_targets,
     type_of_targets)
 from .utils.validation import (
-    check_array, check_consistent_length, check_is_fitted,
-    check_X_Y, _check_sample_weight,
-    has_fit_parameter)
+    check_array, check_X_Y, _check_sample_weight, has_fit_parameter)
 
 
 # =============================================================================

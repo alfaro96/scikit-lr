@@ -231,7 +231,7 @@ def test_bagging_sample_weight_unsupported_but_passed(BaseEstimator,
     # For the sake of coverage, test that no error is raised
     # when sample weights are used with supported estimator
     model = BaggingRanker(n_estimators=10, random_state=seed)
-    clf = model.fit(X_train, Y_train, sample_weight)
+    model.fit(X_train, Y_train, sample_weight)
 
 
 @pytest.mark.max_samples_consistency

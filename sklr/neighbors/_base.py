@@ -9,13 +9,12 @@
 from abc import ABC, abstractmethod
 from functools import partial
 from numbers import Integral
-from warnings import warn
 
 # Third party
 import numpy as np
 
 # Local application
-from ..base import BaseEstimator, is_label_ranker
+from ..base import BaseEstimator
 from ._dist_metrics import DistanceMetric
 from ._dist_metrics import METRIC_MAPPING
 from ..utils.validation import check_array, check_is_fitted

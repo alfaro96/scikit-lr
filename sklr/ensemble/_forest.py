@@ -42,7 +42,6 @@ from ._base import BaseEnsemble
 from ._base import MAX_RAND_SEED
 from ..base import LabelRankerMixin, PartialLabelRankerMixin
 from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
-from ..utils.validation import check_random_state
 from ..utils.validation import check_is_fitted, check_random_state
 
 
