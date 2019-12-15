@@ -146,6 +146,8 @@ SETUPTOOLS_EXTRA_COMMANDS = {
 
 # Import setuptools if at least one of the extra commands have been required
 if SETUPTOOLS_EXTRA_COMMANDS.intersection(sys.argv):
+    # Import
+    import setuptools
     # Optimize
     EXTRA_SETUPTOOLS_ARGS = {
         "zip_false": False,
