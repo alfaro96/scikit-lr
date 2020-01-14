@@ -182,8 +182,7 @@ def type_of_targets(Y):
     # executed, so that optimized Cython versions are employed
 
     # Label Ranking
-    if (are_label_ranking_targets(Y)
-            and not np.any(Y == _RANK_TYPES["top"])):
+    if are_label_ranking_targets(Y):
         target_types.add("label_ranking")
     # Partial Label Ranking
     if are_partial_label_ranking_targets(Y):
@@ -233,8 +232,7 @@ def is_ranking_without_ties(y):
         # Transform the ranking to properly manage it in Cython
         y = _transform_rankings(y[None, :])[0]
         # Check if it is a ranking without ties using the fast version
-        out = (is_ranking_without_ties_fast(y) and
-               not np.any(y == _RANK_TYPES["top"]))
+        out = is_ranking_without_ties_fast(y)
 
     # Return whether the array is a ranking without ties
     return out

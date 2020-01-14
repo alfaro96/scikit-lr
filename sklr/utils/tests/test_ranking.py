@@ -28,9 +28,9 @@ from sklr.utils import (
 Y_lr = np.array([[1, 2, 3], [1, 2, 3], [3, 2, 1]])
 Y_random_lr = np.array([[1, np.nan, 2], [1, np.nan, 2], [1, 2, np.nan]])
 Y_top_lr = np.array([[1, 2, np.inf], [1, 2, np.inf], [np.inf, 2, 1]])
-Y_plr = np.array([[1, 2, 2], [1, 2, 2], [2, 2, 1]])
+Y_plr = np.array([[1, 1, 2], [1, 2, 2], [1, 1, 2]])
 Y_random_plr = np.array([[1, np.nan, 2], [1, np.nan, 2], [1, 1, np.nan]])
-Y_top_plr = np.array([[1, 2, np.inf], [1, 2, np.inf], [2, np.inf, 1]])
+Y_top_plr = np.array([[1, 1, np.inf], [1, 2, np.inf], [1, 1, np.inf]])
 Y_unknown = np.array([[1, 2, 4]])
 
 
@@ -45,15 +45,19 @@ def test_unique_rankings():
     # from the Label Ranking and Partial Label Ranking ones
     Y_unique_lr_true = np.array([[1, 2, 3], [3, 2, 1]])
     Y_unique_random_lr_true = np.array([[1, 2, np.nan], [1, np.nan, 2]])
-    Y_unique_plr_true = np.array([[1, 2, 2], [2, 2, 1]])
+    Y_unique_top_lr_true = np.array([[1, 2, np.inf], [np.inf, 2, 1]])
+    Y_unique_plr_true = np.array([[1, 1, 2], [1, 2, 2]])
     Y_unique_random_plr_true = np.array([[1, 1, np.nan], [1, np.nan, 2]])
+    Y_unique_top_plr_true = np.array([[1, 1, np.inf], [1, 2, np.inf]])
 
     # Compute the unique rankings that are
     # obtained with the corresponding method
     Y_unique_lr_pred = unique_rankings(Y_lr)
     Y_unique_random_lr_pred = unique_rankings(Y_random_lr)
+    Y_unique_top_lr_pred = unique_rankings(Y_top_lr)
     Y_unique_plr_pred = unique_rankings(Y_plr)
     Y_unique_random_plr_pred = unique_rankings(Y_random_plr)
+    Y_unique_top_plr_pred = unique_rankings(Y_top_plr)
 
     # Assert that the unique rankings are properly obtained
     np.testing.assert_array_equal(
@@ -61,9 +65,13 @@ def test_unique_rankings():
     np.testing.assert_array_equal(
         Y_unique_random_lr_pred, Y_unique_random_lr_true)
     np.testing.assert_array_equal(
+        Y_unique_top_lr_pred, Y_unique_top_lr_true)
+    np.testing.assert_array_equal(
         Y_unique_plr_pred, Y_unique_plr_true)
     np.testing.assert_array_equal(
         Y_unique_random_plr_pred, Y_unique_random_plr_true)
+    np.testing.assert_array_equal(
+        Y_unique_top_plr_pred, Y_unique_top_plr_true)
 
     # Assert that an error is raised for "unknown" rankings
     with pytest.raises(ValueError):
@@ -78,11 +86,7 @@ def test_check_label_ranking_targets():
     # (even if some of the classes are randomly missed)
     check_label_ranking_targets(Y_lr)
     check_label_ranking_targets(Y_random_lr)
-
-    # Assert that an error is raised for Label
-    # Ranking targets with top-k missed classes
-    with pytest.raises(ValueError):
-        check_label_ranking_targets(Y_top_lr)
+    check_label_ranking_targets(Y_top_lr)
 
     # Assert that an error is raised when the
     # rankings are not Label Ranking targets
@@ -132,14 +136,11 @@ def test_is_ranking_without_ties():
     assert not is_ranking_without_ties(Y_random_plr[2])
     assert not is_ranking_without_ties(Y_top_plr[0])
 
-    # Assert that a ranking with top-k missed
-    # classes is not a ranking without ties
-    assert not is_ranking_without_ties(Y_top_lr[0])
-
     # Assert that a ranking without ties is a ranking without ties
     # (use both types of Label Ranking targets)
     assert is_ranking_without_ties(Y_lr[0])
     assert is_ranking_without_ties(Y_random_lr[0])
+    assert is_ranking_without_ties(Y_top_lr[0])
 
 
 @pytest.mark.is_ranking_with_ties

@@ -35,25 +35,25 @@ ctypedef vector[BUCKET_t] BUCKETS_t
 # =============================================================================
 
 # =============================================================================
-# Rank aggregation algorithm
+# Rank Aggregation algorithm
 # =============================================================================
 cdef class RankAggregationAlgorithm:
     """Provides a uniform interface to fast Rank Aggregation algorithms."""
 
-    # The following hyperparameter and attributes are required for a few
-    # of the subclasses. We must define it here so that Cython's limited
-    # polymorphism will work. Because we do not expect to instantiate a
+    # The following hyperparameters and attributes are required for a few
+    # of the subclasses. They must be defined here so that Cython's limited
+    # polymorphism will work. Because it is not expected to instantiate a
     # lot of these objects (just once), the extra memory overhead
     # of this setup should not be an issue.
 
     # Hyperparameters
-    cdef DTYPE_t beta  # Beta
+    cdef DTYPE_t beta
 
     # Attributes
-    cdef CountBuilder count_builder  # Count builder
-    cdef PairOrderMatrixBuilder pair_order_matrix_builder  # Pair order matrix builder  # nopep8
-    cdef UtopianMatrixBuilder utopian_matrix_builder  # Utopian matrix builder
-    cdef DANIIndexesBuilder dani_indexes_builder   # DANI indexes builder
+    cdef CountBuilder count_builder
+    cdef PairOrderMatrixBuilder pair_order_matrix_builder
+    cdef UtopianMatrixBuilder utopian_matrix_builder
+    cdef DANIIndexesBuilder dani_indexes_builder
 
     # Methods
     cdef void init(self, INT64_t n_classes)
@@ -82,7 +82,6 @@ cdef class RankAggregationAlgorithm:
     cdef void aggregate_mle(self, INT64_t_2D Y, DTYPE_t_1D sample_weight,
                             INT64_t_1D consensus,
                             DTYPE_t_1D count=*,
-                            DTYPE_t_3D precedences_matrix=*,
                             BOOL_t replace=*) nogil
 
 
@@ -93,7 +92,7 @@ cdef class CountBuilder:
     """Count builder."""
 
     # Attributes
-    cdef DTYPE_t_1D count  # Count
+    cdef DTYPE_t_1D count
 
     # Methods
     cdef void init(self, INT64_t n_classes)
@@ -114,26 +113,25 @@ cdef class PairOrderMatrixBuilder:
     """Pair order matrix builder."""
 
     # Attributes
-    cdef DTYPE_t_3D precedences_matrix  # Precedences matrix
-    cdef DTYPE_t_2D pair_order_matrix  # Pair order matrix
+    cdef DTYPE_t_3D precedences_matrix
+    cdef DTYPE_t_2D pair_order_matrix
 
     # Methods
     cdef void init(self, INT64_t n_classes)
 
-    cdef void reset(self, DTYPE_t_3D precedences_matrix=*) nogil
+    cdef void reset(self, DTYPE_t_3D precedences_matrix=*,
+                    DTYPE_t_2D pair_order_matrix=*) nogil
 
-    cdef void update_precedences_matrix(
-            self, INT64_t_1D y, DTYPE_t weight,
-            DTYPE_t_3D precedences_matrix=*) nogil
+    cdef void update_precedences_matrix(self, INT64_t_1D y, DTYPE_t weight,
+                                        DTYPE_t_3D precedences_matrix=*) nogil
 
-    cdef void build_precedences_matrix(
-            self, INT64_t_2D Y,
-            DTYPE_t_1D sample_weight,
-            DTYPE_t_3D precedences_matrix=*) nogil
+    cdef void build_precedences_matrix(self, INT64_t_2D Y,
+                                       DTYPE_t_1D sample_weight,
+                                       DTYPE_t_3D precedences_matrix=*) nogil
 
-    cdef void build_pair_order_matrix(
-            self,
-            DTYPE_t_3D precedences_matrix=*) nogil
+    cdef void build_pair_order_matrix(self,
+                                      DTYPE_t_3D precedences_matrix=*,
+                                      DTYPE_t_2D pair_order_matrix=*) nogil
 
 
 # =============================================================================
@@ -143,14 +141,15 @@ cdef class UtopianMatrixBuilder:
     """Utopian matrix builder."""
 
     # Attributes
-    cdef DTYPE_t_2D utopian_matrix  # Utopian matrix
+    cdef DTYPE_t_2D utopian_matrix
 
     # Methods
     cdef void init(self, INT64_t n_classes)
 
-    cdef void reset(self) nogil
+    cdef void reset(self, DTYPE_t_2D utopian_matrix=*) nogil
 
-    cdef void build(self, DTYPE_t_2D pair_order_matrix) nogil
+    cdef void build(self, DTYPE_t_2D pair_order_matrix,
+                    DTYPE_t_2D utopian_matrix=*) nogil
 
 
 # =============================================================================
@@ -160,12 +159,13 @@ cdef class DANIIndexesBuilder:
     """DANI indexes builder."""
 
     # Attributes
-    cdef DTYPE_t_1D dani_indexes  # DANI indexes
+    cdef DTYPE_t_1D dani_indexes
 
     # Methods
     cdef void init(self, INT64_t n_classes)
 
-    cdef void reset(self) nogil
+    cdef void reset(self, DTYPE_t_1D dani_indexes=*) nogil
 
     cdef void build(self, DTYPE_t_2D pair_order_matrix,
-                    DTYPE_t_2D utopian_matrix) nogil
+                    DTYPE_t_2D utopian_matrix,
+                    DTYPE_t_1D dani_indexes=*) nogil
