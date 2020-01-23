@@ -18,7 +18,7 @@ sudo apt-get update
 # Install and update the dependencies
 
 # Pip
-echo "Upgrade pip"
+echo "Upgrading pip"
 pip install --upgrade pip
 
 # Flake8

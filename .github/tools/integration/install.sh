@@ -41,7 +41,7 @@ fi
 # Install and update the dependencies
 
 # Pip and Setuptools
-echo "Upgrade pip and setuptools"
+echo "Upgrading pip and setuptools"
 pip install --upgrade pip setuptools
 
 # NumPy, SciPy and Cython
