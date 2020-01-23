@@ -17,8 +17,8 @@
 `scikit-lr` requires:
 
     * Python>=3.6
-    * Numpy>=1.15.2
-    * SciPy>=1.1.0
+    * Numpy>=1.17.3
+    * SciPy>=1.3.2
 
 `Linux` or `Mac OS X` operating systems. `Windows` is not currently supported.
 

@@ -20,7 +20,7 @@ DEFAULT_ROOT = "sklr"
 
 # Minimum required version of Cython
 # to cythonize the extension modules
-CYTHON_MIN_VERSION = "0.29"
+CYTHON_MIN_VERSION = "0.29.14"
 
 
 # =============================================================================
