@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# This script is meant to be called by
-# the "install" step defined in cron.yml
+# This script is meant to be called by the
+# "Install dependencies" step defined in cron.yml
 
-# The behavior of the script is controlled by
+# The behaviour of the script is controlled by
 # the named step defined in the cron.yml in
 # the folder .github/workflows of the project
 
@@ -30,10 +30,10 @@ export CXX=/usr/bin/g++-6
 # Install and update the dependencies
 
 # Pip and Setuptools
-echo "Upgrade pip and setuptools"
+echo "Upgrading pip and setuptools"
 pip install --upgrade pip setuptools
 
-# NumPy, Scipy and Cython
+# NumPy, SciPy and Cython
 echo "Installing numpy, scipy and cython"
 dev_url=https://7933911d6844c6c53a7d-47bd50c35cd79bd838daf386af554a83.ssl.cf2.rackcdn.com
 pip install --pre --upgrade --timeout=60 -f $dev_url numpy scipy cython

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# This script is meant to be called by
-# the "test" step defined in linting.yml
+# This script is meant to be called by the
+# "Run linting" step defined in linting.yml
 
-# The behavior of the script is controlled by
+# The behaviour of the script is controlled by
 # the named step defined in the linting.yml
 # in the folder .github/workflows of the project
 
@@ -11,7 +11,8 @@
 # exits with a non-zero status
 set -e
 
-# Define the repository and URL of the project
+# Define the name of the repository
+# and the URL of the project
 PROJECT=alfaro96/scikit-lr
 PROJECT_URL=https://github.com/$PROJECT.git
 
