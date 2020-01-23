@@ -33,7 +33,7 @@ if [ $OSNAME == "linux" ]; then
 fi
 
 # Set the default compilers
-if [ $OSNAME == "linux"]; then
+if [ $OSNAME == "linux" ]; then
     export CC=/usr/bin/gcc-6
     export CXX=/usr/bin/g++-6
 fi
