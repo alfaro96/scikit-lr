@@ -62,13 +62,14 @@ CLASSIFIERS = [
     "Programming Language :: Cython",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering :: Artificial Intelligence"
 ]
 
 # Minimum version of the required packages
-NUMPY_MIN_VERSION = "1.15.2"
-SCIPY_MIN_VERSION = "1.1.0"
+NUMPY_MIN_VERSION = "1.17.3"
+SCIPY_MIN_VERSION = "1.3.2"
 INSTALL_REQUIRES = [
     "numpy>={}".format(NUMPY_MIN_VERSION),
     "scipy>={}".format(SCIPY_MIN_VERSION),
