@@ -21,11 +21,12 @@ case $(uname | tr "[:upper:]" "[:lower:]") in
         export OSNAME=osx
 esac
 
-# These steps are only required
-# by the Linux environment
+# The following steps are only
+# required by Linux environments
+
+# Install gcc-6 and g++-6, since it
+# is needed by some extension modules
 if [ $OSNAME == "linux" ]; then
-    # Install gcc-6 and g++-6, since it
-    # is needed by some extension modules
     sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
     sudo apt-get update
     sudo apt-get install -y gcc-6 g++-6
