@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# This script is meant to be called by the
-# "install" step defined in linting.yml
+# This script is meant to be called
+# by the "Install dependencies"
+# step defined in linting.yml
 
-# The behavior of the script is controlled by
+# The behaviour of the script is controlled by
 # the named step defined in the linting.yml
 # in the folder .github/workflows of the project
 
@@ -17,7 +18,7 @@ sudo apt-get update
 # Install and update the dependencies
 
 # Pip
-echo "Upgrade pip"
+echo "Upgrading pip"
 pip install --upgrade pip
 
 # Flake8

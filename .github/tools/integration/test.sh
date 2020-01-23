@@ -1,17 +1,18 @@
 #!/bin/bash
 
-# This script is meant to be called by the
-# "test" step defined in integration.yml
+# This script is meant to be called
+# by the "Execute tests" step
+# defined in integration.yml
 
-# The behavior of the script is controlled by
-# the named step defined in the scheduled.yml
+# The behaviour of the script is controlled by
+# the named step defined in the integration.yml
 # in the folder .github/workflows of the project
 
 # Exit immediately if a command
 # exits with a non-zero status
 set -e
 
-# Print the Python, NumPy and Scipy versions
+# Print the Python, NumPy and SciPy versions
 python --version
 python -c 'import numpy; print("NumPy {}".format(numpy.__version__))'
 python -c 'import scipy; print("SciPy {}".format(scipy.__version__))'
