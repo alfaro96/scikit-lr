@@ -42,7 +42,7 @@ def load_data(module_path, problem, data_filename, return_X_Y):
 
     data_filename : str
         The name of the ``.csv`` file to be loaded from
-        ``module_path/data/problem/data_filename.csv``.
+        ``module_path/data/problem/data_filename``.
         For example, "``iris.csv``".
 
     return_X_Y : bool
@@ -53,11 +53,11 @@ def load_data(module_path, problem, data_filename, return_X_Y):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -127,11 +127,11 @@ def load_authorship(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -197,11 +197,11 @@ def load_bodyfat(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -271,11 +271,11 @@ def load_blocks(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -337,11 +337,11 @@ def load_breast(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -403,11 +403,11 @@ def load_calhousing(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -464,11 +464,11 @@ def load_cold(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -521,11 +521,11 @@ def load_cpu(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -584,11 +584,11 @@ def load_diau(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -641,11 +641,11 @@ def load_dtt(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -698,11 +698,11 @@ def load_ecoli(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -761,11 +761,11 @@ def load_elevators(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -824,11 +824,11 @@ def load_fried(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -886,11 +886,11 @@ def load_glass(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -957,11 +957,11 @@ def load_heat(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1014,11 +1014,11 @@ def load_housing(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1077,11 +1077,11 @@ def load_iris(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1148,11 +1148,11 @@ def load_letter(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1213,11 +1213,11 @@ def load_libras(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1278,11 +1278,11 @@ def load_pendigits(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1352,11 +1352,11 @@ def load_satimage(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1417,11 +1417,11 @@ def load_segment(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1491,11 +1491,11 @@ def load_shuttle(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1555,11 +1555,11 @@ def load_spo(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1612,11 +1612,11 @@ def load_stock(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1674,11 +1674,11 @@ def load_vehicle(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1749,11 +1749,11 @@ def load_vowel(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1826,11 +1826,11 @@ def load_wine(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1902,11 +1902,11 @@ def load_wisconsin(problem="label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
@@ -1984,11 +1984,11 @@ def load_yeast(problem="partial_label_ranking", return_X_Y=False):
     -------
     data : object
         Dictionary-like object, the interesting attributes are
-        "``data``", the data to learn, "``rankings``", the target
+        "``data``", the data to learn, "``ranks``", the target
         rankings, "``feature_names``", the meaning of the features
         and "``class_names``", the meaning of the classes.
 
-    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+    (data, ranks) : tuple of ndarray of shape (n_samples, n_features) \
             and (n_samples, n_classes)
         A 2-D array with each row representing one sample and each
         column representing the features of a given sample and a
