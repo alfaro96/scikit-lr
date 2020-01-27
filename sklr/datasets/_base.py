@@ -1949,7 +1949,7 @@ def load_wisconsin(problem="label_ranking", return_X_Y=False):
 
     >>> from sklr.datasets import load_wisconsin
     >>> data = load_wisconsin(problem="label_ranking")
-    >>> data.ranks
+    >>> data.ranks[[10, 25, 50]]
     array([[ 4, 15, 13,  7,  5,  9, 14,  8, 10, 11,  1, 12,  6,  2,  3, 16],
            [11, 14, 16, 15, 13,  4, 10,  5,  6,  9,  1,  3, 12,  7,  2,  8],
            [ 1,  3,  9, 13,  5, 16,  6, 11, 15,  8,  2,  4, 10, 14,  7, 12]])
