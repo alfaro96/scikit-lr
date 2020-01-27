@@ -116,13 +116,6 @@ def test_set_hyperparams():
 
 def test_score():
     """Test the score method."""
-    # Initialize the iris dataset, which will be employed
-    # for testing the score method for the Label Ranking
-    # problem and the Partial Label Ranking problem, with
-    # and without sample weighting to ensure that the
-    # score without sample weighting is different than with it
-    iris = load_iris()
-
     # Initialize estimators for the Label Ranking problem
     # and the Partial Label Ranking problem, that is, a
     # Label Ranker and a Partial Label Ranker
@@ -135,8 +128,8 @@ def test_score():
     # iris dataset for the Label Ranking problem
     # and the Partial Label Ranking problem
     datasets = [
-        (iris.data_lr, iris.ranks_lr),
-        (iris.data_plr, iris.ranks_plr)
+        load_iris(problem="label_ranking", return_X_Y=True),
+        load_iris(problem="partial_label_ranking", return_X_Y=True)
     ]
 
     # Check that the score obtained without

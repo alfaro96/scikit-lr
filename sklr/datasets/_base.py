@@ -6,7 +6,8 @@
 # =====================================================================
 
 # Standard
-from os.path import join, dirname, isfile
+from csv import reader
+from os.path import join, dirname
 
 # Third party
 import numpy as np
@@ -16,99 +17,89 @@ from ..utils.bunch import Bunch
 
 
 # =====================================================================
+# Constants
+# =====================================================================
+
+# Set the path to the module
+# (directory of this file)
+MODULE_PATH = dirname(__file__)
+
+
+# =====================================================================
 # Methods
 # =====================================================================
 
-def load_data(module_path, data_filename):
-    """Loads data from module_path/data/problem/data_type/data_filename.
+def load_data(module_path, problem, data_filename, return_X_Y):
+    """Loads data from ``module_path/data/problem/data_filename``.
 
     Parameters
     ----------
     module_path : str
         The module path.
 
+    problem : {"label_ranking", "partial_label_ranking"}
+        The problem for which the data is to be loaded.
+
     data_filename : str
-        The name csv file to be loaded from
-        module_path/data/problem/data_type/data_filename.csv.
-        For example, "iris.csv".
+        The name of the ``.csv`` file to be loaded from
+        ``module_path/data/problem/data_filename.csv``.
+        For example, "``iris.csv``".
+
+    return_X_Y : bool
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
 
     Returns
     -------
-    data_lr : {None, np.ndarray} of shape (n_samples, n_features)
-        A 2-D array with each row representing one Label Ranking sample
-        and each column representing the features of a given sample.
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
 
-    ranks_lr : {None, np.ndarray} of shape (n_samples, n_classes)
-        A 2-D array with each row representing one Label Ranking target
-        and each column representing the classes of a given target.
-
-    data_plr : {None, np.ndarray} of shape (n_samples, n_features)
-        A 2-D array with each row representing one Partial Label Ranking
-        sample and each column representing the features of a given sample.
-
-    ranks_plr : {None, np.ndarray} of shape (n_samples, n_classes)
-        A 2-D array with each row representing one Partial Label Ranking
-        target and each column representing the classes of a given target.
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
     """
-    # Initialize the data and the rankings to None values
-    (data_lr, ranks_lr, data_plr, ranks_plr) = (None, None, None, None)
+    # Initialize the path to the .csv file to be loaded
+    path = join(module_path, "data", problem, data_filename)
 
-    # Obtain the path to the data and the rankings
-    # for Label Ranking and Partial Label Ranking
-    data_filename_lr = join(
-        module_path,
-        "data", "label_ranking", "ranks",
-        data_filename)
+    # Open the .csv file with the data
+    with open(path) as csv_file:
+        # Initialize the reader of the
+        # file and obtain the first line
+        data_file = reader(csv_file)
+        first_line = next(data_file)
+        # Extract, from the first line, the number of samples,
+        # the number of features, the number of classes, the
+        # names of the features and the names of the classes
+        n_samples = int(first_line[0])
+        n_features = int(first_line[1])
+        n_classes = int(first_line[2])
+        feature_names = first_line[3:-n_classes]
+        class_names = first_line[-n_classes:]
+        # Initialize empty arrays for the data and the rankings
+        data = np.zeros((n_samples, n_features), dtype=np.float64)
+        ranks = np.zeros((n_samples, n_classes), dtype=np.int64)
+        # Read the remaining lines containing the data and the rankings
+        for (i, line) in enumerate(data_file):
+            data[i] = np.array(line[:n_features], dtype=np.float64)
+            ranks[i] = np.array(line[-n_classes:], dtype=np.int64)
 
-    data_filename_plr = join(
-        module_path,
-        "data", "partial_label_ranking", "ranks",
-        data_filename)
-
-    # Check whether the data and the rankings exists
-    # for Label Ranking and Partial Label Ranking
-    exists_ranks_lr = isfile(data_filename_lr)
-    exists_ranks_plr = isfile(data_filename_plr)
-
-    # Gather the header of the file with the
-    # name of the attributes and the classes
-    if exists_ranks_lr:
-        header = list(np.genfromtxt(
-            data_filename_lr,
-            delimiter=",", max_rows=1, dtype=np.str))
+    # Return either the data and the rankings
+    # or an object also containing the names
+    # of the features and the names of the classes
+    if return_X_Y:
+        return (data, ranks)
     else:
-        header = list(np.genfromtxt(
-            data_filename_plr,
-            delimiter=",", max_rows=1, dtype=np.str))
-
-    # Extract the number of features and the
-    # number of classes using a regular expression
-    (n_features, n_classes) = (
-        len(list(filter(lambda x: x.startswith("A"), header))),
-        len(list(filter(lambda x: x.startswith("L"), header))))
-
-    # Finally, read the .csv files
-    # with the data and the rankings
-    if exists_ranks_lr:
-        data_lr = np.genfromtxt(
-            data_filename_lr,
-            delimiter=",", skip_header=True)
-        (data_lr, ranks_lr) = (
-            data_lr[:, :n_features],
-            data_lr[:, -n_classes:].astype(np.int64))
-    if exists_ranks_plr:
-        data_plr = np.genfromtxt(
-            data_filename_plr,
-            delimiter=",", skip_header=True)
-        (data_plr, ranks_plr) = (
-            data_plr[:, :n_features],
-            data_plr[:, -n_classes:].astype(np.int64))
-
-    # Return the data and the rankings
-    return (data_lr, ranks_lr, data_plr, ranks_plr)
+        return Bunch(data=data, ranks=ranks,
+                     feature_names=feature_names,
+                     class_names=class_names)
 
 
-def load_authorship():
+def load_authorship(problem="label_ranking", return_X_Y=False):
     """Load and return the authorship dataset.
 
     The authorship dataset is a classic classification dataset adapted to
@@ -122,12 +113,29 @@ def load_authorship():
     #rankings (PLR)                5
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -145,51 +153,24 @@ def load_authorship():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_authorship
-    >>> data = load_authorship()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_authorship(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 4, 3],
            [1, 2, 4, 3],
            [1, 3, 4, 2]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_authorship(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2],
            [1, 2, 2, 2],
            [1, 2, 2, 2]])
-    >>> data.class_names
-    ['austen', 'london', 'milton', 'shakespeare']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="authorship.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "a", "all", "also", "an", "and", "any", "are", "as", "at",
-        "be", "been", "but", "by", "can", "do", "down", "even", "every",
-        "for", "from", "had", "has", "have", "her", "his", "if", "in",
-        "into", "is", "it", "its", "may", "more", "must", "my", "no",
-        "not", "now", "of", "on", "one", "only", "or", "our", "should",
-        "so", "some", "such", "than", "that", "the", "their", "then",
-        "there", "things", "this", "to", "up", "upon", "was", "were",
-        "what", "when", "which", "who", "will", "with", "would", "your",
-        "book_id"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["austen", "london", "milton", "shakespeare"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "authorship.csv", return_X_Y)
 
 
-def load_bodyfat():
+def load_bodyfat(problem="label_ranking", return_X_Y=False):
     """Load and return the bodyfat dataset.
 
     The bodyfat dataset is a classic regression
@@ -203,12 +184,28 @@ def load_bodyfat():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -235,45 +232,19 @@ def load_bodyfat():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_bodyfat
-    >>> data = load_bodyfat()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_bodyfat(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[7, 6, 2, 1, 5, 3, 4],
            [3, 7, 5, 2, 6, 1, 4],
            [1, 5, 3, 2, 7, 6, 4]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3',
-     'class_4', 'class_5', 'class_6']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="bodyfat.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2",
-        "feature_3", "feature_4", "feature_5", "feature_6"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "class_0", "class_1", "class_2", "class_3",
-        "class_4", "class_5", "class_6"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "bodyfat.csv", return_X_Y)
 
 
-def load_blocks():
+def load_blocks(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the blocks dataset.
 
     The blocks dataset is a classic classification
@@ -287,12 +258,28 @@ def load_blocks():
     #rankings (PLR)               28
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -311,41 +298,19 @@ def load_blocks():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_blocks
-    >>> data = load_blocks()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_blocks(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2, 2],
            [1, 2, 2, 2, 2],
            [1, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['text', 'horiz_line', 'graphic', 'vert_line', 'picture']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="blocks.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "height", "width", "area", "eccen", "p_black", "p_and",
-        "mean_tr", "blackpix", "blackand", "wb_trans"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["text", "horiz_line", "graphic", "vert_line", "picture"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "blocks.csv", return_X_Y)
 
 
-def load_breast():
+def load_breast(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the breast dataset.
 
     The breast dataset is a classic classification
@@ -359,12 +324,28 @@ def load_breast():
     #rankings (PLR)               22
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -383,40 +364,19 @@ def load_breast():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_breast
-    >>> data = load_breast()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_breast(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2, 2, 2],
            [2, 1, 2, 2, 2, 2],
            [2, 3, 1, 3, 3, 3]])
-    >>> data.class_names
-    ['car', 'fad', 'mas', 'gla', 'con', 'adi']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="breast.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "I0", "PA500", "HFS", "DA", "AREA", "A/DA", "MAX", "DR", "P"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["car", "fad", "mas", "gla", "con", "adi"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "breast.csv", return_X_Y)
 
 
-def load_calhousing():
+def load_calhousing(problem="label_ranking", return_X_Y=False):
     """Load and return the calhousing dataset.
 
     The calhousing dataset is a classic regression
@@ -430,12 +390,28 @@ def load_calhousing():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -449,38 +425,19 @@ def load_calhousing():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_calhousing
-    >>> data = load_calhousing()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_calhousing(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 4, 2, 3],
            [3, 2, 4, 1],
            [2, 3, 1, 4]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="calhousing.csv")
-
-    # Initialize the meaning of the features
-    feature_names = ["feature_0", "feature_1", "feature_2", "feature_3"]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "calhousing.csv", return_X_Y)
 
 
-def load_cold():
+def load_cold(problem="label_ranking", return_X_Y=False):
     """Load and return the cold dataset.
 
     The cold dataset is real-world biological
@@ -494,12 +451,28 @@ def load_cold():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -509,45 +482,19 @@ def load_cold():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_cold
-    >>> data = load_cold()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_cold(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 3, 2, 4],
            [4, 2, 1, 3],
            [4, 2, 1, 3]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="cold.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7",
-        "feature_8", "feature_9", "feature_10", "feature_11",
-        "feature_12", "feature_13", "feature_14", "feature_15",
-        "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "cold.csv", return_X_Y)
 
 
-def load_cpu():
+def load_cpu(problem="label_ranking", return_X_Y=False):
     """Load and return the cpu dataset.
 
     The cpu dataset is a classic regression
@@ -561,12 +508,28 @@ def load_cpu():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -582,41 +545,19 @@ def load_cpu():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_cpu
-    >>> data = load_cpu()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_cpu(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[4, 1, 2, 3, 5],
            [4, 1, 2, 3, 5],
            [3, 5, 4, 1, 2]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="cpu.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2",
-        "feature_3", "feature_4", "feature_5"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3", "class_4"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "cpu.csv", return_X_Y)
 
 
-def load_diau():
+def load_diau(problem="label_ranking", return_X_Y=False):
     """Load and return the diau dataset.
 
     The diau dataset is a real-world biological
@@ -630,12 +571,28 @@ def load_diau():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -645,49 +602,19 @@ def load_diau():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_diau
-    >>> data = load_diau()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_diau(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[2, 1, 3, 5, 4, 7, 6],
            [2, 3, 1, 4, 5, 6, 7],
            [2, 3, 6, 1, 4, 5, 7]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3',
-     'class_4', 'class_5', 'class_6']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="diau.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7",
-        "feature_8", "feature_9", "feature_10", "feature_11",
-        "feature_12", "feature_13", "feature_14", "feature_15",
-        "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "class_0", "class_1", "class_2", "class_3",
-        "class_4", "class_5", "class_6"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "diau.csv", return_X_Y)
 
 
-def load_dtt():
+def load_dtt(problem="label_ranking", return_X_Y=False):
     """Load and return the dtt dataset.
 
     The dtt dataset is a real-world biological
@@ -701,12 +628,28 @@ def load_dtt():
     # rankings (PLR)               -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -716,45 +659,19 @@ def load_dtt():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_dtt
-    >>> data = load_dtt()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_dtt(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[3, 4, 1, 2],
            [1, 2, 4, 3],
            [1, 2, 4, 3]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="dtt.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7",
-        "feature_8", "feature_9", "feature_10", "feature_11",
-        "feature_12", "feature_13", "feature_14", "feature_15",
-        "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "dtt.csv", return_X_Y)
 
 
-def load_ecoli():
+def load_ecoli(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the ecoli dataset.
 
     The ecoli dataset is a classic classification
@@ -768,12 +685,28 @@ def load_ecoli():
     #rankings (PLR)               39
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -789,38 +722,19 @@ def load_ecoli():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_ecoli
-    >>> data = load_ecoli()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_ecoli(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2, 2, 2, 2, 2],
            [1, 2, 2, 2, 2, 2, 2, 2],
            [1, 2, 2, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['cp', 'im', 'pp', 'imU', 'om', 'omL', 'imL', 'imS']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="ecoli.csv")
-
-    # Initialize the meaning of the features
-    feature_names = ["mcg", "gvh", "lip", "chg", "aac", "alm1", "alm2"]
-
-    # Initialize the meaning of the classes
-    class_names = ["cp", "im", "pp", "imU", "om", "omL", "imL", "imS"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "ecoli.csv", return_X_Y)
 
 
-def load_elevators():
+def load_elevators(problem="label_ranking", return_X_Y=False):
     """Load and return the elevators dataset.
 
     The elevators dataset is a classic regression
@@ -834,12 +748,28 @@ def load_elevators():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -855,62 +785,54 @@ def load_elevators():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_elevators
-    >>> data = load_elevators()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_elevators(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[9, 8, 7, 6, 1, 3, 2, 4, 5],
            [8, 4, 3, 2, 9, 6, 5, 7, 1],
            [9, 8, 7, 6, 1, 3, 2, 4, 5]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4',
-     'class_5', 'class_6', 'class_7', 'class_8']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="elevators.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7", "feature_8"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3",
-                   "class_4", "class_5", "class_6", "class_7", "class_8"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "elevators.csv", return_X_Y)
 
 
-def load_fried():
+def load_fried(problem="label_ranking", return_X_Y=False):
     """Load and return the fried dataset.
 
     The fried dataset is a classic regression
     dataset adapted to the Label Ranking problem.
 
     ===============   ==============
-    #instances                 40769
+    #instances                 40768
     #attributes                    9
     #classes                       5
     #rankings (LR)               120
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -924,41 +846,19 @@ def load_fried():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_fried
-    >>> data = load_fried()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_fried(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[4, 2, 3, 5, 1],
            [3, 5, 1, 2, 4],
            [5, 1, 2, 4, 3]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="fried.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7", "feature_8"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3", "class_4"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "fried.csv", return_X_Y)
 
 
-def load_glass():
+def load_glass(problem="label_ranking", return_X_Y=False):
     """Load and return the glass dataset.
 
     The glass dataset is a classic classification dataset adapted to
@@ -972,12 +872,29 @@ def load_glass():
     #rankings (PLR)               23
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -996,49 +913,24 @@ def load_glass():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_glass
-    >>> data = load_glass()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_glass(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 3, 2, 4, 5, 6],
            [1, 3, 2, 4, 5, 6],
            [1, 2, 3, 4, 5, 6]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_glass(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 3, 3, 3, 3],
            [1, 2, 2, 2, 2, 2],
            [1, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['building_windows_float_processed',
-     'building_windows_non_float_processed',
-     'vehicle_windows_float_processed',
-     'containers', 'tableware', 'headlamps']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="glass.csv")
-
-    # Initialize the meaning of the features
-    feature_names = ["RI", "Na", "Mg", "Al", "Si", "K", "Ca", "Ba", "Fe"]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "building_windows_float_processed",
-        "building_windows_non_float_processed",
-        "vehicle_windows_float_processed",
-        "containers", "tableware", "headlamps"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "glass.csv", return_X_Y)
 
 
-def load_heat():
+def load_heat(problem="label_ranking", return_X_Y=False):
     """Load and return the heat dataset.
 
     The heat dataset is a real-world biological
@@ -1052,12 +944,28 @@ def load_heat():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1067,48 +975,19 @@ def load_heat():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_heat
-    >>> data = load_heat()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_heat(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[6, 5, 1, 4, 3, 2],
            [1, 6, 3, 5, 4, 2],
            [1, 3, 4, 5, 2, 6]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4', 'class_5']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="heat.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7",
-        "feature_8", "feature_9", "feature_10", "feature_11",
-        "feature_12", "feature_13", "feature_14", "feature_15",
-        "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "class_0", "class_1", "class_2",
-        "class_3", "class_4", "class_5"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "heat.csv", return_X_Y)
 
 
-def load_housing():
+def load_housing(problem="label_ranking", return_X_Y=False):
     """Load and return the housing dataset.
 
     The housing dataset is a classic regression
@@ -1122,12 +1001,28 @@ def load_housing():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1142,44 +1037,19 @@ def load_housing():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_housing
-    >>> data = load_housing()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_housing(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[2, 1, 4, 5, 6, 3],
            [2, 3, 6, 5, 1, 4],
            [5, 1, 3, 6, 4, 2]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4', 'class_5']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="housing.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2",
-        "feature_3", "feature_4", "feature_5"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "class_0", "class_1", "class_2",
-        "class_3", "class_4", "class_5"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "housing.csv", return_X_Y)
 
 
-def load_iris():
+def load_iris(problem="label_ranking", return_X_Y=False):
     """Load and return the iris dataset.
 
     The iris dataset is a classic classification dataset adapted to
@@ -1193,12 +1063,29 @@ def load_iris():
     #rankings (PLR)                6
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1217,44 +1104,24 @@ def load_iris():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_iris
-    >>> data = load_iris()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_iris(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 3],
            [1, 2, 3],
            [3, 1, 2]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_iris(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2],
            [1, 2, 2],
            [2, 1, 2]])
-    >>> data.class_names
-    ['setosa', 'versicolor', 'virginica']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="iris.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "sepal_length", "sepal_width",
-        "petal_length", "petal_width"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["setosa", "versicolor", "virginica"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "iris.csv", return_X_Y)
 
 
-def load_letter():
+def load_letter(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the letter dataset.
 
     The letter dataset is a classic classification dataset
@@ -1268,12 +1135,28 @@ def load_letter():
     #rankings (PLR)              273
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1288,46 +1171,22 @@ def load_letter():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_letter
-    >>> data = load_letter()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
-    array([[1, 2, 2, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    >>> data = load_letter(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
+    array([[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+        2, 2, 2, 2],
+           [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        2, 2, 2, 2],
+           [2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        2, 2, 2, 2]])
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="letter.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "x-box", "y-box", "width", "high", "onpix",
-        "x-bar", "y-bar", "x2bar", "y2bar", "xybar",
-        "x2ybr", "xy2br", "x-ege", "xegvy", "y-ege", "yegvx"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
-        "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "letter.csv", return_X_Y)
 
 
-def load_libras():
+def load_libras(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the libras dataset.
 
     The libras dataset is a classic classification
@@ -1341,12 +1200,28 @@ def load_libras():
     #rankings (PLR)               38
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1363,67 +1238,19 @@ def load_libras():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_libras
-    >>> data = load_libras()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_libras(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
            [2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
            [2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['curved_swing', 'horizontal_swing', 'vertical_swing',
-     'anti-clockwise_arc', 'clockwise_arc', 'circle',
-     'horizontal_straight-line', 'vertical_straight-line',
-     'horizontal_zigzag', 'vertical_zigzag', 'horizontal_wavy',
-     'vertical_wavy', 'face-up_curve', 'face-down_curve', 'tremble']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="libras.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4",
-        "feature_5", "feature_6", "feature_7", "feature_8", "feature_9",
-        "feature_10", "feature_11", "feature_12", "feature_13", "feature_14",
-        "feature_15", "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23", "feature_24",
-        "feature_25", "feature_26", "feature_27", "feature_28", "feature_29",
-        "feature_30", "feature_31", "feature_32", "feature_33", "feature_34",
-        "feature_35", "feature_36", "feature_37", "feature_38", "feature_39",
-        "feature_40", "feature_41", "feature_42", "feature_43", "feature_44",
-        "feature_45", "feature_46", "feature_47", "feature_48", "feature_49",
-        "feature_50", "feature_51", "feature_52", "feature_53", "feature_54",
-        "feature_55", "feature_56", "feature_57", "feature_58", "feature_59",
-        "feature_60", "feature_61", "feature_62", "feature_63", "feature_64",
-        "feature_65", "feature_66", "feature_67", "feature_68", "feature_69",
-        "feature_70", "feature_71", "feature_72", "feature_73", "feature_74",
-        "feature_75", "feature_76", "feature_77", "feature_78", "feature_79",
-        "feature_80", "feature_81", "feature_82", "feature_83", "feature_84",
-        "feature_85", "feature_86", "feature_87", "feature_88", "feature_89"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "curved_swing", "horizontal_swing", "vertical_swing",
-        "anti-clockwise_arc", "clockwise_arc", "circle",
-        "horizontal_straight-line", "vertical_straight-line",
-        "horizontal_zigzag", "vertical_zigzag", "horizontal_wavy",
-        "vertical_wavy", "face-up_curve", "face-down_curve", "tremble"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "libras.csv", return_X_Y)
 
 
-def load_pendigits():
+def load_pendigits(problem="label_ranking", return_X_Y=False):
     """Load and return the pendigits dataset.
 
     The pendigits dataset is a classic classification dataset adapted to
@@ -1437,12 +1264,29 @@ def load_pendigits():
     #rankings (PLR)               60
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1464,46 +1308,24 @@ def load_pendigits():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_pendigits
-    >>> data = load_pendigits()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_pendigits(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[ 7,  2,  8,  6,  4,  3, 10,  9,  5,  1],
            [ 5,  4,  9,  8,  1,  3, 10,  7,  6,  2],
            [ 8,  2, 10,  1,  7,  4,  9,  5,  6,  3]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_pendigits(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
            [2, 2, 2, 2, 1, 2, 2, 2, 2, 2],
            [2, 2, 2, 1, 2, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="pendigits.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4",
-        "feature_5", "feature_6", "feature_7", "feature_8", "feature_9",
-        "feature_10", "feature_11", "feature_12", "feature_13", "feature_14",
-        "feature_15"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "pendigits.csv", return_X_Y)
 
 
-def load_satimage():
+def load_satimage(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the satimage dataset.
 
     The satimage dataset is a classic classification dataset
@@ -1517,12 +1339,28 @@ def load_satimage():
     #rankings (PLR)               35
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1539,51 +1377,19 @@ def load_satimage():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_satimage
-    >>> data = load_satimage()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_satimage(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[2, 2, 2, 1, 2, 2],
            [2, 2, 1, 2, 2, 2],
            [2, 2, 1, 2, 2, 2]])
-    >>> data.class_names
-    ['red_soil', 'cotton_crop', 'grey_soil', 'damp_grey_soil',
-     'soil_with_vegetation_stubble', 'very_damp_grey_soil']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="satimage.csv")
-
-    # Initialize the meaning of the features and the classes
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4",
-        "feature_5", "feature_6", "feature_7", "feature_8", "feature_9",
-        "feature_10", "feature_11", "feature_12", "feature_13", "feature_14",
-        "feature_15", "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23", "feature_24",
-        "feature_25", "feature_26", "feature_27", "feature_28", "feature_29",
-        "feature_30", "feature_31", "feature_32", "feature_33", "feature_34",
-        "feature_35"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "red_soil", "cotton_crop", "grey_soil", "damp_grey_soil",
-        "soil_with_vegetation_stubble", "very_damp_grey_soil"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "satimage.csv", return_X_Y)
 
 
-def load_segment():
+def load_segment(problem="label_ranking", return_X_Y=False):
     """Load and return the segment dataset.
 
     The segment dataset is a classic classification dataset adapted to
@@ -1597,12 +1403,29 @@ def load_segment():
     #rankings (PLR)               20
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1624,50 +1447,24 @@ def load_segment():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_segment
-    >>> data = load_segment()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_segment(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[3, 7, 4, 1, 2, 5, 6],
            [2, 7, 3, 4, 1, 6, 5],
            [1, 7, 4, 2, 3, 5, 6]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_segment(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[3, 3, 3, 1, 2, 3, 3],
            [2, 2, 2, 2, 1, 2, 2],
            [1, 2, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['brickface', 'sky', 'foliage', 'cement', 'window', 'path', 'grass']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="segment.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "region-centroid-col", "region-centroid-row", "short-line-density-5",
-        "short-line-density-2", "vedge-mean", "vegde-sd", "hedge-mean",
-        "hedge-sd", "intensity-mean", "rawred-mean", "rawblue-mean",
-        "rawgreen-mean", "exred-mean", "exblue-mean", "exgreen-mean",
-        "value-mean", "saturation-mean", "hue-mean"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "brickface", "sky", "foliage",
-        "cement", "window", "path", "grass"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "segment.csv", return_X_Y)
 
 
-def load_shuttle():
+def load_shuttle(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the shuttle dataset.
 
     The shuttle dataset is a classic classification
@@ -1681,12 +1478,28 @@ def load_shuttle():
     #rankings (PLR)               18
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1703,45 +1516,19 @@ def load_shuttle():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_shuttle
-    >>> data = load_shuttle()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_shuttle(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2, 2, 2, 2],
            [1, 2, 2, 2, 2, 2, 2],
            [1, 2, 2, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['rad_flow', 'fpv_close', 'fpv_open', 'high',
-     'bypass', 'bpv_close', 'bpv_open']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="shuttle.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3",
-        "feature_4", "feature_5", "feature_6", "feature_7", "feature_8"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "rad_flow", "fpv_close", "fpv_open",
-        "high", "bypass", "bpv_close", "bpv_open"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "shuttle.csv", return_X_Y)
 
 
-def load_spo():
+def load_spo(problem="label_ranking", return_X_Y=False):
     """Load and return the spo dataset.
 
     The spo dataset is real-world biological
@@ -1755,12 +1542,28 @@ def load_spo():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1770,48 +1573,19 @@ def load_spo():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_spo
-    >>> data = load_spo()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_spo(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[10,  2,  3, 11,  7,  1,  4,  8,  9,  5,  6],
            [ 6,  9,  5,  1,  4,  8,  2,  7,  3, 11, 10],
            [10, 11,  2,  3,  1,  7,  4,  8,  5,  6,  9]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4',
-    'class_5', 'class_6', 'class_7', 'class_8', 'class_9', 'class_10']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="spo.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4",
-        "feature_5", "feature_6", "feature_7", "feature_8", "feature_9",
-        "feature_10", "feature_11", "feature_12", "feature_13", "feature_14",
-        "feature_15", "feature_16", "feature_17", "feature_18", "feature_19",
-        "feature_20", "feature_21", "feature_22", "feature_23"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "class_0", "class_1", "class_2", "class_3", "class_4",
-        "class_5", "class_6", "class_7", "class_8", "class_9", "class_10"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "spo.csv", return_X_Y)
 
 
-def load_stock():
+def load_stock(problem="label_ranking", return_X_Y=False):
     """Load and return the stock dataset.
 
     The stock dataset is a classic regression
@@ -1825,12 +1599,28 @@ def load_stock():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1844,40 +1634,19 @@ def load_stock():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_stock
-    >>> data = load_stock()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_stock(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 3, 5, 2, 4],
            [1, 3, 5, 2, 4],
            [2, 3, 5, 1, 4]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="stock.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2", "class_3", "class_4"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "stock.csv", return_X_Y)
 
 
-def load_vehicle():
+def load_vehicle(problem="label_ranking", return_X_Y=False):
     """Load and return the vehicle dataset.
 
     The vehicle dataset is a classic classification dataset adapted to
@@ -1891,12 +1660,29 @@ def load_vehicle():
     #rankings (PLR)               13
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -1918,49 +1704,24 @@ def load_vehicle():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_vehicle
-    >>> data = load_vehicle()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_vehicle(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[2, 3, 4, 1],
            [3, 4, 2, 1],
            [3, 4, 2, 1]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_vehicle(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2, 2],
            [1, 2, 2, 2],
            [2, 1, 2, 2]])
-    >>> data.class_names
-    ['opel', 'saab', 'bus', 'van']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="vehicle.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "compactness", "circularity", "distance_circularity", "radius_ratio",
-        "pr.axis_aspect_ratio", "max.length_aspect_ratio", "scatter_ratio",
-        "elongatedness", "pr.axis_rectangularity", "max.length_rectangularity",
-        "scaled_variance_along_major_axis", "scaled_variance_minor_axis",
-        "scaled_radius_of_gyration", "skewness_about_major_axis",
-        "skewness_about_minor_axis", "kurtosis_about_minor_axis",
-        "kurtosis_about_major_axis", "hollows_ratio"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["opel", "saab", "bus", "van"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "vehicle.csv", return_X_Y)
 
 
-def load_vowel():
+def load_vowel(problem="label_ranking", return_X_Y=False):
     """Load and return the vowel dataset.
 
     The vowel dataset is a classic classification dataset adapted to
@@ -1974,12 +1735,29 @@ def load_vowel():
     #rankings (PLR)               23
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -2003,48 +1781,24 @@ def load_vowel():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_vowel
-    >>> data = load_vowel()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_vowel(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[ 6,  5,  9,  3,  2,  7,  8, 10,  4, 11,  1],
            [ 5,  6,  8,  3,  1,  4,  7,  9, 10, 11,  2],
            [ 8,  9, 10, 11,  2,  4,  1,  5,  3,  7,  6]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_vowel(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
            [2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2],
            [2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2]])
-    >>> data.class_names
-    ['hid', 'hId', 'hEd', 'hAd', 'hYd', 'had',
-     'hOd', 'hod', 'hUd', 'hud', 'hed']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="vowel.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4",
-        "feature_5", "feature_6", "feature_7", "feature_8", "feature_9"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "hid", "hId", "hEd", "hAd", "hYd",
-        "had", "hOd", "hod", "hUd", "hud", "hed"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "vowel.csv", return_X_Y)
 
 
-def load_wine():
+def load_wine(problem="label_ranking", return_X_Y=False):
     """Load and return the wine dataset.
 
     The wine dataset is a classic classification dataset adapted to
@@ -2058,12 +1812,29 @@ def load_wine():
     #rankings (PLR)                5
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking", "partial_label_ranking"}, \
+            default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -2087,46 +1858,24 @@ def load_wine():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_wine
-    >>> data = load_wine()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_wine(problem="label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 3],
            [2, 1, 3],
            [1, 2, 3]])
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_wine(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[1, 2, 2],
            [1, 2, 2],
            [1, 2, 2]])
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="wine.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "alcohol", "malic_acid", "ash", "alcalinity_of_ash",
-        "magnesium", "total_phenols", "flavanoids",
-        "nonflavanoid_phenols", "proanthocyanins", "color_intensity",
-        "hue", "OD280/OD315_of_diluted_wines", "proline"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = ["class_0", "class_1", "class_2"]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "wine.csv", return_X_Y)
 
 
-def load_wisconsin():
+def load_wisconsin(problem="label_ranking", return_X_Y=False):
     """Load and return the wisconsin dataset.
 
     The wisconsin dataset is a classic regression
@@ -2140,12 +1889,28 @@ def load_wisconsin():
     #rankings (PLR)                -
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"label_ranking"}, default="label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -2180,50 +1945,19 @@ def load_wisconsin():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_wisconsin
-    >>> data = load_wisconsin()
-    >>> data.ranks_lr[[10, 25, 50]]
+    >>> data = load_wisconsin(problem="label_ranking")
+    >>> data.ranks
     array([[ 4, 15, 13,  7,  5,  9, 14,  8, 10, 11,  1, 12,  6,  2,  3, 16],
            [11, 14, 16, 15, 13,  4, 10,  5,  6,  9,  1,  3, 12,  7,  2,  8],
            [ 1,  3,  9, 13,  5, 16,  6, 11, 15,  8,  2,  4, 10, 14,  7, 12]])
-    >>> data.ranks_plr
-    >>> data.class_names
-    ['class_0', 'class_1', 'class_2', 'class_3', 'class_4', 'class_5',
-     'class_6', 'class_7', 'class_8', 'class_9', 'class_10', 'class_11',
-     'class_12', 'class_13', 'class_14', 'class_15']
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="wisconsin.csv")
-
-    # Initialize the meaning of the features
-    feature_names = [
-        "feature_0", "feature_1", "feature_2", "feature_3", "feature_4",
-        "feature_5", "feature_6", "feature_7", "feature_8", "feature_9",
-        "feature_10", "feature_11", "feature_12", "feature_13", "feature_14",
-        "feature_15"
-    ]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "class_0", "class_1", "class_2", "class_3", "class_4",
-        "class_5", "class_6", "class_7", "class_8", "class_9",
-        "class_10", "class_11", "class_12", "class_13", "class_14",
-        "class_15"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "wisconsin.csv", return_X_Y)
 
 
-def load_yeast():
+def load_yeast(problem="partial_label_ranking", return_X_Y=False):
     """Load and return the yeast dataset.
 
     The yeast dataset is a classic classification dataset
@@ -2237,12 +1971,28 @@ def load_yeast():
     #rankings (PLR)               81
     ===============   ==============
 
+    Parameters
+    ----------
+    problem : {"partial_label_ranking"}, default="partial_label_ranking"
+        The problem for which the data is to be loaded.
+
+    return_X_Y : bool, default=False
+        If ``True``, returns ``(data, ranks)``
+        instead of a Bunch object.
+
     Returns
     -------
-    data : Bunch
-        Dictionary-like object with the data ("data_lr", "data_plr"),
-        the rankings ("ranks_lr", "ranks_plr"), the meaning of the features
-        ("feature_names") and the meaning of the classes ("class_names").
+    data : object
+        Dictionary-like object, the interesting attributes are
+        "``data``", the data to learn, "``rankings``", the target
+        rankings, "``feature_names``", the meaning of the features
+        and "``class_names``", the meaning of the classes.
+
+    (data, target) : tuple of ndarray of shape (n_samples, n_features) \
+            and (n_samples, n_classes)
+        A 2-D array with each row representing one sample and each
+        column representing the features of a given sample and a
+        2-D array holding target rankings for all the samples.
 
     References
     ----------
@@ -2266,35 +2016,13 @@ def load_yeast():
 
     Examples
     --------
-    Let us say you are interested in the samples 10, 25 and 50,
-    and want to know their class name.
+    Let us say you are interested in the samples 10, 25 and 50.
 
     >>> from sklr.datasets import load_yeast
-    >>> data = load_yeast()
-    >>> data.ranks_lr
-    >>> data.ranks_plr[[10, 25, 50]]
+    >>> data = load_yeast(problem="partial_label_ranking")
+    >>> data.ranks[[10, 25, 50]]
     array([[3, 1, 2, 3, 3, 3, 3, 3, 3, 3],
-            [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-            [3, 2, 1, 3, 3, 3, 3, 3, 3, 3]])
-    >>> data.class_names
-    ['cyt', 'nuc', 'mit', 'me3', 'me2', 'me1', 'exc', 'vac', 'pox', 'erl']
+           [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+           [3, 2, 1, 3, 3, 3, 3, 3, 3, 3]])
     """
-    # Obtain the data and the rankings
-    (data_lr, ranks_lr, data_plr, ranks_plr) = load_data(
-        module_path=dirname(__file__),
-        data_filename="yeast.csv")
-
-    # Initialize the meaning of the features
-    feature_names = ["mcg", "gvh", "alm", "mit", "erl", "pox", "vac", "nuc"]
-
-    # Initialize the meaning of the classes
-    class_names = [
-        "cyt", "nuc", "mit", "me3", "me2",
-        "me1", "exc", "vac", "pox", "erl"
-    ]
-
-    # Return the corresponding bunch
-    return Bunch(
-        data_lr=data_lr, ranks_lr=ranks_lr,
-        data_plr=data_plr, ranks_plr=ranks_plr,
-        feature_names=feature_names, class_names=class_names)
+    return load_data(MODULE_PATH, problem, "yeast.csv", return_X_Y)
