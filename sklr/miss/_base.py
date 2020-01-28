@@ -182,7 +182,7 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         (n_samples, n_classes) = Y.shape
 
         # Initialize the rankings with missed classes
-        # to afloating type (to allow infinite values)
+        # to a floating type (to allow infinite values)
         Yt = np.array(Y, dtype=np.float64)
 
         # Initialize an auxiliary set of
