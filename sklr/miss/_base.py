@@ -1,9 +1,12 @@
-"""This module gathers base transformers to miss classes in rankings."""
+"""This module gathers base transformers to miss classes from rankings."""
 
 
 # =============================================================================
 # Imports
 # =============================================================================
+
+# Standard
+from numbers import Integral, Real
 
 # Third party
 import numpy as np
@@ -23,44 +26,42 @@ from ..utils.validation import check_is_fitted, check_random_state
 # Simple misser
 # =============================================================================
 class SimpleMisser(BaseEstimator, TransformerMixin):
-    """Misser transformer for missing classes in rankings.
+    """Transformer to miss classes from rankings.
 
     Hyperparameters
     ---------------
-    strategy : str, optional (default="random")
+    strategy : {"random", "top"}, default="random"
         The strategy used to miss the classes from the rankings.
-        Supported criteria are "random" for randomly missed classes
-        and "top" to miss the classes outside of the "top-k".
+        Supported criteria are "random", to miss classes at
+        random and "top", to miss the classes out of the top-k.
 
-    percentage : float, optional (default=0.0)
-        The percentage of classes to miss.
+    percentage : float, default=0.0
+        The percentage of classes to be missed.
 
-    random_state : {int, RandomState instance, None}, optional (default=None)
-        - If int, random_state is the seed used by the random number generator.
-        - If RandomState instance, random_state is the random number generator.
-        - If None, the random number generator is the RandomState instance
-          used by `np.random`.
-
-        Only employed if ``strategy="random"``.
+    random_state : int or RandomState instance, default=None
+        If ``int``, ``random_state`` is the seed used by the
+        random number generator. If ``RandomState`` instance,
+        ``random_state`` is the random number generator.
+        If ``None``, the random number generator is the
+        ``RandomState`` instance used by ``np.random``.
 
     Attributes
     ----------
     n_samples_ : int
-        The number of samples when ``fit`` is performed.
+        The number of samples.
 
     n_classes_ : int
-        The number of classes when ``fit`` is performed.
+        The number of classes.
 
     n_missed_classes_ : int
-        The number of classes to be missed (only available
-        if ``strategy="top"``).
+        The number of classes to be missed.
 
-    target_types_ : dict of str
-        The target types of the rankings provided at ``fit``.
+    target_types_ : list of str
+        The type of targets of the rankings.
 
-    random_state_: np.random.RandomState instance
-        The random state generator (only available
-        if ``strategy="random"``).
+    random_state_: RandomState instance
+        ``RandomState`` instance that is generated either from
+        a seed, the random number generator or by ``np.random``.
 
     Examples
     --------
@@ -87,79 +88,90 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         self.random_state = random_state
 
     def fit(self, Y):
-        """Fit the transformer on Y.
+        """Fit the misser on ``Y``.
 
         Parameters
         ----------
         Y : np.ndarray of shape (n_samples, n_classes)
-            Input rankings, where ``n_samples`` is the number of samples
-            and ``n_classes`` is the number of classes.
+            The input rankings.
 
         Returns
         -------
         self : SimpleMisser
+            The fitted misser.
 
         Raises
         ------
+        TypeError
+            If the percentage of classes to be
+            missed is not integer or floating.
+
         ValueError
-            If the percentage of classes to be missed is not a value
+            If the percentage of classes to be missed is not
             greater or equal than zero and less or equal than one.
         """
         # Validate the training rankings
         Y = self._validate_training_rankings(Y)
 
-        # Check that the strategy is valid
+        # Check that the strategy takes a valid value
         if self.strategy not in {"random", "top"}:
             raise ValueError("The strategy must be either "
                              "'random' or 'top'. Got '{}'."
                              .format(self.strategy))
 
-        # Check that the percentage is value greater or
-        # equal than zero and less or equal than one
+        # Check that the percentage of classes to be missed is integer
+        # or floating (to ensure that undesired errors do not appear)
+        if (not isinstance(self.percentage, (Integral, np.integer)) and
+                not isinstance(self.percentage, (Real, np.floating))):
+            raise TypeError("The percentage of classes to be missed "
+                            "must be an integer or a floating type. "
+                            "Got {}.".format(type(self.percentage)))
+
+        # Check that the percentage of classes to be missed is
+        # greater or equal than zero and less or equal than one
         if self.percentage < 0.0 or self.percentage > 1.0:
-            raise ValueError("The percentage of missed classes must be "
-                             "a floating value greater or equal than zero "
-                             "and less or equal than one. Got {}."
+            raise ValueError("The percentage of classes to be missed must "
+                             "be greater or equal than zero and less or "
+                             "equal than one. Got {}."
                              .format(self.percentage))
 
-        # Obtain the random state, since it is needed
-        # to miss the rankings in the transform method
-        # when the selected strategy is "random"
-        if self.strategy == "random":
-            self.random_state_ = check_random_state(self.random_state)
-        # Otherwise, obtain the number of classes to be
-        # miss on each ranking for the "top" strategy
-        else:
-            self.n_missed_classes_ = int(self.n_classes_
-                                         * self.percentage)
+        # Obtain the number of classes to be missed from each
+        # input ranking, which is needed by the top-k strategy
+        self.n_missed_classes_ = int(self.n_classes_ * self.percentage)
 
-        # Return the fitted transformer
+        # Obtain the random state instance, which is needed by the random
+        # strategy to allow that the missed classes from rankings are seeded
+        self.random_state_ = check_random_state(self.random_state)
+
+        # Return the fitted misser
         return self
 
     def transform(self, Y):
-        """Miss the classes in Y.
+        """Transform the rankings in ``Y``.
 
         Parameters
         ----------
         Y : np.ndarray of shape (n_samples, n_classes)
-            The input rankings to miss.
+            The input rankings from which
+            the classes will be missed.
 
         Returns
         -------
         Yt : np.ndarray of shape (n_samples, n_classes)
-            The missed input rankings.
+            The input rankings with missed classes
+            according with the specified percentage.
 
         Raises
         ------
         ValueError
-            If the target types of the input rankings is not a subset
-            of the fitted target types.
+            If the type of targets of the input rankings
+            is not a subset of the fitted type of targets.
 
         ValueError
-            If the number of classes of the input rankings is
-            different than the fitted number of classes.
+            If the number of classes of the input rankings
+            is different than the fitted number of classes.
         """
-        # Check if the estimator is fitted
+        # Check that the estimator is fitted
         check_is_fitted(self)
 
         # Validate the test data
@@ -169,38 +181,41 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         # number of classes from the input rankings
         (n_samples, n_classes) = Y.shape
 
-        # Initialize the missed rankings, using
-        # a floating type to allow infinite values
+        # Initialize the rankings with missed classes
+        # to afloating type (to allow infinite values)
         Yt = np.array(Y, dtype=np.float64)
 
-        # Initialize an auxiliary set of rankings to properly
-        # rank the data when using the fast version of Cython
+        # Initialize an auxiliary set of
+        # rankings to properly rank the data
+        # when using the fast version of Cython
         Y = np.zeros(Y.shape, dtype=np.int64)
 
-        # Obtain the masks
+        # Obtain the masks to miss the classes from the
+        # rankings according to the selected strategy
         if self.strategy == "random":
-            # For the random strategy, miss the classes
-            # that have a probability of being missed
-            # less than the specified threshold
+            # For the random strategy, miss the classes with probability
+            # of being missed strictly less than the specified threshold
             masks = (self.random_state_.rand(n_samples, n_classes) <
                      self.percentage) | np.isnan(Yt)
         else:
-            # For the top-k strategy, miss the classes that are outside
-            # of top-k (in fact, argsort the rankings to properly
-            # miss the classes when some of them are tied)
-            masks = np.argsort(np.argsort(Yt)) + 1 > (self.n_classes_
-                                                      - self.n_missed_classes_)
+            # For the top-k strategy, miss the classes that are
+            # outside of top-k (in fact, argsort the rankings to
+            # properly miss the classes when some of them are tied)
+            masks = (np.argsort(np.argsort(Yt)) + 1 >
+                     self.n_classes_ - self.n_missed_classes_)
 
         # Change the data type of the masks to ensure that
         # they can be managed by Cython extension module
         # in charge of missing the classes from the rankings
         masks = np.array(masks, dtype=np.uint8)
 
+        # Obtain the strategy used by the Cython extension
+        # module to miss the classes from the rankings
+        strategy = STRATEGIES[self.strategy]
+
         # Miss the classes using the
         # optimized version of Cython
-        miss_classes(
-            Y, Yt, masks,
-            strategy=STRATEGIES[self.strategy])
+        miss_classes(Y, Yt, masks, strategy)
 
         # Return the transformed rankings
         return Yt

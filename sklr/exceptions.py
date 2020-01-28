@@ -8,8 +8,8 @@ classes used across scikit-lr.
 # Public objects
 # =============================================================================
 
-# Set the modules that are accessible
-# from the module sklr.exceptions
+# Define the list of public classes and methods that
+# will be exported from this module when importing it
 __all__ = ["NotFittedError"]
 
 
