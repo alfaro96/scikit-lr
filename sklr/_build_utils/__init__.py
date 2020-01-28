@@ -98,8 +98,8 @@ def maybe_cythonize_extensions(top_path, config):
         # Get the installed version of Cython
         # (needed to "cythonize" the extensions)
         cython_version = get_cython_version()
-        # If it is not installed, show the
-        # proper error message to the user
+        # If it is not installed, show
+        # an import error to the user
         if not cython_version:
             raise ImportError("Cython is not installed. "
                               "At least version {} is required."

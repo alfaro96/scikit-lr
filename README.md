@@ -44,9 +44,7 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Setting up a development environment
 
-To setup the development environment, it is strongly recommended to use `docker` tools (see https://github.com/alfaro96/docker-scikit-lr for details).
-
-Alternatively, one can use `Python` virtual environments (see https://docs.python.org/3/library/venv.html for details).
+To setup a development environment, it is strongly recommended to use `docker` tools (see [docker-scikit-lr](https://github.com/alfaro96/docker-scikit-lr) for details).
 
 ### Testing
 
@@ -58,10 +56,10 @@ pytest sklr
 
 ## Authors
 
-    * Alfaro Jiménez, Juan Carlos
-    * Aledo Sánchez, Juan Ángel
-    * Gámez Martín, José Antonio
+    * Juan Carlos Alfaro Jiménez
+    * Juan Ángel Aledo Sánchez
+    * José Antonio Gámez Martín
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/alfaro96/scikit-lr/blob/master/LICENSE) file for details.
+This project is licensed under the MIT license (see the [LICENSE](https://github.com/alfaro96/scikit-lr/blob/master/LICENSE) file for details).
