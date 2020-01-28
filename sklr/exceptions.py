@@ -1,6 +1,6 @@
 """
-The :mod:`sklr.exceptions` module includes all custom warnings and error
-classes used across scikit-lr.
+The :mod:`sklr.exceptions` module includes all custom
+warnings and error classes used across scikit-lr.
 """
 
 
@@ -23,8 +23,8 @@ __all__ = ["NotFittedError"]
 class NotFittedError(ValueError, AttributeError):
     """Exception class to raise if estimator is used before fitting.
 
-    This class inherits from both ValueError and AttributeError to help with
-    exception handling and backward compatibility.
+    This class inherits from both ``ValueError`` and ``AttributeError``
+    to help with exception handling and backward compatibility.
 
     Examples
     --------
