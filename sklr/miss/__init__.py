@@ -1,4 +1,7 @@
-"""Transformers to miss classes in rankings."""
+"""
+The :mod:`sklr.miss` module includes
+transformers to miss classes from rankings.
+"""
 
 
 # =============================================================================
@@ -13,6 +16,6 @@ from ._base import SimpleMisser
 # Public objects
 # =============================================================================
 
-# Set the classes that are accessible
-# from the module sklr.miss
+# Define the list of public classes and methods that
+# will be exported from this module when importing it
 __all__ = ["SimpleMisser"]

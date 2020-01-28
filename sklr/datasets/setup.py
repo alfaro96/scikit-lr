@@ -17,15 +17,15 @@ def configuration(parent_package="", top_path=None):
     # where methods to load popular reference datasets will hold
     config = Configuration("datasets", parent_package, top_path)
 
-    # Add the tests of the
-    # sklr.datasets module
+    # Add the submodule with tests
+    # for the sklr.datasets module
     config.add_subpackage("tests")
 
     # Add the folder with the data
     config.add_data_dir("data")
 
-    # Return the configuration of
-    # the sklr.datasets module
+    # Return the configuration file
+    # of the sklr.datasets module
     return config
 
 

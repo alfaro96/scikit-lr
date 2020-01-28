@@ -8,8 +8,8 @@ warnings and error classes used across scikit-lr.
 # Public objects
 # =============================================================================
 
-# Set the classes that are accessible
-# from the sklr.exceptions module
+# Define the list of public classes and methods that
+# will be exported from this module when importing it
 __all__ = ["NotFittedError"]
 
 

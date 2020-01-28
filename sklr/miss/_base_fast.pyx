@@ -20,7 +20,7 @@ from ..utils._ranking_fast cimport RANK_METHOD
 # Constants
 # =============================================================================
 
-# Strategies used to miss
+# The strategies used to miss
 # the classes from the rankings
 STRATEGIES = {
     "random": 0,
@@ -43,8 +43,8 @@ cpdef void miss_classes(INT64_t_2D Y, DTYPE_t_2D Yt,
     cdef SIZE_t sample
     cdef SIZE_t label
 
-    # Miss the classes from the
-    # rankings using the provided masks
+    # Miss the classes from the rankings
+    # according with the provided masks
     for sample in range(n_samples):
         for label in range(n_classes):
             if masks[sample, label]:
@@ -53,16 +53,17 @@ cpdef void miss_classes(INT64_t_2D Y, DTYPE_t_2D Yt,
                 else:
                     Yt[sample, label] = INFINITY
 
-    # Once the classes have been missed from the rankings, rank
-    # the data again to ensure that they are properly formatted
-    # (only needed for randomly missed classes)
+    # For the classes that have been randomly missed, it is
+    # necessary to rank the data again to ensure that the
+    # rankings are properly formatted for the estimators
     if strategy == RANDOM:
         for sample in range(n_samples):
             # Rank the classes of this ranking using the dense method
-            # (since, in this case, dense returns the same results than ordinal)
-            rank_data_view(data=Yt[sample], y=Y[sample], method=RANK_METHOD.DENSE)
-            # Set the position in this ranking to
-            # ensure that it is properly formatted
+            # (it returns the same ordering than the ordinal method)
+            rank_data_view(
+                data=Yt[sample], y=Y[sample], method=RANK_METHOD.DENSE)
+            # Set the new position of the ranked
+            # classes in the transformed rankings
             for label in range(n_classes):
                 if not masks[sample, label]:
                     Yt[sample, label] = Y[sample, label]
