@@ -10,7 +10,8 @@ clean:
 
 # Installers
 
-# Build extensions in place (folder of the source code)
+# Build extensions in place
+# (folder of the source code)
 inplace:
 	python setup.py build_ext -i
 

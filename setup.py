@@ -6,8 +6,8 @@
 from distutils.command.clean import clean as Clean
 from pkg_resources import parse_version
 from platform import python_version
-from os import walk, unlink
-from os.path import exists, abspath, join, splitext
+from os import unlink, walk
+from os.path import abspath, exists, join, splitext
 import shutil
 import sys
 import traceback
@@ -109,7 +109,8 @@ class CleanCommand(Clean):
         if exists(".pytest_cache"):
             shutil.rmtree(".pytest_cache")
 
-        # Look for the directories and files to remove under the sklr module
+        # Look for the directories and files
+        # to remove under the sklr module
         for (dirpath, dirnames, filenames) in walk("sklr"):
             # Look for the files to remove
             for filename in filenames:
@@ -133,19 +134,22 @@ class CleanCommand(Clean):
                     shutil.rmtree(join(dirpath, dirname))
 
 
-# Custom actions that can be carried out when calling to this setup file
-# (currently, only a custom clean command has been defined)
+# Custom actions that can be carried
+# out when calling to this setup file
+# (defined custom clean command)
 CMDCLASS = {"clean": CleanCommand}
 
-# Optional setuptools features (they require that this package is imported)
+# Optional setuptools features
+# (require that it is imported)
 SETUPTOOLS_EXTRA_COMMANDS = {
-        "alias", "bdist_egg", "bdist_wheel",
-        "develop", "dist_info", "easy_install",
-        "egg_info", "install_egg_info", "rotate",
-        "saveopts", "setopt", "test", "upload_docs"
+    "alias", "bdist_egg", "bdist_wheel",
+    "develop", "dist_info", "easy_install",
+    "egg_info", "install_egg_info", "rotate",
+    "saveopts", "setopt", "test", "upload_docs"
 }
 
-# Import setuptools if at least one of the extra commands have been required
+# Import setuptools if at least one of
+# the extra commands have been required
 if SETUPTOOLS_EXTRA_COMMANDS.intersection(sys.argv):
     # Import
     import setuptools
@@ -168,10 +172,10 @@ EXTRA_SETUPTOOLS_ARGS = {}
 # =============================================================================
 
 def get_numpy_version():
-    """Return a string containing the NumPy version installed in the system
-    (empty string if not installed)."""
-    # Try to import NumPy and if it is not found,
-    # show the proper error message to the user
+    """Return a string containing the NumPy
+    version (empty string if not installed)."""
+    # Try to import NumPy and if it is not
+    # found, show an error message to the user
     try:
         # Import
         import numpy as np
@@ -180,10 +184,11 @@ def get_numpy_version():
     except ImportError:
         # Show the error message
         traceback.print_exc()
-        # Set the version as an empty string
+        # Set the version to an empty string
         numpy_version = ""
 
-    # Return the installed NumPy version
+    # Return the installed
+    # version of NumPy
     return numpy_version
 
 
@@ -200,27 +205,30 @@ def configuration(parent_package="", top_path=None):
     # checking whether it is installed in the system
     from numpy.distutils.misc_util import Configuration
 
-    # Create the configuration file
+    # Create the configuration file of the scikit-lr package
     config = Configuration(None, parent_package, top_path)
 
-    # Avoid useless messages
+    # Remove useless messages
+    # from the configuration file
     config.set_options(
         ignore_setup_xxx_py=True,
         assume_default_configuration=True,
         delegate_options_to_subpackages=True,
         quiet=True)
 
-    # Add the subpackage containing the sklr module
+    # Add to the configuration file the
+    # subpackage with the sklr module
     config.add_subpackage("sklr")
 
-    # Return the configuration
+    # Return the configuration file
+    # of the scikit-lr package
     return config
 
 
 def setup_package():
-    """Configure the scikit-lr package."""
-    # Setup the metadata for the package
-    # (defined at the beginning)
+    """Setup the scikit-lr package."""
+    # Setup the metadata of the scikit-lr package
+    # (all information has been previously defined)
     metadata = dict(
         name=DISTNAME,
         version=VERSION,
@@ -238,39 +246,40 @@ def setup_package():
         cmdclass=CMDCLASS,
         **EXTRA_SETUPTOOLS_ARGS)
 
-    # For some actions like installing from pip, NumPy is not required.
-    # Therefore, the setuptools are employed in such cases
+    # For some actions like installing from pip, NumPy is not
+    # required. Therefore, setuptools are employed in such cases
     if (len(sys.argv) == 1 or
             len(sys.argv) >= 2 and ("--help" in sys.argv[1:] or
                                     sys.argv[1] in (
                                         "--help-commands",
                                         "egg_info",
                                         "--version",
-                                        "clean"
-                                    ))):
+                                        "clean"))):
         try:
             from setuptools import setup
         except ImportError:
             from distutils.core import setup
-    # Otherwise, NumPy is required. So, its setup
-    # configuration method must be imported
+    # Otherwise, NumPy is required. Therefore, its
+    # setup configuration method must be imported
     else:
-        # Check the Python version installed in the system
+        # Ensure that the Python version installed in the system
+        # is greater than or equal the minimum required version
         if sys.version_info < (3, 6):
             raise RuntimeError("scikit-lr requires Python 3.6 or later. "
                                "The current Python version is {} "
                                "installed in {}."
                                .format(python_version(), sys.executable))
-        # Get the version
+        # Get the NumPy version
+        # installed in the system
         numpy_version = get_numpy_version()
-        # If NumPy is not installed, show the
-        # corresponding message to the user
+        # If NumPy is not installed, show an import error to
+        # the user with the minimum required version of NumPy
         if not numpy_version:
             raise ImportError("NumPy is not installed. "
                               "At least version {} is required."
                               .format(NUMPY_MIN_VERSION))
-        # If the version is not the required ones, show the got and
-        # the minimum required version with the corresponding message
+        # Otherwise, if the installed version is not the minimum required one,
+        # inform to the user about the got and the minimum required version
         elif parse_version(numpy_version) < parse_version(NUMPY_MIN_VERSION):
             raise ImportError("Your installation of NumPy is not "
                               "the required. Got {} but requires >={}."
@@ -278,10 +287,11 @@ def setup_package():
         # Import the setup method from NumPy
         # to install the scikit-lr package
         from numpy.distutils.core import setup
-        # Setup the configuration
+        # Setup the metadata of the configuration
         metadata["configuration"] = configuration
 
-    # Setup the package
+    # Setup the scikit-lr package
+    # with the gathered metadata
     setup(**metadata)
 
 
@@ -289,5 +299,4 @@ def setup_package():
 # Main
 # =============================================================================
 if __name__ == "__main__":
-    """Only called when this file is the "main" one."""
     setup_package()
