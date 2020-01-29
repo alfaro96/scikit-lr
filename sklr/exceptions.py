@@ -1,30 +1,23 @@
 """
-The :mod:`sklr.exceptions` module includes all custom
-warnings and error classes used across scikit-lr.
+The :mod:`sklr.exceptions` module includes all custom warnings and error
+classes used across scikit-lr.
 """
 
 
 # =============================================================================
-# Public objects
+# Module public objects
 # =============================================================================
-
-# Define the list of public classes and methods that
-# will be exported from this module when importing it
 __all__ = ["NotFittedError"]
 
 
 # =============================================================================
 # Classes
 # =============================================================================
-
-# =============================================================================
-# Not fitted error
-# =============================================================================
 class NotFittedError(ValueError, AttributeError):
     """Exception class to raise if estimator is used before fitting.
 
-    This class inherits from both ``ValueError`` and ``AttributeError``
-    to help with exception handling and backward compatibility.
+    This class inherits from both ``ValueError`` and ``AttributeError`` to help
+    with exception handling and backward compatibility.
 
     Examples
     --------
@@ -32,7 +25,7 @@ class NotFittedError(ValueError, AttributeError):
     >>> from sklr.neighbors import KNeighborsLabelRanker
     >>> from sklr.exceptions import NotFittedError
     >>> try:
-    ...     KNeighborsLabelRanker().predict(np.array([[1, 2]]))
+    ...     KNeighborsLabelRanker().predict(np.array([[1, 2], [2, 3], [3, 4]]))
     ... except NotFittedError as e:
     ...     print(repr(e))
     NotFittedError("This KNeighborsLabelRanker instance is not fitted yet.
