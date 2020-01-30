@@ -4,6 +4,7 @@
 
 # Standard
 from os import name
+from sys import argv
 
 # Third party
 from numpy import get_include
@@ -11,7 +12,7 @@ from numpy.distutils.core import setup
 from numpy.distutils.misc_util import Configuration
 
 # Local application
-from sklr._build_utils import maybe_cythonize_extensions
+from sklr._build_utils import cythonize_extensions
 
 
 # =============================================================================
@@ -70,10 +71,11 @@ def configuration(parent_package="", top_path=None):
     # tests for the sklr module
     config.add_subpackage("tests")
 
-    # Maybe "cythonize" the extension modules.
-    # This is employed to avoid compiling
-    # the Cython files in release mode
-    maybe_cythonize_extensions(top_path, config)
+    # Skip cythonization as it is not wanted to include the generated
+    # C/C++ files in the release tarballs as they are not necessarily
+    # forward compatible with future versions of Python for instance
+    if 'sdist' not in argv:
+        cythonize_extensions(top_path, config)
 
     # Return the configuration
     return config
