@@ -1,4 +1,4 @@
-"""Testing for the base methods to load popular reference datasets."""
+"""Testing for the base methods to load all the popular datasets."""
 
 
 # =============================================================================
@@ -9,13 +9,14 @@
 import pytest
 
 # Local application
-from sklr.datasets import (
-    load_authorship, load_bodyfat, load_blocks, load_breast, load_calhousing,
-    load_cold, load_cpu, load_diau, load_dtt, load_ecoli, load_elevators,
-    load_fried, load_glass, load_heat, load_housing, load_iris, load_letter,
-    load_libras, load_pendigits, load_satimage, load_segment, load_shuttle,
-    load_spo, load_stock, load_vehicle, load_vowel, load_wine, load_wisconsin,
-    load_yeast)
+from sklr.datasets import (load_authorship, load_bodyfat, load_blocks,
+                           load_breast, load_calhousing, load_cold, load_cpu,
+                           load_diau, load_dtt, load_ecoli, load_elevators,
+                           load_fried, load_glass, load_heat, load_housing,
+                           load_iris, load_letter, load_libras, load_pendigits,
+                           load_satimage, load_segment, load_shuttle, load_spo,
+                           load_stock, load_vehicle, load_vowel, load_wine,
+                           load_wisconsin, load_yeast)
 from sklr.utils import unique_rankings
 
 
@@ -23,12 +24,10 @@ from sklr.utils import unique_rankings
 # Initialization
 # =============================================================================
 
-# The problems from which the data can be loaded
+# Define the lists with the different problems so that they can be
+# used for parameterizing the testing methods to load the datasets
 LABEL_RANKING = ["label_ranking"]
 PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
-
-# Merge the previous lists for those
-# datasets that support both problems
 BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
 
 
@@ -36,34 +35,17 @@ BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
 # Testing
 # =============================================================================
 
-def check_data(method, problem, shape):
+def check_data(load_data, problem, shape):
     """Check the shape of the data provided by the method."""
-    # Store the interesting attributes
-    # of the dataset in a bunch object
-    bunch = method(problem, return_X_Y=False)
+    (data, ranks) = load_data(problem)
 
-    # Load the data and the rankings in different arrays
-    (data, ranks) = method(problem, return_X_Y=True)
-
-    # Assert that the number of samples stored
-    # in the bunch object and the arrays is correct
-    assert bunch.data.shape[0] == data.shape[0] == \
-        ranks.shape[0] == shape[0]
-
-    # Assert that the number of features stored
-    # in the bunch object and the array is correct
-    assert bunch.data.shape[1] == data.shape[1] == \
-        len(bunch.feature_names) == shape[1]
-
-    # Assert that the number of classes stored
-    # in the bunch object and the array is correct
-    assert bunch.ranks.shape[1] == ranks.shape[1] == \
-        len(bunch.class_names) == shape[2]
-
-    # Assert that the number of different rankings computed
-    # from the bunch object and the array is correct
-    assert unique_rankings(bunch.ranks).shape[0] == \
-        unique_rankings(ranks).shape[0] == \
+    # Ensure that the number of samples, number of features,
+    # number of classes and the number of different rankings
+    # of the loaded data is the same that the expected ones
+    assert data.shape[0] == ranks.shape[0] == shape[0]
+    assert data.shape[1] == shape[1]
+    assert ranks.shape[1] == shape[2]
+    assert unique_rankings(ranks).shape[0] == \
         shape[3 if problem == "label_ranking" else 4]
 
 
@@ -73,16 +55,16 @@ def test_load_authorship(problem):
     check_data(load_authorship, problem, (841, 70, 4, 17, 5))
 
 
-@pytest.mark.parametrize("problem", LABEL_RANKING)
-def test_load_bodyfat(problem):
-    """Test the load_bodyfat method."""
-    check_data(load_bodyfat, problem, (252, 7, 7, 236, None))
-
-
 @pytest.mark.parametrize("problem", PARTIAL_LABEL_RANKING)
 def test_load_blocks(problem):
     """Test the load_blocks method."""
     check_data(load_blocks, problem, (5472, 10, 5, None, 28))
+
+
+@pytest.mark.parametrize("problem", LABEL_RANKING)
+def test_load_bodyfat(problem):
+    """Test the load_bodyfat method."""
+    check_data(load_bodyfat, problem, (252, 7, 7, 236, None))
 
 
 @pytest.mark.parametrize("problem", PARTIAL_LABEL_RANKING)

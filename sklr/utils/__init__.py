@@ -6,7 +6,6 @@
 # =============================================================================
 
 # Local application
-from .bunch import Bunch
 from .ranking import (
     unique_rankings, check_label_ranking_targets,
     check_partial_label_ranking_targets, type_of_targets,
@@ -20,13 +19,9 @@ from .validation import (
 # Public objects
 # =============================================================================
 
-# Set the classes that are accessible
-# from the module sklr.utils
-__all__ = ["Bunch"]
-
 # Set the methods that are accessible
 # from the module sklr.utils
-__all__ += [
+__all__ = [
     "check_array", "check_consistent_length",
     "check_is_fitted", "check_label_ranking_targets",
     "check_partial_label_ranking_targets", "check_random_state",

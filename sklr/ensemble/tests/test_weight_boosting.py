@@ -114,7 +114,7 @@ def test_iris(AdaBoostRanker):
     model = AdaBoostRanker(n_estimators=10, random_state=seed)
 
     # Initialize the iris dataset
-    (X, Y) = load_iris(problem="label_ranking", return_X_Y=True)
+    (X, Y) = load_iris(problem="label_ranking")
 
     # Fit the boosting ranker
     # to the training dataset
