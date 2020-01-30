@@ -128,8 +128,8 @@ def test_score():
     # iris dataset for the Label Ranking problem
     # and the Partial Label Ranking problem
     datasets = [
-        load_iris(problem="label_ranking", return_X_Y=True),
-        load_iris(problem="partial_label_ranking", return_X_Y=True)
+        load_iris(problem="label_ranking"),
+        load_iris(problem="partial_label_ranking")
     ]
 
     # Check that the score obtained without

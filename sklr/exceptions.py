@@ -13,6 +13,7 @@ __all__ = ["NotFittedError"]
 # =============================================================================
 # Classes
 # =============================================================================
+
 class NotFittedError(ValueError, AttributeError):
     """Exception class to raise if estimator is used before fitting.
 

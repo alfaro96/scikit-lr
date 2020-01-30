@@ -53,8 +53,12 @@ def configuration(parent_package="", top_path=None):
     # Add the submodules with build utilities
     config.add_subpackage("_build_utils")
 
-    # Add the submodules with its own setup.py file
+    # Add the sub-modules which do not have their own setup file.
+    # We must manually add sub-submodules and tests
     config.add_subpackage("datasets")
+    config.add_subpackage("datasets/tests")
+
+    # Add the submodules with its own setup.py file
     config.add_subpackage("ensemble")
     config.add_subpackage("metrics")
     config.add_subpackage("miss")
