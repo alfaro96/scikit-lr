@@ -267,7 +267,7 @@ def load_breast(problem="partial_label_ranking"):
     """Load and return the breast dataset.
 
     The breast dataset is a classic classification
-    d adapted to the Partial Label Ranking problem.
+    dataset adapted to the Partial Label Ranking problem.
 
     ===============   ==============
     #instances                   106
