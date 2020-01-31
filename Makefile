@@ -15,11 +15,11 @@ clean:
 inplace:
 	python setup.py build_ext -i
 
-# Locally install the package
+# Install the package locally
 install:
 	python setup.py install --prefix=$(HOME)/.local
 
-# Build src files (Cython)
+# Build source Cython files
 cython:
 	python setup.py build_src
 
@@ -29,7 +29,7 @@ cython:
 test-code: inplace
 	pytest -l -v sklr --durations=20
 
-# Test the coverage
+# Test the coverage an create a beautiful report in HTML
 test-coverage:
 	rm -rf coverage .coverage
 	pytest -l -v --cov=sklr --cov-report=html:coverage

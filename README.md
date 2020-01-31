@@ -48,7 +48,7 @@ To setup a development environment, it is strongly recommended to use `docker` t
 
 ### Testing
 
-After installation the test suite can be executed from outside the source directory, with (you will need to have `pytest>=4.6.4` installed):
+After installation, the test suite can be executed, from outside the source directory, with (you will need to have `pytest>=4.6.4` installed):
 
 ```
 pytest sklr

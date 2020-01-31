@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# This script is meant to be called by the
-# "Run linting" step defined in linting.yml
-
-# The behaviour of the script is controlled by
-# the named step defined in the linting.yml
-# in the folder .github/workflows of the project
+# This script is meant to be called by the "Execute tests" step defined in
+# linting.yml. The behaviour of the script is controlled by the named step
+# defined in the linting.yml in the folder .github/workflows of the project.
 
 # Exit immediately if a command
 # exits with a non-zero status

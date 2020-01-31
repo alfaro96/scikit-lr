@@ -4,14 +4,13 @@
 
 # Standard
 from distutils.command.clean import clean as Clean
-from pkg_resources import parse_version
+from distutils.version import LooseVersion
+from importlib import import_module
 from platform import python_version
 from os import unlink, walk
-from os.path import abspath, exists, join, splitext
-import shutil
+from os.path import abspath, dirname, exists, join, splitext
 import sys
-import traceback
-import os
+import shutil
 
 # Local application
 import sklr
@@ -21,33 +20,36 @@ import sklr
 # Constants
 # =============================================================================
 
-# Name and version
-DISTNAME = "scikit-lr"
-VERSION = sklr.__version__
+# The following constants are the metadata of the package
 
-# Description
+# The name of the package, the name of the main
+# module, the current version of the package and
+# the distributing license of the project
+DISTNAME = "scikit-lr"
+MODNAME = "sklr"
+VERSION = sklr.__version__
+LICENSE = "MIT"
+
+# The short and the long description of the package (the latest loaded
+# from the README.md file for maintenance) and the content type of the
+# long description
 DESCRIPTION = "A set of Python modules for Label Ranking problems."
-with open("README.md", encoding="utf-8") as f:
+with open("README.md", mode="r", encoding="utf-8") as f:
     LONG_DESCRIPTION = f.read()
 LONG_DESCRIPTION_CONTENT_TYPE = "text/markdown"
 
-# Maintainer
+# The name and the email of the package maintainer
 MAINTAINER = "Juan Carlos Alfaro Jiménez"
 MAINTAINER_EMAIL = "JuanCarlos.Alfaro@uclm.es"
 
-# URLs
+# The different URLs of the project
 URL = "https://github.com/alfaro96/scikit-lr"
+BUG_TRACKER_URL = "https://github.com/alfaro96/scikit-lr/issues"
 DOWNLOAD_URL = "https://pypi.org/project/scikit-lr/#files"
-PROJECT_URLS = {
-    "Bug Tracker": "https://github.com/alfaro96/scikit-lr/issues",
-    "Source Code": "https://github.com/alfaro96/scikit-lr",
-    "Docker": "https://github.com/alfaro96/docker-scikit-lr"
-}
+SOURCE_CODE_URL = "https://github.com/alfaro96/scikit-lr"
+PROJECT_URLS = {"Bug Tracker": BUG_TRACKER_URL, "Source Code": SOURCE_CODE_URL}
 
-# License
-LICENSE = "MIT"
-
-# Classifiers
+# Trove classifiers to categorize each release
 CLASSIFIERS = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Education",
@@ -67,136 +69,124 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence"
 ]
 
-# Minimum version of the required packages
+# The following places must be sync with regard
+# to the Python, Numpy and SciPy versions:
+#   - .github/workflows/integration.yml
+#   - setup.py
+PYTHON_MIN_VERSION = (3, 6)
 NUMPY_MIN_VERSION = "1.17.3"
 SCIPY_MIN_VERSION = "1.3.2"
-INSTALL_REQUIRES = [
-    "numpy>={}".format(NUMPY_MIN_VERSION),
-    "scipy>={}".format(SCIPY_MIN_VERSION),
-]
+
+# The following constants are required by the package manager
+# to know the minimum required version of the packages
+PYTHON_REQUIRES = ">=" + ".".join(map(str, PYTHON_MIN_VERSION))
+NUMPY_REQUIRES = "numpy>=" + NUMPY_MIN_VERSION
+SCIPY_REQUIRES = "scipy>=" + SCIPY_MIN_VERSION
+INSTALL_REQUIRES = [NUMPY_REQUIRES, SCIPY_REQUIRES]
+
+
+# =============================================================================
+# Others
+# =============================================================================
+
+# Import setuptools early if their features are
+# wanted, as it monkey-patches the "setup" function
+SETUPTOOLS_COMMANDS = {
+    "develop", "release", "bdist_egg", "bdist_rpm",
+    "bdist_wininst", "install_egg_info", "build_sphinx",
+    "egg_info", "easy_install", "upload", "bdist_wheel",
+    "--single-version-externally-managed",
+}
+
+if SETUPTOOLS_COMMANDS.intersection(sys.argv):
+    import setuptools
+
+    extra_setuptools_args = dict(zip_safe=False,
+                                 include_package_data=True,
+                                 extras_require={"alldeps": INSTALL_REQUIRES})
+else:
+    extra_setuptools_args = dict()
 
 
 # =============================================================================
 # Classes
 # =============================================================================
 
-# =============================================================================
-# Clean command
-# =============================================================================
 class CleanCommand(Clean):
     """Custom clean command to remove build artifacts."""
 
     def run(self):
         """Execute the custom clean command."""
-        # Call to the run method of the parent
-        # to clean common files and directories
+        # Call to the method of the parent to
+        # clean common files and directories
         Clean.run(self)
 
-        # Locate the current working directory
-        # to clean the directories and files on it
-        cwd = abspath(os.path.dirname(__file__))
-
-        # Remove the .c and .cpp files if the current working directory is
-        # not a distribution (that is, the "PKG-INFO" file does not exist),
-        # since the source files are needed by the package in release mode
+        # Remove C and C++ files if the current working directory
+        # is not a source distribution, since the source files
+        # are needed by the package in release mode
+        cwd = abspath(dirname(__file__))
         remove_c_files = not exists(join(cwd, "PKG-INFO"))
 
-        # Remove the build directory
         if exists("build"):
             shutil.rmtree("build")
 
-        # Remove the .pytest_cache directory
-        if exists(".pytest_cache"):
-            shutil.rmtree(".pytest_cache")
-
-        # Look for the directories and files
-        # to remove under the sklr module
-        for (dirpath, dirnames, filenames) in walk("sklr"):
-            # Look for the files to remove
+        for (dirpath, dirnames, filenames) in walk(MODNAME):
             for filename in filenames:
-                # Get the current extension of the file
-                filename_ext = splitext(filename)[1]
-                # Check whether this file corresponding to .c or .cpp
-                # taking into account whether they must be removed
-                if filename_ext in {".c", ".cpp"} and remove_c_files:
-                    # Only remove the .c and .cpp files that have been
-                    # generated by Cython, that is, if they exists, in
-                    # the same directory, a .pyx file with the same name
-                    pyx_filename = str.replace(filename, filename_ext, ".pyx")
-                    # If this .pyx file exists, then, remove
-                    # the corresponding .c or .cpp one
-                    if exists(join(dirpath, pyx_filename)):
+                extension = splitext(filename)[1]
+                if filename.endswith((".so", ".pyd", ".dll", ".pyc")):
+                    unlink(join(dirpath, filename))
+                elif remove_c_files and extension in {".c", ".cpp"}:
+                    pyx_file = str.replace(filename, extension, ".pyx")
+                    # Remove the C and C++ files only when they are
+                    # generated from a Cython extension, because in
+                    # any other case, they really correspond to the
+                    # source code
+                    if exists(join(dirpath, pyx_file)):
                         unlink(join(dirpath, filename))
-            # Look for the directories to remove
-            for dirname in dirnames:
-                # Remove the __pycache__ and .pytest_cache directories
-                if dirname in {"__pycache__", ".pytest_cache"}:
-                    shutil.rmtree(join(dirpath, dirname))
+            for ddirname in dirnames:
+                if ddirname in {"__pycache__"}:
+                    shutil.rmtree(join(dirpath, ddirname))
 
 
-# Custom actions that can be carried
-# out when calling to this setup file
-# (defined custom clean command)
 CMDCLASS = {"clean": CleanCommand}
-
-# Optional setuptools features
-# (require that it is imported)
-SETUPTOOLS_EXTRA_COMMANDS = {
-    "alias", "bdist_egg", "bdist_wheel",
-    "develop", "dist_info", "easy_install",
-    "egg_info", "install_egg_info", "rotate",
-    "saveopts", "setopt", "test", "upload_docs"
-}
-
-# Import setuptools if at least one of
-# the extra commands have been required
-if SETUPTOOLS_EXTRA_COMMANDS.intersection(sys.argv):
-    # Import
-    import setuptools
-    # Optimize
-    EXTRA_SETUPTOOLS_ARGS = {
-        "zip_false": False,
-        "include_package_data": True,
-        "extras_require": {
-            "all_deps": INSTALL_REQUIRES
-        }
-    }
-
-# Set the extra arguments as an empty set
-# as far as the setuptools are not required
-EXTRA_SETUPTOOLS_ARGS = {}
 
 
 # =============================================================================
 # Methods
 # =============================================================================
 
-def get_numpy_version():
-    """Return a string containing the NumPy
-    version (empty string if not installed)."""
-    # Try to import NumPy and if it is not
-    # found, show an error message to the user
-    try:
-        # Import
-        import numpy as np
-        # Get the version
-        numpy_version = np.__version__
-    except ImportError:
-        # Show the error message
-        traceback.print_exc()
-        # Set the version to an empty string
-        numpy_version = ""
+def _check_python_version(min_version):
+    """Check that the Python version installed in the system
+    is greater than or equal the minimum required version."""
+    if sys.version_info < min_version:
+        raise RuntimeError("Scikit-lr requires Python {0} or later. "
+                           "The current Python version is {1} installed "
+                           "in {2}.".format(python_version(), min_version,
+                                            sys.executable))
 
-    # Return the installed
-    # version of NumPy
-    return numpy_version
+
+def _check_package_version(package, min_version):
+    """Check that the version of the package installed in the
+    system is greater than or equal the minimum required version."""
+    # Re-raise with a more informative message when the package is not
+    # installed
+    try:
+        module = import_module(package)
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError("Please install {0} with a version >= "
+                                  "{1} in order to install scikit-lr."
+                                  .format(package, min_version))
+
+    if LooseVersion(module.__version__) < min_version:
+        raise ValueError("The current version of {0} is {1} installed in {2}."
+                         .format(package, module.__version__, module.__path__))
 
 
 def configuration(parent_package="", top_path=None):
-    """Configure the scikit-lr package."""
-    # Before building the extensions, remove .MANIFEST.
-    # Otherwise it may not be properly updated when
-    # the contents of directories change
+    """Configure the package."""
+    # Remove the manifest before building the extensions.
+    # Otherwise it may not be properly updated when the
+    # contents of directories change
     if exists("MANIFEST"):
         unlink("MANIFEST")
 
@@ -205,93 +195,63 @@ def configuration(parent_package="", top_path=None):
     # checking whether it is installed in the system
     from numpy.distutils.misc_util import Configuration
 
-    # Create the configuration file of the scikit-lr package
     config = Configuration(None, parent_package, top_path)
 
-    # Remove useless messages
-    # from the configuration file
-    config.set_options(
-        ignore_setup_xxx_py=True,
-        assume_default_configuration=True,
-        delegate_options_to_subpackages=True,
-        quiet=True)
+    # Avoid useless messages
+    config.set_options(ignore_setup_xxx_py=True,
+                       assume_default_configuration=True,
+                       delegate_options_to_subpackages=True,
+                       quiet=True)
 
-    # Add to the configuration file the
-    # subpackage with the sklr module
-    config.add_subpackage("sklr")
+    config.add_subpackage(MODNAME)
 
-    # Return the configuration file
-    # of the scikit-lr package
     return config
 
 
 def setup_package():
-    """Setup the scikit-lr package."""
-    # Setup the metadata of the scikit-lr package
-    # (all information has been previously defined)
-    metadata = dict(
-        name=DISTNAME,
-        version=VERSION,
-        description=DESCRIPTION,
-        long_description=LONG_DESCRIPTION,
-        long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
-        maintainer=MAINTAINER,
-        maintainer_email=MAINTAINER_EMAIL,
-        url=URL,
-        download_url=DOWNLOAD_URL,
-        project_urls=PROJECT_URLS,
-        license=LICENSE,
-        classifiers=CLASSIFIERS,
-        install_requires=INSTALL_REQUIRES,
-        cmdclass=CMDCLASS,
-        **EXTRA_SETUPTOOLS_ARGS)
+    """Setup the package."""
+    # Need to create a dictionary with the metadata of the package
+    # to ensure that it is properly incorporated in the index
+    metadata = dict(name=DISTNAME,
+                    version=VERSION,
+                    license=LICENSE,
+                    maintainer=MAINTAINER,
+                    maintainer_email=MAINTAINER_EMAIL,
+                    description=DESCRIPTION,
+                    long_description=LONG_DESCRIPTION,
+                    url=URL,
+                    download_url=DOWNLOAD_URL,
+                    project_urls=PROJECT_URLS,
+                    classifiers=CLASSIFIERS,
+                    cmdclass=CMDCLASS,
+                    python_requires=PYTHON_REQUIRES,
+                    install_requires=INSTALL_REQUIRES,
+                    **extra_setuptools_args)
 
-    # For some actions like installing from pip, NumPy is not
-    # required. Therefore, setuptools are employed in such cases
+    # For these actions, NumPy is not required. They are required to succeed,
+    # for example, when pip manager is used to install the package when NumPy
+    # is not yet present in the system
     if (len(sys.argv) == 1 or
             len(sys.argv) >= 2 and ("--help" in sys.argv[1:] or
-                                    sys.argv[1] in (
-                                        "--help-commands",
-                                        "egg_info",
-                                        "--version",
-                                        "clean"))):
+                                    sys.argv[1] in {"--help-commands",
+                                                    "egg_info", "dist_info",
+                                                    "--version", "clean"})):
+        # Use setuptools because these commands do
+        # not work well or at all with distutils
         try:
             from setuptools import setup
         except ImportError:
             from distutils.core import setup
-    # Otherwise, NumPy is required. Therefore, its
-    # setup configuration method must be imported
+        metadata["version"] = VERSION
     else:
-        # Ensure that the Python version installed in the system
-        # is greater than or equal the minimum required version
-        if sys.version_info < (3, 6):
-            raise RuntimeError("scikit-lr requires Python 3.6 or later. "
-                               "The current Python version is {} "
-                               "installed in {}."
-                               .format(python_version(), sys.executable))
-        # Get the NumPy version
-        # installed in the system
-        numpy_version = get_numpy_version()
-        # If NumPy is not installed, show an import error to
-        # the user with the minimum required version of NumPy
-        if not numpy_version:
-            raise ImportError("NumPy is not installed. "
-                              "At least version {} is required."
-                              .format(NUMPY_MIN_VERSION))
-        # Otherwise, if the installed version is not the minimum required one,
-        # inform to the user about the got and the minimum required version
-        elif parse_version(numpy_version) < parse_version(NUMPY_MIN_VERSION):
-            raise ImportError("Your installation of NumPy is not "
-                              "the required. Got {} but requires >={}."
-                              .format(numpy_version, NUMPY_MIN_VERSION))
-        # Import the setup method from NumPy
-        # to install the scikit-lr package
+        _check_python_version(PYTHON_MIN_VERSION)
+        _check_package_version("numpy", NUMPY_MIN_VERSION)
+        _check_package_version("scipy", SCIPY_MIN_VERSION)
+
         from numpy.distutils.core import setup
-        # Setup the metadata of the configuration
+
         metadata["configuration"] = configuration
 
-    # Setup the scikit-lr package
-    # with the gathered metadata
     setup(**metadata)
 
 
