@@ -16,6 +16,7 @@ from distutils.version import LooseVersion
 # The following places must be sync
 # with regard to the Cython version:
 #   - .github/workflows/integration.yml
+#   - docker/development/requirements/build.txt
 #   - sklr/_build_utils/__init__.py
 CYTHON_MIN_VERSION = "0.29.14"
 
