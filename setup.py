@@ -72,6 +72,8 @@ CLASSIFIERS = [
 # The following places must be sync with regard
 # to the Python, Numpy and SciPy versions:
 #   - .github/workflows/integration.yml
+#   - docker/development/requirements/build.txt
+#   - docker/development/requirements/test.txt
 #   - setup.py
 PYTHON_MIN_VERSION = (3, 6)
 NUMPY_MIN_VERSION = "1.17.3"
