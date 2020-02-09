@@ -1,8 +1,18 @@
 name: Linting tests
 
-# This workflow is triggered on
-# each push and pull request
-on: [push, pull_request]
+# This workflow will be triggered on each push or pull request
+# but only for the master and release branches, since feature
+# and bug-fix branches will be merged via pull request. Thus,
+# it ensures that changes are integrated without any issue
+on:
+  push:
+    branches:
+      - master
+      - [0-9]+.[0-9]+.X
+  pull_request:
+    branches:
+      - master
+      - [0-9]+.[0-9]+.X
 
 jobs:
   # Linux environment to test that PRs do not add
