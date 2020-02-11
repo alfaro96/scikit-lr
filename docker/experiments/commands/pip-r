@@ -1,0 +1,31 @@
+#!/usr/bin/Rscript
+
+# Activate the command line arguments and
+# get the requirements to be installed
+args <- commandArgs(TRUE)
+requirements <- readLines(file(args[1], open="r"))
+
+# Install the devtools package and activate
+# it to install specific package versions
+install.packages("devtools", dependencies=TRUE)
+require(devtools)
+
+for (i in 1:length(requirements))
+{
+    # Extract from the read line, the package to
+    # be installed and its version (if available)
+    line <- unlist(strsplit(requirements[i], "=="))
+    package <- line[1]
+    version <- if (length(line) == 2) line[2] else NULL
+
+    # If possible, install the package using the specified version,
+    # otherwise, use the latest version available in the CRAN mirror
+    if (!is.null(version))
+    {
+        install.packages(package, version=version)
+    }
+    else
+    {
+        install.packages(package)
+    }
+}

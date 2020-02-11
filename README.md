@@ -24,7 +24,7 @@
 
 ### User installation
 
-The easiest way to install `scikit-lr` is using `pip` package:
+The easiest way to install `scikit-lr` is using `pip` package manager:
 
 ```
 pip install -U scikit-lr
@@ -44,7 +44,7 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Setting up a development environment
 
-To setup a development environment, it is strongly recommended to use `docker` tools (see [docker-scikit-lr](https://github.com/alfaro96/docker-scikit-lr) for details).
+To setup a development environment, it is strongly recommended to use `docker` tools (see the [`README.md`](https://github.com/alfaro96/scikit-lr/tree/master/docker/development/README.md) file for details).
 
 ### Testing
 
