@@ -1,4 +1,4 @@
-# Contributing to `scikit-lr`
+# Contributing
 
 There are many ways to contribute to `scikit-lr`, with the most common ones being contribution of code or documentation to the project. Improving the documentation is no less important than improving the library itself. If you find a typo in the documentation, or have made improvements, do not hesitate to submit a `GitHub` pull request.
 
