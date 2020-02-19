@@ -13,8 +13,8 @@ import pytest
 # Local application
 from sklr.utils import (
     unique_rankings, check_label_ranking_targets,
-    check_partial_label_ranking_targets,
-    is_ranking_without_ties, is_ranking_with_ties, rank_data)
+    check_partial_label_ranking_targets, is_ranking_without_ties,
+    is_ranking_with_ties, num_buckets, rank_data)
 
 
 # =============================================================================
@@ -37,6 +37,21 @@ Y_unknown = np.array([[1, 2, 4]])
 # =============================================================================
 # Testing
 # =============================================================================
+
+@pytest.mark.num_buckets
+def test_num_buckets():
+    """Test the num_buckets method."""
+    np.testing.assert_almost_equal(num_buckets(Y_lr), 3)
+    np.testing.assert_almost_equal(num_buckets(Y_random_lr), 2)
+    np.testing.assert_almost_equal(num_buckets(Y_top_lr), 3)
+    np.testing.assert_almost_equal(num_buckets(Y_plr), 2)
+    np.testing.assert_almost_equal(num_buckets(Y_random_plr), 5/3)
+    np.testing.assert_almost_equal(num_buckets(Y_random_plr), 5/3)
+    np.testing.assert_almost_equal(num_buckets(Y_top_plr), 7/3)
+
+    with pytest.raises(ValueError):
+        num_buckets(Y_unknown)
+
 
 @pytest.mark.unique_rankings
 def test_unique_rankings():
