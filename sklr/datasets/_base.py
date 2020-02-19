@@ -84,7 +84,9 @@ def load_authorship(problem="label_ranking"):
     #attributes                   70
     #classes                       4
     #rankings (LR)                17
-    #rankings (PLR)                5
+    #rankings (PLR)               47
+    #buckets (LR)                  4
+    #buckets (PLR)           3.06302
     ===============   ==============
 
     Parameters
@@ -113,11 +115,6 @@ def load_authorship(problem="label_ranking"):
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
 
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
-
     Examples
     --------
     Let us say you are interested in the samples 10, 25 and 50.
@@ -130,9 +127,9 @@ def load_authorship(problem="label_ranking"):
            [1, 3, 4, 2]])
     >>> (_, ranks) = load_authorship(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2],
-           [1, 2, 2, 2],
-           [1, 2, 2, 2]])
+    array([[1, 2, 4, 3],
+           [1, 2, 3, 2],
+           [1, 2, 3, 2]])
     """
     return load_data(MODULE_PATH, problem, "authorship.csv")
 
@@ -148,7 +145,9 @@ def load_blocks(problem="partial_label_ranking"):
     #attributes                   10
     #classes                       5
     #rankings (LR)                 -
-    #rankings (PLR)               28
+    #rankings (PLR)              116
+    #buckets (LR)                  -
+    #buckets (PLR)           2.33662
     ===============   ==============
 
     Parameters
@@ -173,14 +172,10 @@ def load_blocks(problem="partial_label_ranking"):
             "Multistrategy Learning for Document Recognition",
             Applied Artificial Intelligence, vol. 8, pp. 33-84, 1994.`_
 
-    .. [2] `D. Malerba and F. Esposito and G. Semeraro, "A Further Comparison
-            of Simplification Methods for Decision-Tree Induction",
-            Lecture Notes in Statistics, vol. 112, pp. 365-374, 1996.`_
-
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+    .. [2] `D. Malerba and F. Esposito and G. Semeraro,
+            "A Further Comparison of Simplification Methods for
+            Decision-Tree Induction", Lecture Notes in Statistics,
+            vol. 112, pp. 365-374, 1996.`_
 
     Examples
     --------
@@ -189,8 +184,8 @@ def load_blocks(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_blocks
     >>> (_, ranks) = load_blocks(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2],
+    array([[1, 4, 4, 3, 2],
+           [1, 2, 3, 3, 3],
            [1, 2, 2, 2, 2]])
     """
     return load_data(MODULE_PATH, problem, "blocks.csv")
@@ -208,6 +203,8 @@ def load_bodyfat(problem="label_ranking"):
     #classes                       7
     #rankings (LR)               236
     #rankings (PLR)                -
+    #buckets (LR)                  7
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -237,8 +234,8 @@ def load_bodyfat(problem="label_ranking"):
     .. [3] `W. E. Siri, "Gross composition of the body", Advances in
             Biological and Medical Physics, vol. 4, pp. 239-280, 1956.`_
 
-    .. [4] `F. Katch and W. McArdle, "Nutrition, Weight Control, and Exercise".
-            Houghton Mifflin, 1977.`_
+    .. [4] `F. Katch and W. McArdle, "Nutrition, Weight Control,
+            and Exercise". Houghton Mifflin, 1977.`_
 
     .. [5] `J. Wilmore, "Athletic Training and Physical Fitness:
             Physiological Principles of the Conditioning Process".
@@ -274,7 +271,9 @@ def load_breast(problem="partial_label_ranking"):
     #attributes                    9
     #classes                       6
     #rankings (LR)                 -
-    #rankings (PLR)               22
+    #rankings (PLR)               62
+    #buckets (LR)                  -
+    #buckets (PLR)           3.92453
     ===============   ==============
 
     Parameters
@@ -301,12 +300,8 @@ def load_breast(problem="partial_label_ranking"):
 
     .. [2] `J. Estrela and J. P. Marques, "Classification of breast
             tissue by electrical impedance spectroscopy", Medical and
-            Biological Engineering and Computing, vol. 38, pp. 26-30, 2000.`_
-
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+            Biological Engineering and Computing, vol. 38, pp. 26-30,
+            2000.`_
 
     Examples
     --------
@@ -315,9 +310,9 @@ def load_breast(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_breast
     >>> (_, ranks) = load_breast(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2, 2, 2],
-           [2, 1, 2, 2, 2, 2],
-           [2, 3, 1, 3, 3, 3]])
+    array([[1, 3, 2, 3, 3, 2],
+           [4, 1, 2, 3, 4, 4],
+           [1, 3, 2, 3, 4, 4]])
     """
     return load_data(MODULE_PATH, problem, "breast.csv")
 
@@ -334,6 +329,8 @@ def load_calhousing(problem="label_ranking"):
     #classes                       4
     #rankings (LR)                24
     #rankings (PLR)                -
+    #buckets (LR)                  4
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -388,6 +385,8 @@ def load_cold(problem="label_ranking"):
     #classes                       4
     #rankings (LR)                24
     #rankings (PLR)                -
+    #buckets (LR)                  4
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -438,6 +437,8 @@ def load_cpu(problem="label_ranking"):
     #classes                       5
     #rankings (LR)               119
     #rankings (PLR)                -
+    #buckets (LR)                  5
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -458,9 +459,9 @@ def load_cpu(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `C. E. Rasmussen and R. M. Neal and G. Hinton and D. van Camp
-            and M. Revow and R. Kustra and R. Tibshirani. "Data for
-            Evaluating Learning in Valid Experiments",
+    .. [1] `C. E. Rasmussen and R. M. Neal and G. Hinton and
+            D. van Camp and M. Revow and R. Kustra and R. Tibshirani.
+            "Data for Evaluating Learning in Valid Experiments",
             https://www.cs.toronto.edu/~delve/group.html, 1996.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
@@ -494,6 +495,8 @@ def load_diau(problem="label_ranking"):
     #classes                       7
     #rankings (LR)               967
     #rankings (PLR)                -
+    #buckets (LR)                  7
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -539,11 +542,13 @@ def load_dtt(problem="label_ranking"):
     dataset adapted to the Label Ranking problem.
 
     ===============   ==============
-    # instances                 2465
-    # attributes                  24
-    # classes                      4
-    # rankings (LR)               24
-    # rankings (PLR)               -
+    #instances                  2465
+    #attributes                   24
+    #classes                       4
+    #rankings (LR)                24
+    #rankings (PLR)                -
+    #buckets (LR)                  4
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -593,7 +598,9 @@ def load_ecoli(problem="partial_label_ranking"):
     #attributes                    7
     #classes                       8
     #rankings (LR)                 -
-    #rankings (PLR)               39
+    #rankings (PLR)              179
+    #buckets (LR)                  -
+    #buckets (PLR)           4.13988
     ===============   ==============
 
     Parameters
@@ -614,15 +621,11 @@ def load_ecoli(problem="partial_label_ranking"):
 
     References
     ----------
-    .. [1] `P. Horton and K. Nakai, "A Probabilistic Classification System
-            for Predicting the Cellular Localization Sites of Proteins",
-            In Proceedings of the Fourth International Conference on
-            Intelligent Systems for Molecular Biology, 1996, pp. 109-115.`_
-
-    .. [2] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+    .. [1] `P. Horton and K. Nakai, "A Probabilistic Classification
+            System for Predicting the Cellular Localization Sites
+            of Proteins", In Proceedings of the Fourth International
+            Conference on Intelligent Systems for Molecular Biology,
+            1996, pp. 109-115.`_
 
     Examples
     --------
@@ -631,9 +634,9 @@ def load_ecoli(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_ecoli
     >>> (_, ranks) = load_ecoli(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2, 2, 2]])
+    array([[1, 3, 4, 4, 3, 4, 4, 2],
+           [1, 3, 3, 3, 3, 3, 3, 2],
+           [1, 2, 4, 4, 4, 4, 5, 3]])
     """
     return load_data(MODULE_PATH, problem, "ecoli.csv")
 
@@ -650,6 +653,8 @@ def load_elevators(problem="label_ranking"):
     #classes                       9
     #rankings (LR)               131
     #rankings (PLR)                -
+    #buckets (LR)                  9
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -670,9 +675,9 @@ def load_elevators(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `C. E. Rasmussen and R. M. Neal and G. Hinton and D. van Camp
-            and M. Revow and R. Kustra and R. Tibshirani. "Data for
-            Evaluating Learning in Valid Experiments",
+    .. [1] `C. E. Rasmussen and R. M. Neal and G. Hinton and D.
+            van Camp and M. Revow and R. Kustra and R. Tibshirani.
+            "Data for Evaluating Learning in Valid Experiments",
             https://www.cs.toronto.edu/~delve/group.html, 1996.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
@@ -706,6 +711,8 @@ def load_fried(problem="label_ranking"):
     #classes                       5
     #rankings (LR)               120
     #rankings (PLR)                -
+    #buckets (LR)                  5
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -759,7 +766,9 @@ def load_glass(problem="label_ranking"):
     #attributes                    9
     #classes                       6
     #rankings (LR)                30
-    #rankings (PLR)               23
+    #rankings (PLR)              105
+    #buckets (LR)                  6
+    #buckets (PLR)           4.08879
     ===============   ==============
 
     Parameters
@@ -789,11 +798,6 @@ def load_glass(problem="label_ranking"):
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
 
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
-
     Examples
     --------
     Let us say you are interested in the samples 10, 25 and 50.
@@ -806,9 +810,9 @@ def load_glass(problem="label_ranking"):
            [1, 2, 3, 4, 5, 6]])
     >>> (_, ranks) = load_glass(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 3, 3, 3, 3],
-           [1, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2]])
+    array([[2, 1, 3, 3, 3, 3],
+           [1, 2, 3, 4, 4, 3],
+           [1, 3, 2, 5, 6, 4]])
     """
     return load_data(MODULE_PATH, problem, "glass.csv")
 
@@ -825,6 +829,8 @@ def load_heat(problem="label_ranking"):
     #classes                       6
     #rankings (LR)               622
     #rankings (PLR)                -
+    #buckets (LR)                  6
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -875,6 +881,8 @@ def load_housing(problem="label_ranking"):
     #classes                       6
     #rankings (LR)               112
     #rankings (PLR)                -
+    #buckets (LR)                  6
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -929,7 +937,9 @@ def load_iris(problem="label_ranking"):
     #attributes                    4
     #classes                       3
     #rankings (LR)                 5
-    #rankings (PLR)                6
+    #rankings (PLR)                7
+    #buckets (LR)                  3
+    #buckets (PLR)           2.38000
     ===============   ==============
 
     Parameters
@@ -951,18 +961,14 @@ def load_iris(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `R. A. Fisher, "The use of multiple measurements in taxonomic
-            problems", Annals of Eugenics, vol. 7, pp. 179-188, 1936.`_
+    .. [1] `R. A. Fisher, "The use of multiple measurements in
+            taxonomic problems", Annals of Eugenics, vol. 7,
+            pp. 179-188, 1936.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
-
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
 
     Examples
     --------
@@ -978,7 +984,7 @@ def load_iris(problem="label_ranking"):
     >>> ranks[[10, 25, 50]]
     array([[1, 2, 2],
            [1, 2, 2],
-           [2, 1, 2]])
+           [3, 1, 2]])
     """
     return load_data(MODULE_PATH, problem, "iris.csv")
 
@@ -994,7 +1000,9 @@ def load_letter(problem="partial_label_ranking"):
     #attributes                   16
     #classes                      26
     #rankings (LR)                 -
-    #rankings (PLR)              273
+    #rankings (PLR)            15014
+    #buckets (LR)                  -
+    #buckets (PLR)           7.03260
     ===============   ==============
 
     Parameters
@@ -1019,11 +1027,6 @@ def load_letter(problem="partial_label_ranking"):
             Holland-style adaptive classifiers", Machine Learning,
             vol. 6, pp. 161-182, 1991.`_
 
-    .. [2] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
-
     Examples
     --------
     Let us say you are interested in the samples 10, 25 and 50.
@@ -1031,12 +1034,12 @@ def load_letter(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_letter
     >>> (_, ranks) = load_letter(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-        2, 2, 2, 2],
-           [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2],
-           [2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2]])
+    array([[5, 6, 5, 6, 5, 6, 5, 5, 4, 6, 6, 5, 6, 6, 6, 6, 5, 6, 2, 6, 5, 6,
+            6, 1, 3, 3],
+           [8, 9, 1, 9, 3, 9, 2, 7, 4, 5, 9, 6, 8, 9, 5, 9, 6, 8, 3, 8, 7, 9,
+            9, 8, 9, 6],
+           [2, 7, 6, 8, 7, 7, 7, 8, 7, 7, 8, 7, 5, 7, 7, 7, 4, 8, 5, 7, 5, 7,
+            6, 8, 1, 3]])
     """
     return load_data(MODULE_PATH, problem, "letter.csv")
 
@@ -1052,7 +1055,9 @@ def load_libras(problem="partial_label_ranking"):
     #attributes                   90
     #classes                      15
     #rankings (LR)                 -
-    #rankings (PLR)               38
+    #rankings (PLR)              356
+    #buckets (LR)                  -
+    #buckets (PLR)           6.88889
     ===============   ==============
 
     Parameters
@@ -1073,16 +1078,11 @@ def load_libras(problem="partial_label_ranking"):
 
     References
     ----------
-    .. [1] `D. B. Dias and R. C. B. Madeo and T. Rocha and H. H. Bíscaro
-            and S. M. Peres, "Hand Movement Recognition for Brazilian
-            Sign Language: A Study Using Distance-based Neural Networks",
-            In Proceedings of the 2009 international joint conference
-            on Neural Networks, 2009, pp. 2355-2362.`_
-
-    .. [2] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+    .. [1] `D. B. Dias and R. C. B. Madeo and T. Rocha and H. H.
+            Bíscaro and S. M. Peres, "Hand Movement Recognition for
+            Brazilian Sign Language: A Study Using Distance-based
+            Neural Networks", In Proceedings of the 2009 international
+            joint conference on Neural Networks, 2009, pp. 2355-2362.`_
 
     Examples
     --------
@@ -1091,9 +1091,9 @@ def load_libras(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_libras
     >>> (_, ranks) = load_libras(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-           [2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-           [2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]])
+    array([[1, 2, 6, 7, 5, 7, 4, 7, 5, 3, 6, 4, 7, 6, 3],
+           [3, 1, 6, 6, 4, 5, 2, 6, 3, 4, 6, 4, 6, 5, 6],
+           [7, 6, 1, 7, 6, 5, 2, 4, 3, 5, 7, 5, 7, 7, 4]])
     """
     return load_data(MODULE_PATH, problem, "libras.csv")
 
@@ -1109,7 +1109,9 @@ def load_pendigits(problem="label_ranking"):
     #attributes                   16
     #classes                      10
     #rankings (LR)              2081
-    #rankings (PLR)               60
+    #rankings (PLR)             3327
+    #buckets (LR)                 10
+    #buckets (PLR)           3.39747
     ===============   ==============
 
     Parameters
@@ -1132,20 +1134,15 @@ def load_pendigits(problem="label_ranking"):
     References
     ----------
     .. [1] `F. Alimoglu and E. Alpaydin, "Methods of Combining Multiple
-            Classifiers Based on Different Representations for Pen-based
-            Handwritten Digit Recognition", In Proceedings of the Fifth
-            Turkish Artificial Intelligence and Artificial Neural Networks
-            Symposium, 1996.`_
+            Classifiers Based on Different Representations for
+            Pen-based Handwritten Digit Recognition", In Proceedings
+            of the Fifth Turkish Artificial Intelligence and Artificial
+            Neural Networks Symposium, 1996.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
-
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
 
     Examples
     --------
@@ -1177,7 +1174,9 @@ def load_satimage(problem="partial_label_ranking"):
     #attributes                   36
     #classes                       6
     #rankings (LR)                 -
-    #rankings (PLR)               35
+    #rankings (PLR)              504
+    #buckets (LR)                  -
+    #buckets (PLR)           3.35649
     ===============   ==============
 
     Parameters
@@ -1198,16 +1197,11 @@ def load_satimage(problem="partial_label_ranking"):
 
     References
     ----------
-    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and R.
-            Henery, "Comparison of Machine Learning Classifiers to Statistics
-            and Neural Networks", In Proceedings of the 4th International
-            Workshop on Artificial Intelligence and Statistics, 1993,
-            pp. 41-52.`_
-
-    .. [2] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and
+            R. Henery, "Comparison of Machine Learning Classifiers to
+            Statistics and Neural Networks", In Proceedings of the 4th
+            International Workshop on Artificial Intelligence and
+            Statistics, 1993, pp. 41-52.`_
 
     Examples
     --------
@@ -1216,9 +1210,9 @@ def load_satimage(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_satimage
     >>> (_, ranks) = load_satimage(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[2, 2, 2, 1, 2, 2],
-           [2, 2, 1, 2, 2, 2],
-           [2, 2, 1, 2, 2, 2]])
+    array([[4, 5, 3, 1, 4, 2],
+           [3, 3, 1, 2, 3, 3],
+           [3, 5, 5, 4, 1, 2]])
     """
     return load_data(MODULE_PATH, problem, "satimage.csv")
 
@@ -1234,7 +1228,9 @@ def load_segment(problem="label_ranking"):
     #attributes                   18
     #classes                       7
     #rankings (LR)               135
-    #rankings (PLR)               20
+    #rankings (PLR)              271
+    #buckets (LR)                  7
+    #buckets (PLR)           3.03074
     ===============   ==============
 
     Parameters
@@ -1256,21 +1252,16 @@ def load_segment(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and R.
-            Henery, "Comparison of Machine Learning Classifiers to Statistics
-            and Neural Networks", In Proceedings of the 4th International
-            Workshop on Artificial Intelligence and Statistics, 1993,
-            pp. 41-52.`_
+    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and
+            R. Henery, "Comparison of Machine Learning Classifiers to
+            Statistics and Neural Networks", In Proceedings of the 4th
+            International Workshop on Artificial Intelligence and
+            Statistics, 1993, pp. 41-52.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
-
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
 
     Examples
     --------
@@ -1284,7 +1275,7 @@ def load_segment(problem="label_ranking"):
            [1, 7, 4, 2, 3, 5, 6]])
     >>> (_, ranks) = load_segment(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[3, 3, 3, 1, 2, 3, 3],
+    array([[3, 5, 5, 2, 1, 4, 5],
            [2, 2, 2, 2, 1, 2, 2],
            [1, 2, 2, 2, 2, 2, 2]])
     """
@@ -1298,11 +1289,13 @@ def load_shuttle(problem="partial_label_ranking"):
     dataset adapted to the Partial Label Ranking problem.
 
     ===============   ==============
-    #instances                 43500
+    #instances                 58000
     #attributes                    9
     #classes                       7
     #rankings (LR)                 -
-    #rankings (PLR)               18
+    #rankings (PLR)              136
+    #buckets (LR)                  -
+    #buckets (PLR)           2.01317
     ===============   ==============
 
     Parameters
@@ -1323,16 +1316,11 @@ def load_shuttle(problem="partial_label_ranking"):
 
     References
     ----------
-    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and R.
-            Henery, "Comparison of Machine Learning Classifiers to Statistics
-            and Neural Networks", In Proceedings of the 4th International
-            Workshop on Artificial Intelligence and Statistics, 1993,
-            pp. 41-52.`_
-
-    .. [2] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and
+            R. Henery, "Comparison of Machine Learning Classifiers to
+            Statistics and Neural Networks", In Proceedings of the 4th
+            International Workshop on Artificial Intelligence and
+            Statistics, 1993, pp. 41-52.`_
 
     Examples
     --------
@@ -1360,6 +1348,8 @@ def load_spo(problem="label_ranking"):
     #classes                      11
     #rankings (LR)              2361
     #rankings (PLR)                -
+    #buckets (LR)                 11
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -1410,6 +1400,8 @@ def load_stock(problem="label_ranking"):
     #classes                       5
     #rankings (LR)                51
     #rankings (PLR)                -
+    #buckets (LR)                  5
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -1430,8 +1422,8 @@ def load_stock(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `H. Altay and I. Uysal, "Bilkent University Function Approximation
-            Repository", 2000.`_
+    .. [1] `H. Altay and I. Uysal, "Bilkent University Function
+            Approximation Repository", 2000.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
@@ -1463,7 +1455,9 @@ def load_vehicle(problem="label_ranking"):
     #attributes                   18
     #classes                       4
     #rankings (LR)                18
-    #rankings (PLR)               13
+    #rankings (PLR)               47
+    #buckets (LR)                  4
+    #buckets (PLR)           3.11702
     ===============   ==============
 
     Parameters
@@ -1485,21 +1479,16 @@ def load_vehicle(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and R.
-            Henery, "Comparison of Machine Learning Classifiers to Statistics
-            and Neural Networks", In Proceedings of the 4th International
-            Workshop on Artificial Intelligence and Statistics, 1993,
-            pp. 41-52.`_
+    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and
+            R. Henery, "Comparison of Machine Learning Classifiers to
+            Statistics and Neural Networks", In Proceedings of the 4th
+            International Workshop on Artificial Intelligence and
+            Statistics, 1993, pp. 41-52.`_
 
     .. [2] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
-
-    .. [3] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
 
     Examples
     --------
@@ -1513,9 +1502,9 @@ def load_vehicle(problem="label_ranking"):
            [3, 4, 2, 1]])
     >>> (_, ranks) = load_vehicle(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2],
-           [1, 2, 2, 2],
-           [2, 1, 2, 2]])
+    array([[1, 3, 4, 2],
+           [1, 3, 2, 3],
+           [3, 1, 4, 2]])
     """
     return load_data(MODULE_PATH, problem, "vehicle.csv")
 
@@ -1531,7 +1520,9 @@ def load_vowel(problem="label_ranking"):
     #attributes                   10
     #classes                      11
     #rankings (LR)               294
-    #rankings (PLR)               23
+    #rankings (PLR)              504
+    #buckets (LR)                 11
+    #buckets (PLR)           5.73863
     ===============   ==============
 
     Parameters
@@ -1553,23 +1544,19 @@ def load_vowel(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `M. Niranjan and F. Fallside, "Neural networks and radial basis
-            functions in classifying static speech patterns", Computer Speech
-            and Language, vol. 4, pp. 275-289, 1990.`_
+    .. [1] `M. Niranjan and F. Fallside, "Neural networks and radial
+            basis functions in classifying static speech patterns",
+            Computer Speech and Language, vol. 4, pp. 275-289, 1990.`_
 
     .. [2] `S. Renals and R. Rohwer, "Phoneme Classification Experiments
-            Using Radial Basis Functions", In Proceedings of the International
-            1989 Joint Conference on Neural Networks, 1989, pp. 461-467.`_
+            Using Radial Basis Functions", In Proceedings of the
+            International 1989 Joint Conference on Neural Networks,
+            1989, pp. 461-467.`_
 
     .. [3] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
-
-    .. [4] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
 
     Examples
     --------
@@ -1583,9 +1570,9 @@ def load_vowel(problem="label_ranking"):
            [ 8,  9, 10, 11,  2,  4,  1,  5,  3,  7,  6]])
     >>> (_, ranks) = load_vowel(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-           [2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2],
-           [2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2]])
+    array([[7, 6, 6, 3, 2, 6, 5, 7, 4, 5, 1],
+           [8, 7, 6, 1, 3, 4, 5, 8, 5, 7, 2],
+           [8, 7, 8, 7, 5, 4, 1, 3, 2, 6, 7]])
     """
     return load_data(MODULE_PATH, problem, "vowel.csv")
 
@@ -1601,7 +1588,9 @@ def load_wine(problem="label_ranking"):
     #attributes                   13
     #classes                       3
     #rankings (LR)                 5
-    #rankings (PLR)                5
+    #rankings (PLR)               11
+    #buckets (LR)                  3
+    #buckets (PLR)           2.67978
     ===============   ==============
 
     Parameters
@@ -1623,23 +1612,19 @@ def load_wine(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `S. Aeberhard and D. Coomans and O. de Vel, "Comparative analysis
-            of statistical pattern recognition methods in high dimensional
-            settings", Pattern Recognition, vol. 27, pp. 1065-1077, 1994.`_
+    .. [1] `S. Aeberhard and D. Coomans and O. de Vel, "Comparative
+            analysis of statistical pattern recognition methods in
+            high dimensional settings", Pattern Recognition, vol. 27,
+            pp. 1065-1077, 1994.`_
 
-    .. [2] `S. Aeberhard and D. Coomans and O. de Vel, "Improvements to the
-            classification performance of RDA", Journal of Chemometrics,
-            vol. 7, pp. 99-115, 1993.`_
+    .. [2] `S. Aeberhard and D. Coomans and O. de Vel, "Improvements
+            to the classification performance of RDA", Journal of
+            Chemometrics, vol. 7, pp. 99-115, 1993.`_
 
     .. [3] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
             instance-based learning for label ranking", In Proceedings
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
-
-    .. [4] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
 
     Examples
     --------
@@ -1654,8 +1639,8 @@ def load_wine(problem="label_ranking"):
     >>> (_, ranks) = load_wine(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
     array([[1, 2, 2],
-           [1, 2, 2],
-           [1, 2, 2]])
+           [1, 2, 3],
+           [1, 2, 3]])
     """
     return load_data(MODULE_PATH, problem, "wine.csv")
 
@@ -1672,6 +1657,8 @@ def load_wisconsin(problem="label_ranking"):
     #classes                      16
     #rankings (LR)               194
     #rankings (PLR)                -
+    #buckets (LR)                 16
+    #buckets (PLR)                 -
     ===============   ==============
 
     Parameters
@@ -1692,34 +1679,36 @@ def load_wisconsin(problem="label_ranking"):
 
     References
     ----------
-    .. [1] `W. N. Street and O. L. Mangasarian and W. H. Wolberg, "An inductive
-            learning approach to prognostic prediction", In Proceedings of the
-            Twelfth International Conference on Machine Learning, 1995,
-            pp. 522-530.`_
+    .. [1] `W. N. Street and O. L. Mangasarian and W. H. Wolberg, "An
+            inductive learning approach to prognostic prediction", In
+            Proceedings of the Twelfth International Conference on
+            Machine Learning, 1995, pp. 522-530.`_
 
     .. [2] `O. L. Mangasarian and W. N. Street and W. H. Wolberg,
-            "Breast cancer diagnosis and prognosis via linear programming",
-            Operations Research, vol. 43, pp. 570-577, 1995.`_
+            "Breast cancer diagnosis and prognosis via linear
+            programming", Operations Research, vol. 43, pp. 570-577,
+            1995.`_
 
-    .. [3] `W. H. Wolberg and W. N. Street and D. M. Heisey and
-            O. L. Mangasarian, "Computerized breast cancer diagnosis and
-            prognosis from fine needle aspirates",
-            Archives of Surgery, vol 130, pp. 511-516, 1995.`_
+    .. [3] `W. H. Wolberg and W. N. Street and D. M. Heisey and O.
+            L. Mangasarian, "Computerized breast cancer diagnosis and
+            prognosis from fine needle aspirates", Archives of Surgery,
+            vol 130, pp. 511-516, 1995.`_
 
     .. [4] `W. H. Wolberg and W. N. Street and O. L. Mangasarian,
             "Image analysis and machine learning applied to breast
-            cancer diagnosis and prognosis", Analytical and Quantitative
-            Cytology and Histology, vol. 17, pp. 77-87, 1995.`_
+            cancer diagnosis and prognosis", Analytical and
+            Quantitative Cytology and Histology, vol. 17, pp. 77-87,
+            1995.`_
 
     .. [5] `W. H. Wolberg and W. N. Street and O. L. Mangasarian,
-            "Computer-derived nuclear grade and breast cancer prognosis",
-            Analytical and Quantitative Cytology and Histology,
-            vol. 17, pp. 257-264, 1995.`_
+            "Computer-derived nuclear grade and breast cancer
+            prognosis", Analytical and Quantitative Cytology and
+            Histology, vol. 17, pp. 257-264, 1995.`_
 
     .. [6] `W. Cheng and J. Hühn and E. Hüllermeier, "Decision tree and
-            instance-based learning for label ranking", In Proceedings of
-            the 26th International Conference on Machine Learning, 2009,
-            pp. 161-168.`_
+            instance-based learning for label ranking", In Proceedings
+            of the 26th International Conference on Machine Learning,
+            2009, pp. 161-168.`_
 
     Examples
     --------
@@ -1746,7 +1735,9 @@ def load_yeast(problem="partial_label_ranking"):
     #attributes                    8
     #classes                      10
     #rankings (LR)                 -
-    #rankings (PLR)               81
+    #rankings (PLR)             1006
+    #buckets (LR)                  -
+    #buckets (PLR)           5.92925
     ===============   ==============
 
     Parameters
@@ -1767,23 +1758,19 @@ def load_yeast(problem="partial_label_ranking"):
 
     References
     ----------
-    .. [1] `P. Horton and K. Nakai, "A Probablistic Classification System
-            for Predicting the Cellular Localization Sites of Proteins",
-            Intelligent Systems in Molecular Biology, vol. 4, pp. 109-115,
-            1996.`_
+    .. [1] `P. Horton and K. Nakai, "A Probablistic Classification
+            System for Predicting the Cellular Localization Sites
+            of Proteins", Intelligent Systems in Molecular Biology,
+            vol. 4, pp. 109-115, 1996.`_
 
-    .. [2] `K. Nakai and M. Kanehisa, "Expert Sytem for Predicting Protein
-            Localization Sites in Gram-Negative Bacteria", Proteins: Structure,
-            Function, and Bioinformatics, vol. 11, pp. 95-110, 1991.`_
+    .. [2] `K. Nakai and M. Kanehisa, "Expert Sytem for Predicting
+            Protein Localization Sites in Gram-Negative Bacteria",
+            Proteins: Structure, Function, and Bioinformatics,
+            vol. 11, pp. 95-110, 1991.`_
 
-    .. [3] `K. Nakai and M. Kanehisa, "A Knowledge Base for Predicting Protein
-            Localization Sites in Eukaryotic Cells", Genomics, vol. 14,
-            pp. 987-911, 1992.`_
-
-    .. [4] `J. C. Alfaro, J. A. Aledo, y J. A. Gámez, "Algoritmos basados en
-            árboles de decisión para partial label ranking", In Actas de la
-            XVIII Conferencia de la Asociación Española para la Inteligencia
-            Artificial, 2018, pp. 15-20.`_
+    .. [3] `K. Nakai and M. Kanehisa, "A Knowledge Base for Predicting
+            Protein Localization Sites in Eukaryotic Cells", Genomics,
+            vol. 14, pp. 987-911, 1992.`_
 
     Examples
     --------
@@ -1792,8 +1779,8 @@ def load_yeast(problem="partial_label_ranking"):
     >>> from sklr.datasets import load_yeast
     >>> (_, ranks) = load_yeast(problem="partial_label_ranking")
     >>> ranks[[10, 25, 50]]
-    array([[3, 1, 2, 3, 3, 3, 3, 3, 3, 3],
-           [1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-           [3, 2, 1, 3, 3, 3, 3, 3, 3, 3]])
+    array([[3, 2, 1, 6, 6, 6, 5, 4, 6, 6],
+           [1, 3, 2, 5, 5, 5, 5, 4, 5, 5],
+           [3, 2, 1, 6, 5, 6, 4, 5, 6, 6]])
     """
     return load_data(MODULE_PATH, problem, "yeast.csv")
