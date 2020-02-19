@@ -1108,16 +1108,11 @@ cdef class PairOrderMatrixBuilder:
                     precedences_matrix[f_class, s_class, 1] += weight
                 # Otherwise, apply the standard procedure
                 else:
-                    # Since either "f_class" or "s_class" is missed,
-                    # then either "f_class" could precede "s_class"
-                    # or viceversa. Moreover, it is also considered
-                    # that they can be tied
+                    # By-pass the information of this precedence relation if
+                    # either "f_class" or "s_class" is missed in this ranking
                     if (y[f_class] == RANK_TYPE.RANDOM or
                             y[s_class] == RANK_TYPE.RANDOM):
-                        precedences_matrix[f_class, s_class, 0] += weight
-                        precedences_matrix[s_class, f_class, 0] += weight
-                        precedences_matrix[f_class, s_class, 1] += weight
-                        precedences_matrix[s_class, f_class, 1] += weight
+                        pass
                     # "f_class" precedes "s_class", put the
                     # corresponding weight in the entry
                     # where counting the precedences
