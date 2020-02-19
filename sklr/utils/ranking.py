@@ -31,6 +31,45 @@ _RANK_TYPES = {
 # Methods
 # =============================================================================
 
+def num_buckets(Y):
+    """Find the mean number of buckets in an array.
+
+    Parameters
+    ----------
+    Y : np.ndarray of shape (n_samples, n_classes)
+        The input rankings.
+
+    Returns
+    -------
+    buckets : float
+        The mean number of buckets in the input rankings.
+
+    Raises
+    ------
+    ValueError
+        If the input rankings are not for neither the
+        Label Ranking problem nor the Partial Label problem.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from sklr.utils import num_buckets
+    >>> Y = np.array([[1, 2, 2], [2, 3, 1], [1, 1, 1]])
+    >>> num_buckets(Y)
+    2.0
+    """
+    target_types = type_of_targets(Y)
+
+    if "unknown" in target_types:
+        raise ValueError("Unknown label type: {}."
+                         .format(sorted(list(target_types))))
+
+    # Missing classes are not consired when computing the number of buckets
+    buckets = np.mean([np.unique(y[~np.isnan(y)]).shape[0] for y in Y])
+
+    return buckets
+
+
 def unique_rankings(Y):
     """Find the unique rankings of an array.
 
