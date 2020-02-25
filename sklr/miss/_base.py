@@ -15,7 +15,7 @@ import numpy as np
 from ._base_fast import miss_classes
 from ._base_fast import STRATEGIES
 from ..base import BaseEstimator, TransformerMixin
-from ..utils.validation import check_is_fitted, check_random_state
+from ..utils.validation import check_random_state
 
 
 # =============================================================================
@@ -111,7 +111,7 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
             greater or equal than zero and less or equal than one.
         """
         # Validate the training rankings
-        Y = self._validate_training_rankings(Y)
+        Y = self._validate_train_ranks(Y)
 
         # Check that the strategy takes a valid value
         if self.strategy not in {"random", "top"}:
@@ -171,11 +171,8 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
             If the number of classes of the input rankings
             is different than the fitted number of classes.
         """
-        # Check that the estimator is fitted
-        check_is_fitted(self)
-
         # Validate the test data
-        Y = self._validate_test_rankings(Y)
+        Y = self._validate_test_ranks(Y)
 
         # Initialize the number of samples and the
         # number of classes from the input rankings

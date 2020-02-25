@@ -30,8 +30,7 @@ from ._base import MAX_RAND_SEED
 from ..base import LabelRankerMixin
 from ..metrics import kendall_distance as error_lr
 from ..tree import DecisionTreeLabelRanker
-from ..utils.validation import (
-    check_is_fitted, check_random_state, has_fit_parameter)
+from ..utils.validation import check_random_state, has_fit_parameter
 
 
 # =============================================================================
@@ -86,8 +85,7 @@ class BaseWeightBoosting(BaseEnsemble, ABC):
         self : object
         """
         # Validate the training data and rankings
-        (X, Y, sample_weight) = self._validate_training_data(
-            X, Y, sample_weight)
+        (X, Y, sample_weight) = self._validate_train_data(X, Y, sample_weight)
 
         # Normalize the provided sample
         # weights to make them sum one
@@ -164,9 +162,6 @@ class BaseWeightBoosting(BaseEnsemble, ABC):
         Y : np.ndarray of shape (n_samples, n_classes)
             The predicted rankings.
         """
-        # Check if the model is fitted
-        check_is_fitted(self)
-
         # Check the test data
         X = self._validate_test_data(X)
 

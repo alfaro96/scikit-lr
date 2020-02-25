@@ -72,12 +72,6 @@ class TestSimpleMisser:
         (self.misser.set_hyperparams(percentage=0.0)
                     .fit(self.Y))
 
-        # Assert that a value error is raised when the
-        # type of targets of the input rankings is not
-        # a subset of the fitted type of targets
-        with pytest.raises(ValueError):
-            self.misser.transform(np.array([[0, 0, 0]]))
-
         # Assert that a value error is raised when
         # the number of classes of the input rankings
         # is different than the fitted number of classes

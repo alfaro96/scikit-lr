@@ -159,6 +159,7 @@ def check_is_fitted(estimator):
     attrs = [
         v for v in vars(estimator)
         if (v.endswith("_") or v.startswith("_")) and not v.startswith("__")
+        and v not in {"n_samples_", "n_features_", "n_classes_"}
     ]
 
     # Check if the estimator contains the corresponding attributes
@@ -169,7 +170,7 @@ def check_is_fitted(estimator):
                              .format(type(estimator).__name__))
 
 
-def _check_sample_weight(sample_weight, X):
+def check_sample_weight(sample_weight, X):
     """Validate sample weights.
 
     Note that passing sample_weight=None will output an array of ones.
