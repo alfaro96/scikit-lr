@@ -31,7 +31,7 @@ from .utils.ranking import (
     check_label_ranking_targets, check_partial_label_ranking_targets,
     _transform_rankings)
 from .utils.validation import (
-    check_array, check_consistent_length, _check_sample_weight)
+    check_array, check_consistent_length, check_sample_weight)
 
 
 # =============================================================================
@@ -300,7 +300,7 @@ cdef class RankAggregationAlgorithm:
         cdef INT64_t n_classes = Y.shape[1]
 
         # Check the sample weights
-        sample_weight = _check_sample_weight(sample_weight, Y)
+        sample_weight = check_sample_weight(sample_weight, Y)
 
         # Transform the rankings for
         # properly handle them in Cython

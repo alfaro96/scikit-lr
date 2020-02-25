@@ -18,8 +18,7 @@ from ._base import _indexes_to_mask
 from ._base import MAX_RAND_SEED
 from ..base import LabelRankerMixin, PartialLabelRankerMixin
 from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
-from ..utils.validation import (
-    check_is_fitted, check_random_state, has_fit_parameter)
+from ..utils.validation import check_random_state, has_fit_parameter
 
 
 # =============================================================================
@@ -189,8 +188,7 @@ class BaseBagging(BaseEnsemble, ABC):
         # and, if provided, the sample weights. In fact,
         # they are not stored (only checked) since they
         # will be modified when fitting the estimators
-        (X, Y, _) = self._validate_training_data(
-            X, Y, sample_weight)
+        (X, Y, _) = self._validate_train_data(X, Y, sample_weight)
 
         # Obtain the random state
         random_state = check_random_state(self.random_state)
@@ -279,9 +277,6 @@ class BaseBagging(BaseEnsemble, ABC):
         Y : np.ndarray of shape (n_samples, n_classes)
             The predicted rankings.
         """
-        # Check if the model is fitted
-        check_is_fitted(self)
-
         # Check the test data
         X = self._validate_test_data(X)
 

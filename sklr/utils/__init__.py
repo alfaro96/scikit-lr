@@ -13,7 +13,7 @@ from .ranking import (
     rank_data)
 from .validation import (
     check_array, check_is_fitted, check_consistent_length,
-    check_random_state, check_X_Y, has_fit_parameter)
+    check_random_state, check_sample_weight, check_X_Y, has_fit_parameter)
 
 
 # =============================================================================
@@ -26,7 +26,7 @@ __all__ = [
     "check_array", "check_consistent_length",
     "check_is_fitted", "check_label_ranking_targets",
     "check_partial_label_ranking_targets", "check_random_state",
-    "check_X_Y", "has_fit_parameter", "is_ranking_without_ties",
-    "is_ranking_with_ties", "num_buckets", "rank_data",
-    "type_of_targets", "unique_rankings"
+    "check_sample_weight", "check_X_Y", "has_fit_parameter",
+    "is_ranking_without_ties", "is_ranking_with_ties", "num_buckets",
+    "rank_data", "type_of_targets", "unique_rankings"
 ]

@@ -1,4 +1,4 @@
-"""Testing for base classes of all estimators."""
+"""Testing of base classes for all estimators."""
 
 
 # =============================================================================
@@ -10,41 +10,18 @@ import numpy as np
 import pytest
 
 # Local application
+from sklr.miss import SimpleMisser
 from sklr.base import BaseEstimator
 from sklr.base import is_label_ranker, is_partial_label_ranker
-from sklr.datasets import load_iris
-from sklr.tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
+from sklr.neighbors import KNeighborsLabelRanker, KNeighborsPartialLabelRanker
 
 
 # =============================================================================
 # Classes
 # =============================================================================
 
-# =============================================================================
-# P
-# =============================================================================
-class P(BaseEstimator):
-    """P."""
-    pass
-
-
-# =============================================================================
-# K
-# =============================================================================
-class K(BaseEstimator):
-    """K."""
-
-    def __init__(self, c=None, d=None):
-        """Constructor."""
-        self.c = c
-        self.d = d
-
-
-# =============================================================================
-# T
-# =============================================================================
-class T(BaseEstimator):
-    """T."""
+class Foo(BaseEstimator):
+    """Foo estimator."""
 
     def __init__(self, a=None, b=None):
         """Constructor."""
@@ -52,128 +29,99 @@ class T(BaseEstimator):
         self.b = b
 
 
-# =============================================================================
-# Initialization
-# =============================================================================
+class Bar(BaseEstimator):
+    """Bar estimator."""
 
-# Initialize a seed to always obtain the same results. It
-# has been obtained from the service https://www.random.org,
-# which seems to obtain true random numbers
-seed = 198075
+    def __init__(self, c=None, d=None):
+        """Constructor."""
+        self.c = c
+        self.d = d
 
-# Initialize the random state generator using the seed.
-# This will guarantee that the tests are reproducible
-# by anyone even if they are run in other conditions
-random_state = np.random.RandomState(seed)
+
+class Baz(BaseEstimator):
+    """Baz estimator."""
+
+    def __init__(self, **hyperparams):
+        """Constructor."""
+        pass
 
 
 # =============================================================================
 # Testing
 # =============================================================================
 
-@pytest.mark.get_hyperparams
-def test_get_hyperparams():
-    """Test the get_hyperparams method."""
-    # Initialize an estimator whose hyperparameters are estimators
-    # to ensure that the nested hyperparameters are properly got
-    test = T(a=K(), b=K())
+class TestBaseEstimator:
+    """Testing for base class for all estimators in scikit-lr."""
 
-    # Assert that the hyperparameters are properly obtained according
-    # to whether those of the sub-objects must be also obtained
-    assert "a__d" in test.get_hyperparams(deep=True)
-    assert "a__d" not in test.get_hyperparams(deep=False)
+    def setup(self):
+        """Setup the attributes for testing."""
+        # Dummy estimators for common methods of all estimators
+        self.foo = Foo(a="foo", b="foo")
+        self.baz = Baz(e="baz", f="baz")
+        self.bar = Bar(c=self.foo, d=self.foo)
 
-    # Assert that an exception is raised when the estimator does not set
-    # their hyperparameters in the signature of their __init__ constructor
-    with pytest.raises(RuntimeError):
-        P().get_hyperparams(deep=True)
+        # Real estimators for particular methods of transformers and rankers
+        self.misser = SimpleMisser(strategy="top")
+        self.label_ranker = KNeighborsLabelRanker(n_neighbors=3)
+        self.partial_label_ranker = KNeighborsPartialLabelRanker(n_neighbors=3)
 
+        # Toy dataset to assess that the handled errors are properly raised
+        self.X = np.array([[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3]])
+        self.Y = np.array([[1, 2, 3], [2, 1, 3], [1, 2, 3], [3, 1, 2]])
 
-@pytest.mark.set_hyperparams
-def test_set_hyperparams():
-    """Test the set_hyperparams method."""
-    # Initialize an estimator whose hyperparameters are
-    # estimators to ensure that the nested hyperparameters
-    # are properly set in the corresponding objects
-    test = T(a=K(), b=K())
+        # Sample weights to test that score of the rankers
+        # with and without sample weighting is different
+        self.sample_weight = np.array([0.1, 0.2, 0.3, 0.4])
 
-    # Set an hyperparameter (except in the first call) into the
-    # estimator and an inner hyperparameters into the sub-estimators
-    test.set_hyperparams()
-    test.set_hyperparams(b=None)
-    test.set_hyperparams(a__d=2)
+    def test_gets_raised(self):
+        """Test that some of the errors are raised."""
+        with pytest.raises(ValueError):
+            self.misser.fit(self.Y).transform(self.Y[:, 1:])
 
-    # Assert the hyperparameters has been properly set for both,
-    # the estimator and the nested objects that are estimators
-    assert test.b is None
-    assert test.a.d == 2
+        with pytest.raises(ValueError):
+            self.label_ranker.fit(self.X, self.Y).predict(self.X[:, 1])
 
-    # Assert that an error is raised when the
-    # hyperparameter does not belong to the estimator
-    with pytest.raises(ValueError):
-        test.set_hyperparams(c=None)
+        with pytest.raises(ValueError):
+            self.partial_label_ranker.fit(self.X, self.Y).predict(self.X[:, 1])
 
+    def test_get_hyperparams(self):
+        """Test the get_hyperparams method."""
+        assert "c__a" in self.bar.get_hyperparams(deep=True)
+        assert "c__a" not in self.bar.get_hyperparams(deep=False)
 
-def test_score():
-    """Test the score method."""
-    # Initialize estimators for the Label Ranking problem
-    # and the Partial Label Ranking problem, that is, a
-    # Label Ranker and a Partial Label Ranker
-    estimators = [
-        DecisionTreeLabelRanker(random_state=seed, max_depth=3),
-        DecisionTreePartialLabelRanker(random_state=seed, max_depth=3)
-    ]
+        with pytest.raises(RuntimeError):
+            self.baz.get_hyperparams(deep=True)
 
-    # Initialize the data and the rankings of the
-    # iris dataset for the Label Ranking problem
-    # and the Partial Label Ranking problem
-    datasets = [
-        load_iris(problem="label_ranking"),
-        load_iris(problem="partial_label_ranking")
-    ]
+    def test_set_hyperparams(self):
+        """Test the set_hyperparams method."""
+        self.bar.set_hyperparams(c="bar")
+        self.bar.set_hyperparams(d__a="bar")
 
-    # Check that the score obtained without
-    # and with sample weighting is different
-    for (estimator, dataset) in zip(estimators, datasets):
-        # Fit the estimator
-        estimator.fit(X=dataset[0], Y=dataset[1])
-        # Generate random sample weights
-        sample_weight = random_state.randint(1, 10, size=dataset[0].shape[0])
-        # Obtain the score without and with sample weighting
-        score = estimator.score(
-            X=dataset[0], Y=dataset[1])
-        weighted_score = estimator.score(
-            X=dataset[0], Y=dataset[1], sample_weight=sample_weight)
-        # Assert that the score without and with sample weighting is different
-        assert score != weighted_score
+        assert self.bar.c == "bar"
+        assert self.bar.d.a == "bar"
 
+        with pytest.raises(ValueError):
+            self.foo.set_hyperparams(c="foo")
 
-@pytest.mark.is_label_ranker
-def test_is_label_ranker():
-    """Test the is_label_ranker method."""
-    # Assert that an estimator of the class
-    # DecisionTreeLabelRanker is a Label Ranker
-    assert is_label_ranker(
-        DecisionTreeLabelRanker(random_state=seed))
+    def test_score(self):
+        """Test the score method."""
+        self.label_ranker.fit(self.X, self.Y)
+        self.partial_label_ranker.fit(self.X, self.Y)
 
-    # Assert that an estimator of the class
-    # DecisionTreePartialLabelRanker
-    # is not a Label Ranker
-    assert not is_label_ranker(
-        DecisionTreePartialLabelRanker(random_state=seed))
+        assert self.label_ranker.score(self.X, self.Y) != \
+            self.label_ranker.score(self.X, self.Y, self.sample_weight)
 
+        assert self.partial_label_ranker.score(self.X, self.Y) != \
+            self.partial_label_ranker.score(self.X, self.Y, self.sample_weight)
 
-@pytest.mark.is_partial_label_ranker
-def test_is_partial_label_ranker():
-    """Test the is_partial_label_ranker method."""
-    # Assert that an estimator of the class
-    # DecisionTreePartialLabelRanker
-    # is a Partial Label Ranker
-    assert is_partial_label_ranker(
-        DecisionTreePartialLabelRanker(random_state=seed))
+    def test_is_label_ranker(self):
+        """Test the is_label_ranker method."""
+        assert not is_label_ranker(self.misser)
+        assert is_label_ranker(self.label_ranker)
+        assert not is_label_ranker(self.partial_label_ranker)
 
-    # Assert that an estimator of the class
-    # DecisionTreeLabelRanker is not a
-    # Partial Label Ranker
-    assert not is_partial_label_ranker(
-        DecisionTreeLabelRanker(random_state=seed))
+    def test_is_partial_label_ranker(self):
+        """Test the is_partial_label_ranker method."""
+        assert not is_partial_label_ranker(self.misser)
+        assert is_partial_label_ranker(self.partial_label_ranker)
+        assert not is_partial_label_ranker(self.label_ranker)

@@ -115,7 +115,7 @@ class BaseNeighbors(BaseEstimator, ABC):
         self : object
         """
         # Validate the training data
-        (X, Y) = self._validate_training_data(X, Y)
+        (X, Y) = self._validate_train_data(X, Y)
 
         # Check that the metric is correct
         self._check_metric()

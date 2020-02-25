@@ -26,7 +26,7 @@ class NotFittedError(ValueError, AttributeError):
     >>> from sklr.neighbors import KNeighborsLabelRanker
     >>> from sklr.exceptions import NotFittedError
     >>> try:
-    ...     KNeighborsLabelRanker().predict(np.array([[1, 2], [2, 3], [3, 4]]))
+    ...     KNeighborsLabelRanker(n_neighbors=1).predict(np.array([[1]]))
     ... except NotFittedError as e:
     ...     print(repr(e))
     NotFittedError("This KNeighborsLabelRanker instance is not fitted yet.

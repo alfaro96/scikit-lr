@@ -132,8 +132,7 @@ class BaseDecisionTree(BaseEstimator, ABC):
         """Fit the decision tree on the training data and rankings."""
         # Validate the training data, the training
         # rankings and also the sample weights
-        (X, Y, sample_weight) = self._validate_training_data(
-            X, Y, sample_weight)
+        (X, Y, sample_weight) = self._validate_train_data(X, Y, sample_weight)
 
         # Only considers the samples positively weighted. Also,
         # transform the rankings for properly handle them in Cython
@@ -255,9 +254,6 @@ class BaseDecisionTree(BaseEstimator, ABC):
         Y: np.ndarray of shape (n_samples, n_classes)
             The predicted rankings.
         """
-        # Check if the model is fitted
-        check_is_fitted(self)
-
         # Check the test data
         X = self._validate_test_data(X)
 
