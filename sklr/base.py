@@ -15,8 +15,7 @@ import numpy as np
 # Local application
 from .consensus import RankAggregationAlgorithm
 from .metrics import tau_score, tau_x_score
-from .utils import (check_array, check_is_fitted, check_label_ranking_targets,
-                    check_partial_label_ranking_targets, check_sample_weight,
+from .utils import (check_array, check_is_fitted, check_sample_weight,
                     check_X_Y, has_fit_parameter)
 
 
@@ -121,6 +120,8 @@ class BaseEstimator:
                                  "{1}. Check the available hyperparameters "
                                  "with `estimator.get_hyperparams().keys()`."
                                  .format(key, self.__class__.__name__))
+            # Set the estimator hyperparameter and put
+            # the value in the (nested) dictionary
             if delim:
                 nested_hyperparams[key][sub_key] = value
             else:
@@ -139,29 +140,33 @@ class BaseEstimator:
         """Validate the training samples and rankings for this
         estimator and, if possible, validate the sample weights."""
         (X, Y) = check_X_Y(X, Y)
-        self.check_targets(Y)
 
-        # Determine the output settings to validate the test
-        # data when "predict" is performed on the estimator
-        (self.n_samples_, self.n_features_) = X.shape
-        (_, self.n_classes_) = Y.shape
+        # Check that the training rankings can be managed by the Rank
+        # Aggregation algorithm of this estimator, since they are not
+        # tested if the underlying fast methods are employed directly
+        self._rank_algorithm.check_targets(Y)
 
         support_sample_weighting = has_fit_parameter(self, "sample_weight")
 
         if support_sample_weighting:
             # Does not matter whether the samples weights are
-            # validated with respect to the training samples or
+            # checked with respect to the training samples or
             # the training rankings, since both has been checked
             sample_weight = check_sample_weight(sample_weight, X)
 
+        # Determine the output shape to validate the
+        # test data when predicting with the estimator
+        (self.n_samples_, self.n_features_) = X.shape
+        (_, self.n_classes_) = Y.shape
+
         return (X, Y, sample_weight) if support_sample_weighting else (X, Y)
 
-    def _validate_train_ranks(self, Y):
+    def _validate_train_rankings(self, Y):
         """Validate the training rankings for this estimator."""
         Y = check_array(Y, dtype=np.int64)
 
-        # Determine the output settings to validate the test
-        # rankings when "transform" is performed on the estimator
+        # Determine the output shape to validate the test
+        # rankings when transforming with the estimator
         (self.n_samples_, self.n_classes_) = Y.shape
 
         return Y
@@ -180,7 +185,7 @@ class BaseEstimator:
 
         return X
 
-    def _validate_test_ranks(self, Y):
+    def _validate_test_rankings(self, Y):
         """Validate the test rankings for this estimator."""
         check_is_fitted(self)
 
@@ -200,16 +205,6 @@ class LabelRankerMixin:
 
     _estimator_type = "label_ranker"
     _rank_algorithm = RankAggregationAlgorithm.get_algorithm("borda_count")
-
-    def check_targets(self, Y):
-        """Check if the rankings are for a Label Ranker.
-
-        Parameters
-        ----------
-        Y : ndarray of shape (n_samples, n_classes), dtype=np.int64
-            The rankings to be checked.
-        """
-        return check_label_ranking_targets(Y)
 
     def score(self, X, Y, sample_weight=None):
         """Return the mean tau score on the given test data and rankings.
@@ -239,16 +234,6 @@ class PartialLabelRankerMixin:
 
     _estimator_type = "partial_label_ranker"
     _rank_algorithm = RankAggregationAlgorithm.get_algorithm("bpa_lia_mp2")
-
-    def check_targets(self, Y):
-        """Check if the rankings are for a Partial Label Ranker.
-
-        Parameters
-        ----------
-        Y : ndarray of shape (n_samples, n_classes), dtype=np.int64
-            The rankings to be checked.
-        """
-        return check_partial_label_ranking_targets(Y)
 
     def score(self, X, Y, sample_weight=None):
         """Return the mean tau-x score on the given test data and rankings.

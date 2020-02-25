@@ -232,7 +232,7 @@ cdef class RankAggregationAlgorithm:
         Borda count algorithm. If specified, the rankings
         in Y will be replaced by the completed ones."""
 
-    def _check_targets(self, Y):
+    def check_targets(self, Y):
         """Check whether the rankings in Y can be
         aggregated with the Rank Aggregation algorithm."""
 
@@ -280,7 +280,7 @@ cdef class RankAggregationAlgorithm:
 
         # Check whether the rankings can be
         # aggregated with the selected algorithm
-        self._check_targets(Y)
+        self.check_targets(Y)
 
         # Check whether the MLE process can be
         # applied with this Rank Aggregation algorithm
@@ -573,7 +573,7 @@ cdef class BordaCountAlgorithm(RankAggregationAlgorithm):
         free(consensus_copy)
         free(Y_copy)
 
-    def _check_targets(self, Y):
+    def check_targets(self, Y):
         """Check whether the rankings in Y can be
         aggregated with the Borda count algorithm."""
         # The Borda count algorithm can
@@ -924,7 +924,7 @@ cdef class BPALIAMP2Algorithm(RankAggregationAlgorithm):
             for item in bucket:
                 consensus[item] = pos
 
-    def _check_targets(self, Y):
+    def check_targets(self, Y):
         """Check whether the rankings in Y can be
         aggregated with the Bucket Pivot Algorithm
         with multiple pivots and two-stages."""

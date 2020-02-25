@@ -111,7 +111,7 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
             greater or equal than zero and less or equal than one.
         """
         # Validate the training rankings
-        Y = self._validate_train_ranks(Y)
+        Y = self._validate_train_rankings(Y)
 
         # Check that the strategy takes a valid value
         if self.strategy not in {"random", "top"}:
@@ -172,7 +172,7 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
             is different than the fitted number of classes.
         """
         # Validate the test data
-        Y = self._validate_test_ranks(Y)
+        Y = self._validate_test_rankings(Y)
 
         # Initialize the number of samples and the
         # number of classes from the input rankings
