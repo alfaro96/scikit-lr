@@ -126,10 +126,10 @@ class BaseNeighbors(BaseEstimator, ABC):
         # If the metric is precomputed, then, ensure
         # that the training data is an square matrix
         if (self.metric == "precomputed" and
-                self.n_samples_ != self.n_features_):
+                self.n_samples_in_ != self.n_features_in_):
             raise ValueError("Precomputed matrix must be a square matrix. "
                              "Input is a {}x{} matrix."
-                             .format(self.n_samples_, self.n_features_))
+                             .format(self.n_samples_in_, self.n_features_in_))
 
         # Ensure that the number of nearest neighbors
         # is an integer type greater than zero and less
@@ -141,10 +141,10 @@ class BaseNeighbors(BaseEstimator, ABC):
         elif self.n_neighbors <= 0:
             raise ValueError("Expected n_neighbors > 0. Got {}."
                              .format(self.n_neighbors))
-        elif self.n_neighbors > self.n_samples_:
+        elif self.n_neighbors > self.n_samples_in_:
             raise ValueError("Expected n_neighbors <= n_samples. "
                              "Got n_samples = {} and n_neighbors = {}."
-                             .format(self.n_samples_, self.n_neighbors))
+                             .format(self.n_samples_in_, self.n_neighbors))
 
         # Store the training instances
         # (or distances) and the rankings
@@ -162,19 +162,19 @@ class BaseNeighbors(BaseEstimator, ABC):
         # that the second dimension of the input array
         # is equal to the number of training input samples
         if self.metric == "precomputed":
-            if X.shape[1] != self.n_samples_:
+            if X.shape[1] != self.n_samples_in_:
                 raise ValueError("Precomputed metric requires shape "
                                  "(n_queries, n_indexed). "
                                  "Got {} for {} indexed."
-                                 .format(X.shape, self.n_samples_))
+                                 .format(X.shape, self.n_samples_in_))
         # Otherwise, check that the second dimension of the input array
         # is equal to the number of features on the training input samples
         else:
-            if X.shape[1] != self.n_features_:
+            if X.shape[1] != self.n_features_in_:
                 raise ValueError("Incompatible dimension for X and Y "
                                  "matrices: X.shape[1] = {} while "
                                  "Y.shape[1] = {}."
-                                 .format(X.shape[1], self.n_features_))
+                                 .format(X.shape[1], self.n_features_in_))
 
     def _pairwise_distances(self, X, reduce_func):
         """Generate a distance matrix between the input data
@@ -314,10 +314,10 @@ class KNeighborsMixin:
 
         # Ensures that the number of nearest neighbors is less
         # or equal than the number of training input samples
-        if n_neighbors > self.n_samples_:
+        if n_neighbors > self.n_samples_in_:
             raise ValueError("Expected n_neighbors <= n_samples. "
                              "Got n_samples = {} and n_neighbors = {}."
-                             .format(self.n_samples_, n_neighbors))
+                             .format(self.n_samples_in_, n_neighbors))
 
         # Obtain the number of
         # samples of the input data
