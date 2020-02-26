@@ -156,8 +156,8 @@ class BaseEstimator:
 
         # Determine the output shape to validate the
         # test data when predicting with the estimator
-        (self.n_samples_, self.n_features_) = X.shape
-        (_, self.n_classes_) = Y.shape
+        (self.n_samples_in_, self.n_features_in_) = X.shape
+        (_, self.n_classes_in_) = Y.shape
 
         return (X, Y, sample_weight) if support_sample_weighting else (X, Y)
 
@@ -167,7 +167,7 @@ class BaseEstimator:
 
         # Determine the output shape to validate the test
         # rankings when transforming with the estimator
-        (self.n_samples_, self.n_classes_) = Y.shape
+        (self.n_samples_in_, self.n_classes_in_) = Y.shape
 
         return Y
 
@@ -177,11 +177,11 @@ class BaseEstimator:
 
         X = check_array(X, dtype=np.float64)
 
-        if self.n_features_ != X.shape[1]:
+        if self.n_features_in_ != X.shape[1]:
             raise ValueError("Number of features of the model must match "
                              "the input. Model number of features is {0} "
                              "and input number of features is {1}."
-                             .format(self.n_features_, X.shape[1]))
+                             .format(self.n_features_in_, X.shape[1]))
 
         return X
 
@@ -191,11 +191,11 @@ class BaseEstimator:
 
         Y = check_array(Y, dtype=np.int64)
 
-        if self.n_classes_ != Y.shape[1]:
+        if self.n_classes_in_ != Y.shape[1]:
             raise ValueError("Number of classes of the model must match "
                              "the input. Model number of classes is {0} "
                              "and input number of classes is {1}."
-                             .format(self.n_classes_, Y.shape[1]))
+                             .format(self.n_classes_in_, Y.shape[1]))
 
         return Y
 

@@ -73,7 +73,7 @@ class Baz(BaseEstimator, TransformerMixin):
 # =============================================================================
 
 class TestBaseEstimator:
-    """Testing for base class for all estimators in scikit-lr."""
+    """Testing of the base class for all estimators in scikit-lr."""
 
     def setup(self):
         """Setup the attributes for testing."""

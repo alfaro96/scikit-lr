@@ -172,7 +172,7 @@ class BaseDecisionTree(BaseEstimator, ABC):
                                  .format(self.min_samples_split))
             min_samples_split = max(
                 2,
-                int(ceil(self.min_samples_split * self.n_samples_)))
+                int(ceil(self.min_samples_split * self.n_samples_in_)))
 
         # Ensure that the maximum number of features is one of the
         # available possible strings (forcing al least to be one).
@@ -181,19 +181,20 @@ class BaseDecisionTree(BaseEstimator, ABC):
         # greater than zero and less than or equal the number of features
         if isinstance(self.max_features, str):
             if self.max_features == "auto":
-                self.max_features_ = max(1, int(np.sqrt(self.n_features_)))
+                self.max_features_ = max(1, int(np.sqrt(self.n_features_in_)))
             elif self.max_features == "sqrt":
-                self.max_features_ = max(1, int(np.sqrt(self.n_features_)))
+                self.max_features_ = max(1, int(np.sqrt(self.n_features_in_)))
             elif self.max_features == "log2":
-                self.max_features_ = max(1, int(np.log2(self.n_features_)))
+                self.max_features_ = max(1, int(np.log2(self.n_features_in_)))
             else:
                 raise ValueError("Invalid value for max_features. Allowed "
                                  "string values are 'auto', 'sqrt' or "
                                  "'log2'.")
         elif self.max_features is None:
-            self.max_features_ = self.n_features_
+            self.max_features_ = self.n_features_in_
         elif isinstance(self.max_features, (Integral, np.integer)):
-            if self.max_features <= 0 or self.max_features > self.n_features_:
+            if (self.max_features <= 0 or
+                    self.max_features > self.n_features_in_):
                 raise ValueError("max_features must be in (0, n_features].")
             else:
                 self.max_features_ = self.max_features
@@ -202,7 +203,7 @@ class BaseDecisionTree(BaseEstimator, ABC):
                 raise ValueError("max_features must be in (0.0, 1.0].")
             else:
                 self.max_features_ = max(
-                    1, int(self.max_features * self.n_features_))
+                    1, int(self.max_features * self.n_features_in_))
 
         # Ensure that the maximum number of splits
         # considered at each internal node it at least two
@@ -226,7 +227,7 @@ class BaseDecisionTree(BaseEstimator, ABC):
                                             random_state)
 
         # Initialize the tree
-        self.tree_ = Tree(self.n_features_, self.n_classes_)
+        self.tree_ = Tree(self.n_features_in_, self.n_classes_in_)
 
         # Initialize the builder
         builder = TreeBuilder(splitter, min_samples_split, max_depth)

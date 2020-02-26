@@ -203,10 +203,10 @@ class BaseBagging(BaseEnsemble, ABC):
         if isinstance(max_samples, (Integral, np.integer)):
             self._max_samples = max_samples
         elif isinstance(max_samples, (Real, np.floating)):
-            self._max_samples = int(max_samples * self.n_samples_)
+            self._max_samples = int(max_samples * self.n_samples_in_)
         else:
             raise TypeError("max_samples must be int or float.")
-        if self._max_samples <= 0 or self._max_samples > self.n_samples_:
+        if self._max_samples <= 0 or self._max_samples > self.n_samples_in_:
             raise ValueError("max_samples must be in (0, n_samples].")
         self._max_samples = max(1, int(self._max_samples))
 
@@ -217,10 +217,10 @@ class BaseBagging(BaseEnsemble, ABC):
         if isinstance(self.max_features, (Integral, np.integer)):
             self._max_features = self.max_features
         elif isinstance(self.max_features, (Real, np.floating)):
-            self._max_features = self.max_features * self.n_features_
+            self._max_features = self.max_features * self.n_features_in_
         else:
             raise TypeError("max_features must be int or float.")
-        if self._max_features <= 0 or self._max_features > self.n_features_:
+        if self._max_features <= 0 or self._max_features > self.n_features_in_:
             raise ValueError("max_features must be in (0, n_features].")
         self._max_features = max(1, int(self._max_features))
 
