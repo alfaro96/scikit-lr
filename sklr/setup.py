@@ -47,6 +47,13 @@ def configuration(parent_package="", top_path=None):
         extra_compile_args=["-O3", "-std=c++11"],
         extra_link_args=["-std=c++11"])
 
+    config.add_extension(
+        "_types",
+        sources=["_types.pyx"],
+        include_dirs=[get_include()],
+        libraries=libraries,
+        extra_compile_args=["-O3"])
+
     # Add the data files
     config.add_data_files("consensus.pxd")
     config.add_data_files("_types.pxd")

@@ -217,7 +217,7 @@ class LabelRankerMixin:
         Y : ndarray of shape (n_samples, n_classes), dtype=np.int64
             The true rankings for ``X``.
 
-        sample_weight: ndarray of shape (n_samples,), dtype=np.float64, \
+        sample_weight : ndarray of shape (n_samples,), dtype=np.float64, \
                 default=None
             The sample weights. If ``None``, then samples are equally weighted.
 
@@ -246,7 +246,7 @@ class PartialLabelRankerMixin:
         Y : ndarray of shape (n_samples, n_classes), dtype=np.int64
             The true rankings for ``X``.
 
-        sample_weight : ndarray of shape (n_samples,), dtype=np.float64 \
+        sample_weight : ndarray of shape (n_samples,), dtype=np.float64, \
                 default=None
             The sample weights. If ``None``, then samples are equally weighted.
 
