@@ -13,20 +13,9 @@ import numpy as np
 
 # Local application
 from ._base_fast import miss_classes
+from ._base_fast import STRATEGY_MAPPING
 from ..utils import check_random_state
 from ..base import BaseEstimator, TransformerMixin
-
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-# Map the strategy string identifier
-# to the Cython integer enumeration
-STRATEGY_MAPPING = {
-    "random": 0,
-    "top": 1
-}
 
 
 # =============================================================================

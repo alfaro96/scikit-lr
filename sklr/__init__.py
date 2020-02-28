@@ -43,6 +43,7 @@ __version__ = "0.3.dev0"
 __all__ = [
     "consensus",
     "datasets",
+    "dummy",
     "ensemble",
     "exceptions",
     "metrics",

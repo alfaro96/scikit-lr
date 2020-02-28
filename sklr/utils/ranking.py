@@ -9,22 +9,12 @@
 import numpy as np
 
 # Local application
+from .._types import RANK_TYPE_MAPPING
 from ._ranking_fast import RANK_METHODS
 from ._ranking_fast import (
     are_label_ranking_targets, are_partial_label_ranking_targets,
     is_ranking_without_ties_fast, is_ranking_with_ties_fast, rank_data_view)
 from .validation import check_array
-
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-# Type of rankings
-_RANK_TYPES = {
-    "random": 2147483646,
-    "top": 2147483645
-}
 
 
 # =============================================================================
@@ -411,8 +401,8 @@ def _transform_rankings(Y):
     # Copy the randomly and top-k missed classes from
     # the input rankings to the transformed, taking
     # into account the value internally used by Cython
-    Yt[np.isnan(Y)] = _RANK_TYPES["random"]
-    Yt[np.isinf(Y)] = _RANK_TYPES["top"]
+    Yt[np.isnan(Y)] = RANK_TYPE_MAPPING["random"]
+    Yt[np.isinf(Y)] = RANK_TYPE_MAPPING["top"]
 
     # Return the transformed rankings
     return Yt
