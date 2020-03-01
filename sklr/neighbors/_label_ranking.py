@@ -1,57 +1,55 @@
-"""Nearest Neighbor Label Ranking."""
+"""Classes for Nearest Neighbors Label Rankers."""
 
 
 # =============================================================================
 # Imports
 # =============================================================================
 
-# Third party
-import numpy as np
-
 # Local application
-from ._base import BaseNeighbors, KNeighborsMixin
-from ._base import _get_weights
 from ..base import LabelRankerMixin
+from ._base import BaseNeighbors, KNeighborsMixin
 
 
 # =============================================================================
 # Classes
 # =============================================================================
 
-# =============================================================================
-# K-Nearest Neighbors
-# =============================================================================
 class KNeighborsLabelRanker(BaseNeighbors, KNeighborsMixin, LabelRankerMixin):
     """Label Ranker implementing the k-nearest neighbors vote.
 
     Hyperparameters
     ---------------
-    n_neighbors : int, optional (default=5)
-        The number of neighbors to use by
-        default for :meth:`kneighbors` queries.
+    n_neighbors : int, default=5
+        The number of neighbors to use by default for :meth:`k_neighbors`
+        queries.
 
-    weights : str, optional (defauult="uniform")
-        Weight function used in prediction. Possible values are:
+    weights : {"uniform", "distance"}, default="uniform"
+        The weight function used in prediction. The possible values are
+        "uniform", to weight all points in each neighborhood equally and
+        "distance", to weight points by the inverse of their distance, that
+        is, closer neighbors of a query point will have a greater influence
+        than neighbors which are further away.
 
-        - "uniform": Uniform weights. All points in each neighborhood
-          are weighted equally.
-        - "distance": Weight points by the inverse of their distance.
-          In this case, closer neighbors of a query point will have a
-          greater influence than neighbors which are further away.
+    p : int, default=2
+        The power parameter for the Minkowski metric. When ``p=1``, this
+        is equivalent to using Manhattan distance, and Euclidean distance
+        for ``p=2``. For arbitrary ``p``, Minkowski distance is used.
 
-    p : int, optional (default=2)
-        The power parameter for the Minkowski metric.
-        When p=1, this is equivalent to using Manhattan
-        distance (l1-norm), and Euclidean distance (l2-norm)
-        for p=2. For arbitrary p, Minkowski distance (l_p-norm) is used.
+    metric : {"manhattan", "euclidean", "minkowski", "chebyshev"}, \
+            default="minkowski"
+        The distance metric to use. The default metric is ``"minkowski"``,
+        and with ``p=2`` is equivalent to the standard Euclidean metric.
 
-    metric : str, optional (default="minkowski")
-        The distance metric to use. The default metric is
-        minkowski, and with p=2 is equivalent to the standard Euclidean
-        metric. See the documentation of the DistanceMetric class for a
-        list of available metrics.
-        If metric is "precomputed", X is assumed to be a distance matrix and
-        must be square during fit.
+    Notes
+    -----
+    Regarding the nearest neighbors algorithms, if it is found that two
+    neighbors, neighbor `k+1` and `k`, have identical distances but
+    different labels, the results will depend on the ordering of the
+    training data.
+
+    See also
+    --------
+    KNeighborsPartialLabelRanker : A K-Nearest Neighbors Partial Label Ranker.
 
     References
     ----------
@@ -64,78 +62,41 @@ class KNeighborsLabelRanker(BaseNeighbors, KNeighborsMixin, LabelRankerMixin):
             of the 26th International Conference on Machine Learning,
             2009, pp. 161-168.`_
 
-    Attributes
-    ----------
-    n_samples_ : int
-        The number of samples when ``fit`` is performed.
-
-    n_features_ : int
-        The number of features when ``fit`` is performed.
-
-    n_classes_ : int
-        The number of classes when ``fit`` is performed.
-
     Examples
     --------
     >>> import numpy as np
     >>> from sklr.neighbors import KNeighborsLabelRanker
     >>> X = np.array([[0], [1], [2], [3]])
     >>> Y = np.array([[1, 2, 3], [2, 1, 3], [1, 2, 3], [3, 1, 2]])
-    >>> model = KNeighborsLabelRanker(n_neighbors=3)
-    >>> clf = model.fit(X, Y)
-    >>> clf.predict(np.array([[1.1]]))
-    array([[1, 2, 3]])
-
-    See also
-    --------
-    KNeighborsPartialLabelRanker
-
-    Notes
-    -----
-
-    .. warning::
-
-       Regarding the Nearest Neighbors algorithms, if it is found that two
-       neighbors, neighbor `k+1` and `k`, have identical distances
-       but different labels, the results will depend on the ordering of the
-       training data.
+    >>> knn_model = KNeighborsLabelRanker(n_neighbors=3)
+    >>> knn_lr = knn_model.fit(X, Y)
+    >>> knn_lr.predict(np.array([[1.1], [2.2]]))
+    array([[1, 2, 3],
+           [2, 1, 3]])
     """
 
     def __init__(self, n_neighbors=5, weights="uniform",
-                 p=2, metric="minkowski"):
+                 metric="minkowski", p=2):
         """Constructor."""
-        # Call to the constructor of the parent
-        super().__init__(n_neighbors, weights, p, metric)
+        super(KNeighborsLabelRanker, self).__init__(
+            n_neighbors, weights, metric, p)
 
-    def predict(self, X):
-        """Predict the rankings for the provided data.
+    def fit(self, X, Y):
+        """Fit the K-Nearest Neighbors Label Ranker on the training data and
+        rankings.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_queries, n_features) or
-                (n_queries, n_samples) if metric == "precomputed".
-            Test samples.
+        X : ndarray of shape (n_samples, n_features), dtype=np.float64
+            The training samples.
+
+        Y : ndarray of shape or (n_samples, n_classes), dtype=np.int64 \
+                or dtype=np.float64
+            The target rankings.
 
         Returns
         -------
-        Y : np.ndarray of shape (n_queries, n_classes)
-            Rankings for each data sample.
+        self : KNeighborsLabelRanker
+            The fitted K-Nearest Neighbors Label Ranker.
         """
-        # Obtain the nearest neighbors
-        # (both, the indexes and the distances)
-        # and the rankings for the test samples
-        (neigh_ind, neigh_dist) = self.kneighbors(X)
-        neigh_Y = self._Y[neigh_ind]
-
-        # Obtain the weight of each nearest neighbor
-        # for all the instances in the test samples
-        neigh_sample_weight = _get_weights(neigh_Y, neigh_dist, self.weights)
-
-        # Obtain the predictions by aggregating the rankings of the
-        # nearest neighbors and taking into account the sample weights
-        predictions = np.array([
-            self._rank_algorithm.aggregate(Y, sample_weight, apply_mle=True)
-            for (Y, sample_weight) in zip(neigh_Y, neigh_sample_weight)])
-
-        # Return them
-        return predictions
+        return super(KNeighborsLabelRanker, self).fit(X, Y)

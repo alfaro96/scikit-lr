@@ -1282,60 +1282,6 @@ def load_segment(problem="label_ranking"):
     return load_data(MODULE_PATH, problem, "segment.csv")
 
 
-def load_shuttle(problem="partial_label_ranking"):
-    """Load and return the shuttle dataset.
-
-    The shuttle dataset is a classic classification
-    dataset adapted to the Partial Label Ranking problem.
-
-    ===============   ==============
-    #instances                 58000
-    #attributes                    9
-    #classes                       7
-    #rankings (LR)                 -
-    #rankings (PLR)              136
-    #buckets (LR)                  -
-    #buckets (PLR)           2.01317
-    ===============   ==============
-
-    Parameters
-    ----------
-    problem : {"partial_label_ranking"}, default="partial_label_ranking"
-        The problem for which the data is to be loaded.
-
-    Returns
-    -------
-    data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
-
-    ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in
-        ``data``. For example, ``ranks[0]`` is the target ranking
-        for ``data[0]``.
-
-    References
-    ----------
-    .. [1] `C. Fend and A. Sutherland and S. King and S. Muggleton and
-            R. Henery, "Comparison of Machine Learning Classifiers to
-            Statistics and Neural Networks", In Proceedings of the 4th
-            International Workshop on Artificial Intelligence and
-            Statistics, 1993, pp. 41-52.`_
-
-    Examples
-    --------
-    Let us say you are interested in the samples 10, 25 and 50.
-
-    >>> from sklr.datasets import load_shuttle
-    >>> (_, ranks) = load_shuttle(problem="partial_label_ranking")
-    >>> ranks[[10, 25, 50]]
-    array([[1, 2, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2, 2],
-           [1, 2, 2, 2, 2, 2, 2]])
-    """
-    return load_data(MODULE_PATH, problem, "shuttle.csv")
-
-
 def load_spo(problem="label_ranking"):
     """Load and return the spo dataset.
 
