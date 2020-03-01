@@ -16,19 +16,16 @@ from .._types cimport DTYPE_t, DTYPE_t_1D, DTYPE_t_2D, INT64_t, SIZE_t
 # Classes
 # =============================================================================
 
-# =============================================================================
-# Distance metric
-# =============================================================================
 cdef class DistanceMetric:
-    """DistanceMetric class."""
+    """A distance metric wrapper."""
+
+    # The following hyperparameters are required for a few of the
+    # subclasses to work, due to the Cython's limited polymorphism.
+    # Because it is not expected to instantiate a lot of this object
+    # (just once), the extra memory overhead should not be an issue.
 
     # Hyperparameters
-
-    # The following hyperparameter is required for a few of the subclasses.
-    # We must define it here so that Cython's limited polymorphism will work.
-    # Because we do not expect to instantiate a lot of this object (just once),
-    # the extra memory overhead of this setup should not be an issue.
-    cdef DTYPE_t p  # Power
+    cdef DTYPE_t p
 
     # Methods
     cdef DTYPE_t dist(self, DTYPE_t_1D x1, DTYPE_t_1D x2) nogil

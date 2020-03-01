@@ -18,13 +18,13 @@ from sklr.datasets import (load_authorship, load_bodyfat, load_blocks,
                            load_diau, load_dtt, load_ecoli, load_elevators,
                            load_fried, load_glass, load_heat, load_housing,
                            load_iris, load_letter, load_libras, load_pendigits,
-                           load_satimage, load_segment, load_shuttle, load_spo,
-                           load_stock, load_vehicle, load_vowel, load_wine,
-                           load_wisconsin, load_yeast)
+                           load_satimage, load_segment, load_spo, load_stock,
+                           load_vehicle, load_vowel, load_wine, load_wisconsin,
+                           load_yeast)
 
 
 # =============================================================================
-# Initialization
+# Constants
 # =============================================================================
 
 # Define the lists with the different problems so that they can be
@@ -200,13 +200,6 @@ def test_load_segment(problem):
     """Test the load_segment method."""
     check_data(load_segment, problem,
                (2310, 18, 7, 135, 271, 7, 3.03074))
-
-
-@pytest.mark.parametrize("problem", PARTIAL_LABEL_RANKING)
-def test_load_shuttle(problem):
-    """Test the load_shuttle method."""
-    check_data(load_shuttle, problem,
-               (58000, 9, 7, None, 136, None, 2.01317))
 
 
 @pytest.mark.parametrize("problem", LABEL_RANKING)

@@ -24,8 +24,8 @@ from .base import BaseEstimator, LabelRankerMixin, PartialLabelRankerMixin
 # Constants
 # =============================================================================
 
-# Define the set of allowed strategy types
-ALLOWED_STRATEGIES = {"most_frequent", "constant"}
+# Define the set of valid strategy types
+VALID_STRATEGIES = {"most_frequent", "constant"}
 
 
 # =============================================================================
@@ -45,9 +45,9 @@ class BaseDummy(BaseEstimator, ABC):
         """Fit the dummy estimator on the training data and rankings."""
         (X, Y, sample_weight) = self._validate_train_data(X, Y, sample_weight)
 
-        if self.strategy not in ALLOWED_STRATEGIES:
+        if self.strategy not in VALID_STRATEGIES:
             raise ValueError("Unknown strategy type: {0}. Expected one of {1}."
-                             .format(self.strategy, list(ALLOWED_STRATEGIES)))
+                             .format(self.strategy, list(VALID_STRATEGIES)))
 
         if self.strategy == "constant":
             if self.constant is None:
@@ -72,7 +72,7 @@ class BaseDummy(BaseEstimator, ABC):
         return self
 
     def predict(self, X):
-        """Predict rankings for ``X``.
+        """Predict rankings for the provided data.
 
         Parameters
         ----------
@@ -86,10 +86,9 @@ class BaseDummy(BaseEstimator, ABC):
         """
         X = self._validate_test_data(X)
 
-        Y = np.tile((self.constant if self.strategy == "constant"
-                     else self.ranking_), reps=(X.shape[0], 1))
-
-        return Y
+        # Repeat the constant target value for all the input samples
+        return np.tile((self.constant if self.strategy == "constant"
+                        else self.ranking_), reps=(X.shape[0], 1))
 
 
 class DummyLabelRanker(LabelRankerMixin, BaseDummy):

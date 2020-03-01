@@ -11,7 +11,7 @@ import numpy as np
 
 # Local application
 from sklr.datasets import load_iris
-from sklr.dummy import ALLOWED_STRATEGIES
+from sklr.dummy import VALID_STRATEGIES
 from sklr.dummy import DummyLabelRanker, DummyPartialLabelRanker
 
 
@@ -49,12 +49,12 @@ class TestDummyLabelRanker:
             (DummyLabelRanker(strategy="constant", constant=np.zeros(3))
              .fit(self.X, self.Y))
 
-    @pytest.mark.parametrize("strategy", ALLOWED_STRATEGIES)
+    @pytest.mark.parametrize("strategy", VALID_STRATEGIES)
     def test_score(self, strategy):
         """Test that the score is too low for "real" problems."""
-        dummy_lr = self.dummy_model.set_hyperparams(strategy=strategy)
+        dummy_model = self.dummy_model.set_hyperparams(strategy=strategy)
 
-        assert dummy_lr.fit(self.X, self.Y).score(self.X, self.Y) < 0.5
+        assert dummy_model.fit(self.X, self.Y).score(self.X, self.Y) < 0.5
 
 
 class TestDummyPartialLabelRanker:
@@ -67,9 +67,9 @@ class TestDummyPartialLabelRanker:
 
         (self.X, self.Y) = load_iris(problem="partial_label_ranking")
 
-    @pytest.mark.parametrize("strategy", ALLOWED_STRATEGIES)
+    @pytest.mark.parametrize("strategy", VALID_STRATEGIES)
     def test_score(self, strategy):
         """Test that the score is too low for "real" problems."""
-        dummy_plr = self.dummy_model.set_hyperparams(strategy=strategy)
+        dummy_model = self.dummy_model.set_hyperparams(strategy=strategy)
 
-        assert dummy_plr.fit(self.X, self.Y).score(self.X, self.Y) < 0.5
+        assert dummy_model.fit(self.X, self.Y).score(self.X, self.Y) < 0.5
