@@ -5,114 +5,79 @@
 
 
 # =============================================================================
+# Imports
+# =============================================================================
+
+# Local application
+from .._types cimport (BOOL_t, DTYPE_t_1D,
+                       INT64_t, INT64_t_1D, INT64_t_2D, SIZE_t)
+
+
+# =============================================================================
 # Methods
 # =============================================================================
 
-cpdef void kendall_distance_fast(INT64_t_2D Y_true, INT64_t_2D Y_pred,
-                                 BOOL_t normalize, DTYPE_t_1D dists) nogil:
-    """Fast version of Kendall distance."""
-    # Initialize some values from the input arrays
+cpdef void kendall_distance_fast(INT64_t_2D Y_true,
+                                 INT64_t_2D Y_pred,
+                                 BOOL_t normalize,
+                                 DTYPE_t_1D dists) nogil:
+    """Compute the Kendall distance."""
     cdef INT64_t n_samples = Y_true.shape[0]
+    cdef INT64_t n_classes = Y_true.shape[1]
 
-    # Define the indexes
+    cdef INT64_t_1D y_true
+    cdef INT64_t_1D y_pred
+
     cdef SIZE_t sample
-
-    # Compute the Kendall distances between
-    # the pairwise true and predicted rankings
-    for sample in range(n_samples):
-        dists[sample] = _kendall_distance_fast(
-            y_true=Y_true[sample], y_pred=Y_pred[sample], normalize=normalize)
-
-
-cdef DTYPE_t _kendall_distance_fast(INT64_t_1D y_true, INT64_t_1D y_pred,
-                                    BOOL_t normalize) nogil:
-    """Fast version of Kendall distance."""
-    # Initialize some values from the input arrays
-    cdef INT64_t n_classes = y_true.shape[0]
-
-    # Define some variables to be employed
-    cdef DTYPE_t dist
-
-    # Define the indexes
     cdef SIZE_t f_class
     cdef SIZE_t s_class
 
-    # Initialize the Kendall distance
-    # between the rankings to zero
-    dist = 0.0
+    for sample in range(n_samples):
+        y_true = Y_true[sample]
+        y_pred = Y_pred[sample]
 
-    # Compute the Kendall distance between
-    # this true and predicted ranking
-    for f_class in range(n_classes):
-        for s_class in range(f_class + 1, n_classes):
-            # Disagreement if "f_class" precedes "s_class"
-            # in one ranking and "s_class" precedes "f_class"
-            # in the other (or viceversa)
-            if (y_true[f_class] < y_true[s_class] and
-                    y_pred[f_class] > y_pred[s_class] or
-                    y_true[f_class] > y_true[s_class] and
-                    y_pred[f_class] < y_pred[s_class]):
-                dist += 1
+        for f_class in range(n_classes):
+            for s_class in range(f_class + 1, n_classes):
+                # There exist a disagreement among the rankings
+                # if the compared classes are in opposite order
+                if (y_true[f_class] < y_true[s_class] and
+                        y_pred[f_class] > y_pred[s_class] or
+                        y_true[f_class] > y_true[s_class] and
+                        y_pred[f_class] < y_pred[s_class]):
+                    dists[sample] += 1
 
-    # Normalize the Kendall distance (using the
-    # number of different possible combinations)
-    if normalize:
-        dist /= (n_classes * (n_classes-1)) / 2
-
-    # Return the Kendall distance
-    return dist
+        if normalize:
+            dists[sample] /= n_classes * (n_classes-1) / 2
 
 
-cpdef void tau_score_fast(INT64_t_2D Y_true, INT64_t_2D Y_pred,
+cpdef void tau_score_fast(INT64_t_2D Y_true,
+                          INT64_t_2D Y_pred,
                           DTYPE_t_1D scores) nogil:
-    """Fast version of Tau score."""
-    # Initialize some values from the input arrays
+    """Compute the Kendall tau."""
     cdef INT64_t n_samples = Y_true.shape[0]
+    cdef INT64_t n_classes = Y_true.shape[1]
 
-    # Define the indexes
+    cdef INT64_t_1D y_true
+    cdef INT64_t_1D y_pred
+
     cdef SIZE_t sample
-
-    # Compute the Tau scores between the
-    # pairwise true and the predicted rankings
-    for sample in range(n_samples):
-        scores[sample] = _tau_score_fast(
-            y_true=Y_true[sample], y_pred=Y_pred[sample])
-
-
-cdef DTYPE_t _tau_score_fast(INT64_t_1D y_true, INT64_t_1D y_pred) nogil:
-    """Fast version of Tau score."""
-    # Initialize some values from the input arrays
-    cdef INT64_t n_classes = y_true.shape[0]
-
-    # Define some variables to be employed
-    cdef DTYPE_t score
-
-    # Define the indexes
     cdef SIZE_t f_class
     cdef SIZE_t s_class
 
-    # Initialize the Tau score
-    # between the rankings to zero
-    score = 0.0
+    for sample in range(n_samples):
+        y_true = Y_true[sample]
+        y_pred = Y_pred[sample]
 
-    # Compute the Tau score
-    for f_class in range(n_classes):
-        for s_class in range(f_class + 1, n_classes):
-            # Agreeement if "f_class" precedes "s_class"
-            # in one ranking and "f_class" precedes
-            # "s_class" in the other (or viceversa)
-            if (y_true[f_class] < y_true[s_class] and
-                    y_pred[f_class] < y_pred[s_class] or
-                    y_true[f_class] > y_true[s_class] and
-                    y_pred[f_class] > y_pred[s_class]):
-                score += 1.0
-            # Disagreement in any other case
-            else:
-                score -= 1.0
+        for f_class in range(n_classes):
+            for s_class in range(f_class + 1, n_classes):
+                # There exist an agreement among the rankings
+                # if the compared classes are in the same order
+                if (y_true[f_class] < y_true[s_class] and
+                        y_pred[f_class] < y_pred[s_class] or
+                        y_true[f_class] > y_true[s_class] and
+                        y_pred[f_class] > y_pred[s_class]):
+                    scores[sample] += 1.0
+                else:
+                    scores[sample] -= 1.0
 
-    # Normalize the Tau score (using the number
-    # of different possible combinations)
-    score /= (n_classes * (n_classes-1)) / 2
-
-    # Return the Tau score
-    return score
+        scores[sample] /= n_classes * (n_classes-1) / 2

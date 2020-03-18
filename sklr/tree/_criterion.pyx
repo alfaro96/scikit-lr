@@ -17,9 +17,6 @@ cimport numpy as np
 # NumPy, to avoid segmentation faults
 np.import_array()
 
-# Local application
-from ..metrics._label_ranking_fast cimport _kendall_distance_fast
-
 
 # =============================================================================
 # Constants
@@ -1140,3 +1137,42 @@ cdef class Entropy(PartialLabelRankingCriterion):
 cdef DTYPE_t log2(DTYPE_t x) nogil:
     """Compute the logarithm in base 2."""
     return log(x) / log(2.0)
+
+
+cdef DTYPE_t _kendall_distance_fast(INT64_t_1D y_true, INT64_t_1D y_pred,
+                                    BOOL_t normalize) nogil:
+    """Fast version of Kendall distance."""
+    # Initialize some values from the input arrays
+    cdef INT64_t n_classes = y_true.shape[0]
+
+    # Define some variables to be employed
+    cdef DTYPE_t dist
+
+    # Define the indexes
+    cdef SIZE_t f_class
+    cdef SIZE_t s_class
+
+    # Initialize the Kendall distance
+    # between the rankings to zero
+    dist = 0.0
+
+    # Compute the Kendall distance between
+    # this true and predicted ranking
+    for f_class in range(n_classes):
+        for s_class in range(f_class + 1, n_classes):
+            # Disagreement if "f_class" precedes "s_class"
+            # in one ranking and "s_class" precedes "f_class"
+            # in the other (or viceversa)
+            if (y_true[f_class] < y_true[s_class] and
+                    y_pred[f_class] > y_pred[s_class] or
+                    y_true[f_class] > y_true[s_class] and
+                    y_pred[f_class] < y_pred[s_class]):
+                dist += 1
+
+    # Normalize the Kendall distance (using the
+    # number of different possible combinations)
+    if normalize:
+        dist /= (n_classes * (n_classes-1)) / 2
+
+    # Return the Kendall distance
+    return dist
