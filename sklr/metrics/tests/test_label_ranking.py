@@ -1,4 +1,4 @@
-"""Testing for Label Ranking metrics."""
+"""Testing of Label Ranking metrics."""
 
 
 # =============================================================================
@@ -11,66 +11,128 @@ import pytest
 
 # Local application
 from sklr.metrics import kendall_distance, tau_score
+from sklr.utils import check_random_state
+
+
+# =============================================================================
+# Methods
+# =============================================================================
+
+def _kendall_distance(Y_true, Y_pred, normalize=True, sample_weight=None):
+    """Alternative implementation of the Kendall distance.
+
+    This implementation follows the Wikipedia article's definition (see
+    References). This should give identical results as ``kendall_distance``.
+
+    References
+    ----------
+    .. [1] `Wikipedia entry for the Kendall tau distance.
+            <https://en.wikipedia.org/wiki/Kendall_tau_distance>`_
+    """
+    (n_samples, n_classes) = Y_true.shape
+    dists = np.zeros(n_samples)
+
+    for sample in range(n_samples):
+        for f_class in range(n_classes):
+            for s_class in range(f_class + 1, n_classes):
+                a = Y_true[sample, f_class] - Y_true[sample, s_class]
+                b = Y_pred[sample, f_class] - Y_pred[sample, s_class]
+
+                if a * b < 0:
+                    dists[sample] += 1
+
+        if normalize:
+            dists[sample] /= n_classes * (n_classes-1) / 2
+
+    return np.average(a=dists, weights=sample_weight)
+
+
+def _tau_score(Y_true, Y_pred, sample_weight=None):
+    """Alternative implementation of the Kendall tau.
+
+    This implementation follows the Wikipedia article's definition (see
+    References). This should give identical results as ``tau_score``.
+
+    References
+    ----------
+    .. [1] `Wikipedia entry for the Kendall rank correlation coefficient.
+            <https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient>`_
+    """
+    (n_samples, n_classes) = Y_true.shape
+    scores = np.zeros(n_samples)
+
+    for sample in range(n_samples):
+        for f_class in range(n_classes):
+            for s_class in range(f_class + 1, n_classes):
+                a = Y_true[sample, f_class] - Y_true[sample, s_class]
+                b = Y_pred[sample, f_class] - Y_pred[sample, s_class]
+                scores[sample] += np.sign(a * b)
+
+        scores[sample] *= 2 / (n_classes * (n_classes-1))
+
+    return np.average(a=scores, weights=sample_weight)
+
+
+def make_label_ranking(n_samples, n_classes, random_state):
+    """Helper method to make a Label Ranking problem."""
+    rankings = np.zeros((n_samples, n_classes), dtype=np.int64)
+
+    for sample in range(n_samples):
+        rankings[sample] = random_state.permutation(n_classes) + 1
+
+    return rankings
+
+
+def make_sample_weights(n_repetitions, n_samples, random_state):
+    """Helper method to make random sample weights."""
+    sample_weights = np.zeros((n_repetitions, n_samples), dtype=np.float64)
+
+    for repetition in range(n_repetitions):
+        sample_weights[repetition] = random_state.rand(n_samples) + 1
+
+    return sample_weights
 
 
 # =============================================================================
 # Initialization
 # =============================================================================
 
-# Initialize the true and the predicted
-# rankings to test the different methods
-Y_true = np.array([[1, 2, 3, 4, 5], [1, 3, 2, 5, 4], [1, 2, 3, 5, 4]])
-Y_pred = np.array([[1, 3, 2, 5, 4], [1, 4, 2, 3, 5], [3, 4, 5, 1, 2]])
+# Initialize a random number generator to
+# ensure that the tests are reproducible
+seed = 198075
+random_state = check_random_state(seed)
+
+n_repetitions = 10
+n_samples = 20
+n_classes = 5
+
+Y_true = make_label_ranking(n_samples, n_classes, random_state)
+Y_pred = make_label_ranking(n_samples, n_classes, random_state)
+sample_weights = make_sample_weights(n_repetitions, n_samples, random_state)
+
+# Values of the "normalize" parameter
+# to parametrize the testing methods
+NORMALIZE = [True, False]
 
 
 # =============================================================================
 # Testing
 # =============================================================================
 
-@pytest.mark.kendall_distance
-def test_kendall_distance():
+@pytest.mark.parametrize("normalize", NORMALIZE)
+@pytest.mark.parametrize("sample_weight", sample_weights)
+def test_kendall_distance(normalize, sample_weight):
     """Test the kendall_distance method."""
-    # Initialize the true and the predicted Kendall
-    # distance, without and with normalization
-    kendall_distance_true = 11/3
-    kendall_distance_norm_true = 11/30
-    kendall_distance_pred = kendall_distance(
-        Y_true, Y_pred, normalize=False, return_dists=False)
-    kendall_distance_norm_pred = kendall_distance(
-        Y_true, Y_pred, normalize=True, return_dists=False)
+    dist_desired = _kendall_distance(Y_true, Y_pred, normalize, sample_weight)
+    dist_actual = kendall_distance(Y_true, Y_pred, normalize, sample_weight)
 
-    # Initialize the true and the predicted Kendall
-    # distances, without and with normalization
-    kendall_distances_true = np.array([2, 2, 7])
-    kendall_distances_norm_true = np.array([0.2, 0.2, 0.7])
-    (_, kendall_distances_pred) = kendall_distance(
-        Y_true, Y_pred, normalize=False, return_dists=True)
-    (_, kendall_distances_norm_pred) = kendall_distance(
-        Y_true, Y_pred, normalize=True, return_dists=True)
-
-    # Assert that the true and the predicted Kendall
-    # distance without and with normalization is correct
-    np.testing.assert_almost_equal(
-        kendall_distance_pred, kendall_distance_true)
-    np.testing.assert_almost_equal(
-        kendall_distance_norm_pred, kendall_distance_norm_true)
-
-    # Assert that the true and the predicted Kendall
-    # distances without and with normalization are correct
-    np.testing.assert_array_almost_equal(
-        kendall_distances_pred, kendall_distances_true)
-    np.testing.assert_almost_equal(
-        kendall_distances_norm_pred, kendall_distances_norm_true)
+    np.testing.assert_almost_equal(dist_desired, dist_actual)
 
 
-@pytest.mark.tau_score
-def test_tau_score():
+@pytest.mark.parametrize("sample_weight", sample_weights)
+def test_tau_score(sample_weight):
     """Test the tau_score method."""
-    # Initialize the true and the predicted Tau score
-    tau_score_true = 4 / 15
-    tau_score_pred = tau_score(Y_true, Y_pred)
+    score_desired = _tau_score(Y_true, Y_pred, sample_weight)
+    score_actual = tau_score(Y_true, Y_pred, sample_weight)
 
-    # Assert that the true and the
-    # predicted Tau scores are the same
-    np.testing.assert_almost_equal(
-        tau_score_pred, tau_score_true)
+    np.testing.assert_almost_equal(score_desired, score_actual)

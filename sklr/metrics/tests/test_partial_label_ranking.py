@@ -1,4 +1,4 @@
-"""Testing for the Partial Label Ranking metrics."""
+"""Testing of Partial Label Ranking metrics."""
 
 
 # =============================================================================
@@ -6,76 +6,103 @@
 # =============================================================================
 
 # Third party
+from scipy.stats import rankdata
 import numpy as np
 import pytest
 
 # Local application
-from sklr.metrics import penalized_kendall_distance, tau_x_score
+from sklr.metrics import tau_x_score
+from sklr.utils import check_random_state
+
+
+# =============================================================================
+# Methods
+# =============================================================================
+
+def _tau_x_matrix(Y, sample, f_class, s_class):
+    """Matrix for the Kendall tau extension."""
+    return (0 if f_class == s_class else
+            -1 if Y[sample, f_class] > Y[sample, s_class] else 1)
+
+
+def _tau_x_score(Y_true, Y_pred, sample_weight=None):
+    """Alternative implementation of Kendall tau extension.
+
+    This implementation follows the original article's definition (see
+    References). This should give identical results as ``tau_x_score``.
+
+    References
+    ----------
+    .. [1] `E. J. Emond and D. W. Mason, "A new rank correlation coefficient
+            with application to the consensus ranking problem", Journal of
+            Multi-Criteria Decision Analysis, vol. 11, pp. 17-28, 2002.`_
+    """
+    (n_samples, n_classes) = Y_true.shape
+    scores = np.zeros(n_samples)
+
+    for sample in range(n_samples):
+        for f_class in range(n_classes):
+            for s_class in range(n_classes):
+                a = _tau_x_matrix(Y_true, sample, f_class, s_class)
+                b = _tau_x_matrix(Y_pred, sample, f_class, s_class)
+                scores[sample] += a * b
+
+        scores[sample] /= n_classes * (n_classes-1)
+
+    return np.average(a=scores, weights=sample_weight)
+
+
+def make_partial_label_ranking(n_samples, n_classes, random_state):
+    """Helper method to make a Partial Label Ranking problem."""
+    rankings = np.zeros((n_samples, n_classes), dtype=np.int64)
+
+    for sample in range(n_samples):
+        rankings[sample] = random_state.choice(n_samples, n_classes, True)
+        rankings[sample] = rankdata(rankings[sample], method="dense")
+
+    return rankings
+
+
+def make_sample_weights(n_repetitions, n_samples, random_state):
+    """Helper method to make random sample weights."""
+    sample_weights = np.zeros((n_repetitions, n_samples), dtype=np.float64)
+
+    for repetition in range(n_repetitions):
+        sample_weights[repetition] = random_state.rand(n_samples) + 1
+
+    return sample_weights
 
 
 # =============================================================================
 # Initialization
 # =============================================================================
 
+# Initialize a random number generator to
+# ensure that the tests are reproducible
+seed = 198075
+random_state = check_random_state(seed)
 
-# Initialize the true and the predicted
-# rankings to test the different methods
-Y_true = np.array([[1, 2, 2, 3, 3], [1, 2, 2, 3, 3], [1, 2, 2, 3, 3]])
-Y_pred = np.array([[1, 2, 2, 3, 3], [1, 3, 2, 2, 3], [2, 3, 3, 1, 1]])
+n_repetitions = 10
+n_samples = 20
+n_classes = 5
+
+Y_true = make_partial_label_ranking(n_samples, n_classes, random_state)
+Y_pred = make_partial_label_ranking(n_samples, n_classes, random_state)
+sample_weights = make_sample_weights(n_repetitions, n_samples, random_state)
+
+# Values of the "normalize" parameter
+# to parametrize the testing methods
+NORMALIZE = [True, False]
 
 
 # =============================================================================
 # Testing
 # =============================================================================
 
-@pytest.mark.penalized_kendall_distance
-def test_penalized_kendall_distance():
-    """Test the penalized_kendall_distance method."""
-    # Initialize the true and the predicted penalized
-    # Kendall distance, without and with normalization
-    penalized_kendall_distance_true = 3.0
-    penalized_kendall_distance_norm_true = 0.3
-    penalized_kendall_distance_pred = penalized_kendall_distance(
-        Y_true, Y_pred, normalize=False, return_dists=False)
-    penalized_kendall_distance_norm_pred = penalized_kendall_distance(
-        Y_true, Y_pred, normalize=True, return_dists=False)
-
-    # Initialize the true and the predicted penalized
-    # Kendall distances, without and with normalization
-    penalized_kendall_distances_true = np.array([0, 3, 6])
-    penalized_kendall_distances_norm_true = np.array([0, 0.3, 0.6])
-    (_, penalized_kendall_distances_pred) = penalized_kendall_distance(
-        Y_true, Y_pred, normalize=False, return_dists=True)
-    (_, penalized_kendall_distances_norm_pred) = penalized_kendall_distance(
-        Y_true, Y_pred, normalize=True, return_dists=True)
-
-    # Assert that the true and the predicted penalized Kendall
-    # distance without and with normalization is correct
-    np.testing.assert_almost_equal(
-        penalized_kendall_distance_pred,
-        penalized_kendall_distance_true)
-    np.testing.assert_almost_equal(
-        penalized_kendall_distance_norm_pred,
-        penalized_kendall_distance_norm_true)
-
-    # Assert that the true and the predicted penalized Kendall
-    # distances without and with normalization are correct
-    np.testing.assert_array_almost_equal(
-        penalized_kendall_distances_pred,
-        penalized_kendall_distances_true)
-    np.testing.assert_almost_equal(
-        penalized_kendall_distances_norm_pred,
-        penalized_kendall_distances_norm_true)
-
-
-@pytest.mark.tau_x_score
-def test_tau_x_score():
+@pytest.mark.parametrize("sample_weight", sample_weights)
+def test_tau_x_score(sample_weight):
     """Test the tau_x_score method."""
-    # Initialize the true and the predicted Tau-x score
-    tau_x_score_true = 0.4
-    tau_x_score_pred = tau_x_score(Y_true, Y_pred)
+    score_desired = _tau_x_score(Y_true, Y_pred, sample_weight)
+    score_actual = tau_x_score(Y_true, Y_pred, sample_weight)
 
-    # Assert that the true and the
-    # predicted Tau-x scores are the same
-    np.testing.assert_almost_equal(
-        tau_x_score_pred, tau_x_score_true)
+    np.testing.assert_almost_equal(score_desired, score_actual)
