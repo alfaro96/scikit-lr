@@ -24,6 +24,8 @@ from sklr.datasets import (load_authorship, load_bodyfat, load_blocks,
 # Constants
 # =============================================================================
 
+# Define the lists with the different problems so that they can be
+# used to parametrize the testing methods for loading the datasets
 LABEL_RANKING = ["label_ranking"]
 PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
 BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
