@@ -24,6 +24,15 @@ VALID_NEIGHBORS = [3, 4, 5, 6, 7, 8, 9, 10]
 
 
 # =============================================================================
+# Methods
+# =============================================================================
+
+def check_knn_score(knn_model, X, Y):
+    """Check the score for "real" problems."""
+    assert knn_model.fit(X, Y).score(X, Y) > 0.9
+
+
+# =============================================================================
 # Testing
 # =============================================================================
 
@@ -60,9 +69,8 @@ class TestKNeighborsLabelRanker:
     @pytest.mark.parametrize("weights", VALID_WEIGHTS)
     def test_score(self, n_neighbors, weights):
         """Test the score for "real" problems."""
-        knn_model = KNeighborsLabelRanker(n_neighbors, weights)
-
-        assert knn_model.fit(self.X, self.Y).score(self.X, self.Y) > 0.9
+        check_knn_score(
+            KNeighborsLabelRanker(n_neighbors, weights), self.X, self.Y)
 
 
 class TestKNeighborsPartialLabelRanker:
@@ -76,6 +84,5 @@ class TestKNeighborsPartialLabelRanker:
     @pytest.mark.parametrize("weights", VALID_WEIGHTS)
     def test_score(self, n_neighbors, weights):
         """Test the score for "real" problems."""
-        knn_model = KNeighborsPartialLabelRanker(n_neighbors, weights)
-
-        assert knn_model.fit(self.X, self.Y).score(self.X, self.Y) > 0.9
+        check_knn_score(
+            KNeighborsPartialLabelRanker(n_neighbors, weights), self.X, self.Y)
