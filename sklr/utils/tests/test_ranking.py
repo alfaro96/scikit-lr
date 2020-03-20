@@ -12,9 +12,8 @@ import pytest
 
 # Local application
 from sklr.utils import (
-    unique_rankings, check_label_ranking_targets,
-    check_partial_label_ranking_targets, is_ranking_without_ties,
-    is_ranking_with_ties, num_buckets, rank_data)
+    check_label_ranking_targets, check_partial_label_ranking_targets,
+    is_ranking_without_ties, is_ranking_with_ties, rank_data)
 
 
 # =============================================================================
@@ -37,61 +36,6 @@ Y_unknown = np.array([[1, 2, 4]])
 # =============================================================================
 # Testing
 # =============================================================================
-
-@pytest.mark.num_buckets
-def test_num_buckets():
-    """Test the num_buckets method."""
-    np.testing.assert_almost_equal(num_buckets(Y_lr), 3)
-    np.testing.assert_almost_equal(num_buckets(Y_random_lr), 2)
-    np.testing.assert_almost_equal(num_buckets(Y_top_lr), 3)
-    np.testing.assert_almost_equal(num_buckets(Y_plr), 2)
-    np.testing.assert_almost_equal(num_buckets(Y_random_plr), 5/3)
-    np.testing.assert_almost_equal(num_buckets(Y_random_plr), 5/3)
-    np.testing.assert_almost_equal(num_buckets(Y_top_plr), 7/3)
-
-    with pytest.raises(ValueError):
-        num_buckets(Y_unknown)
-
-
-@pytest.mark.unique_rankings
-def test_unique_rankings():
-    """Test the unique_rankings method."""
-    # Initialize the unique rankings that must be obtained
-    # from the Label Ranking and Partial Label Ranking ones
-    Y_unique_lr_true = np.array([[1, 2, 3], [3, 2, 1]])
-    Y_unique_random_lr_true = np.array([[1, 2, np.nan], [1, np.nan, 2]])
-    Y_unique_top_lr_true = np.array([[1, 2, np.inf], [np.inf, 2, 1]])
-    Y_unique_plr_true = np.array([[1, 1, 2], [1, 2, 2]])
-    Y_unique_random_plr_true = np.array([[1, 1, np.nan], [1, np.nan, 2]])
-    Y_unique_top_plr_true = np.array([[1, 1, np.inf], [1, 2, np.inf]])
-
-    # Compute the unique rankings that are
-    # obtained with the corresponding method
-    Y_unique_lr_pred = unique_rankings(Y_lr)
-    Y_unique_random_lr_pred = unique_rankings(Y_random_lr)
-    Y_unique_top_lr_pred = unique_rankings(Y_top_lr)
-    Y_unique_plr_pred = unique_rankings(Y_plr)
-    Y_unique_random_plr_pred = unique_rankings(Y_random_plr)
-    Y_unique_top_plr_pred = unique_rankings(Y_top_plr)
-
-    # Assert that the unique rankings are properly obtained
-    np.testing.assert_array_equal(
-        Y_unique_lr_pred, Y_unique_lr_true)
-    np.testing.assert_array_equal(
-        Y_unique_random_lr_pred, Y_unique_random_lr_true)
-    np.testing.assert_array_equal(
-        Y_unique_top_lr_pred, Y_unique_top_lr_true)
-    np.testing.assert_array_equal(
-        Y_unique_plr_pred, Y_unique_plr_true)
-    np.testing.assert_array_equal(
-        Y_unique_random_plr_pred, Y_unique_random_plr_true)
-    np.testing.assert_array_equal(
-        Y_unique_top_plr_pred, Y_unique_top_plr_true)
-
-    # Assert that an error is raised for "unknown" rankings
-    with pytest.raises(ValueError):
-        unique_rankings(Y_unknown)
-
 
 @pytest.mark.check_label_ranking_targets
 def test_check_label_ranking_targets():
