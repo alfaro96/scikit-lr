@@ -32,14 +32,12 @@ problems that are accessible to everybody and reusable in all contexts.
 #
 # Dev branch marker is: "X.Y.dev" or "X.Y.devN" where N is an integer.
 # "X.Y.dev0" is the canonical version of "X.Y.dev".
-__version__ = "0.3.dev0"
+__version__ = "0.4.dev0"
 
 
 # =============================================================================
-# Public objects
+# Module public objects
 # =============================================================================
-
-# Set the modules that are accessible from sklr
 __all__ = [
     "consensus",
     "datasets",
