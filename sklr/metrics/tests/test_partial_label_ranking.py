@@ -52,7 +52,7 @@ def _tau_x_score(Y_true, Y_pred, sample_weight=None):
     return np.average(a=scores, weights=sample_weight)
 
 
-def make_partial_label_ranking(n_samples, n_classes, random_state):
+def _make_partial_label_ranking(n_samples, n_classes, random_state):
     """Helper method to make a Partial Label Ranking problem."""
     rankings = np.zeros((n_samples, n_classes), dtype=np.int64)
 
@@ -63,7 +63,7 @@ def make_partial_label_ranking(n_samples, n_classes, random_state):
     return rankings
 
 
-def make_sample_weights(n_repetitions, n_samples, random_state):
+def _make_sample_weights(n_repetitions, n_samples, random_state):
     """Helper method to make random sample weights."""
     sample_weights = np.zeros((n_repetitions, n_samples), dtype=np.float64)
 
@@ -82,17 +82,13 @@ def make_sample_weights(n_repetitions, n_samples, random_state):
 seed = 198075
 random_state = check_random_state(seed)
 
-n_repetitions = 10
+n_repetitions = 2
 n_samples = 20
 n_classes = 5
 
-Y_true = make_partial_label_ranking(n_samples, n_classes, random_state)
-Y_pred = make_partial_label_ranking(n_samples, n_classes, random_state)
-sample_weights = make_sample_weights(n_repetitions, n_samples, random_state)
-
-# Values of the "normalize" parameter
-# to parametrize the testing methods
-NORMALIZE = [True, False]
+Y_true = _make_partial_label_ranking(n_samples, n_classes, random_state)
+Y_pred = _make_partial_label_ranking(n_samples, n_classes, random_state)
+sample_weights = _make_sample_weights(n_repetitions, n_samples, random_state)
 
 
 # =============================================================================
@@ -102,7 +98,6 @@ NORMALIZE = [True, False]
 @pytest.mark.parametrize("sample_weight", sample_weights)
 def test_tau_x_score(sample_weight):
     """Test the tau_x_score method."""
-    score_desired = _tau_x_score(Y_true, Y_pred, sample_weight)
-    score_actual = tau_x_score(Y_true, Y_pred, sample_weight)
-
-    np.testing.assert_almost_equal(score_desired, score_actual)
+    np.testing.assert_almost_equal(
+        tau_x_score(Y_true, Y_pred, sample_weight),
+        _tau_x_score(Y_true, Y_pred, sample_weight))

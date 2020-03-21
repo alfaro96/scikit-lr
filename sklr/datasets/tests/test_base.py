@@ -21,7 +21,21 @@ from sklr.datasets import (load_authorship, load_bodyfat, load_blocks,
 
 
 # =============================================================================
-# Constants
+# Methods
+# =============================================================================
+
+def _num_buckets(Y):
+    """Find the mean number of buckets."""
+    return np.mean([np.unique(y).shape[0] for y in Y])
+
+
+def _num_unique_rankings(Y):
+    """Find the number of unique rankings."""
+    return np.unique(Y, axis=0).shape[0]
+
+
+# =============================================================================
+# Initialization
 # =============================================================================
 
 # Define the lists with the different problems so that they can be
@@ -29,20 +43,6 @@ from sklr.datasets import (load_authorship, load_bodyfat, load_blocks,
 LABEL_RANKING = ["label_ranking"]
 PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
 BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
-
-
-# =============================================================================
-# Methods
-# =============================================================================
-
-def num_buckets(Y):
-    """Find the mean number of buckets."""
-    return np.mean([np.unique(y).shape[0] for y in Y])
-
-
-def num_unique_rankings(Y):
-    """Find the number of unique rankings."""
-    return np.unique(Y, axis=0).shape[0]
 
 
 # =============================================================================
@@ -62,8 +62,8 @@ def check_data(load_data, problem, shape):
     assert data.shape[0] == ranks.shape[0] == n_samples
     assert data.shape[1] == n_features
     assert ranks.shape[1] == n_classes
-    assert num_unique_rankings(ranks) == n_rankings
-    np.testing.assert_almost_equal(num_buckets(ranks), n_buckets, decimal=5)
+    assert _num_unique_rankings(ranks) == n_rankings
+    np.testing.assert_almost_equal(_num_buckets(ranks), n_buckets, decimal=5)
 
 
 @pytest.mark.parametrize("problem", BOTH_PROBLEMS)

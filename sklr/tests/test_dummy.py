@@ -19,7 +19,7 @@ from sklr.dummy import DummyLabelRanker, DummyPartialLabelRanker
 # Methods
 # =============================================================================
 
-def check_dummy_score(dummy_model, strategy, X, Y):
+def _check_dummy_score(dummy_model, strategy, X, Y):
     """Check that the score is too low for "real" problems."""
     dummy_model = dummy_model.set_hyperparams(strategy=strategy)
 
@@ -63,7 +63,7 @@ class TestDummyLabelRanker:
     @pytest.mark.parametrize("strategy", VALID_STRATEGIES)
     def test_score(self, strategy):
         """Test that the score is too low for "real" problems."""
-        check_dummy_score(self.dummy_model, strategy, self.X, self.Y)
+        _check_dummy_score(self.dummy_model, strategy, self.X, self.Y)
 
 
 class TestDummyPartialLabelRanker:
@@ -79,4 +79,4 @@ class TestDummyPartialLabelRanker:
     @pytest.mark.parametrize("strategy", VALID_STRATEGIES)
     def test_score(self, strategy):
         """Test that the score is too low for "real" problems."""
-        check_dummy_score(self.dummy_model, strategy, self.X, self.Y)
+        _check_dummy_score(self.dummy_model, strategy, self.X, self.Y)
