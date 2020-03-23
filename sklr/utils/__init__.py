@@ -6,25 +6,19 @@
 # =============================================================================
 
 # Local application
-from .ranking import (
-    check_label_ranking_targets, check_partial_label_ranking_targets,
-    type_of_targets, is_ranking_without_ties, is_ranking_with_ties, rank_data)
-from .validation import (
-    check_array, check_is_fitted, check_consistent_length,
-    check_random_state, check_sample_weight, check_X_Y, has_fit_parameter)
+from .ranking import (check_label_ranking_targets,
+                      check_partial_label_ranking_targets, type_of_target)
+from .validation import (check_array, check_is_fitted, check_consistent_length,
+                         check_random_state, check_sample_weight, check_X_Y,
+                         has_fit_parameter)
 
 
 # =============================================================================
-# Public objects
+# Module public objects
 # =============================================================================
-
-# Set the methods that are accessible
-# from the module sklr.utils
 __all__ = [
-    "check_array", "check_consistent_length",
-    "check_is_fitted", "check_label_ranking_targets",
-    "check_partial_label_ranking_targets", "check_random_state",
-    "check_sample_weight", "check_X_Y", "has_fit_parameter",
-    "is_ranking_without_ties", "is_ranking_with_ties", "rank_data",
-    "type_of_targets",
+    "check_array", "check_consistent_length", "check_is_fitted",
+    "check_label_ranking_targets", "check_partial_label_ranking_targets",
+    "check_random_state", "check_sample_weight", "check_X_Y",
+    "has_fit_parameter", "type_of_target"
 ]

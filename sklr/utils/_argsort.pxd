@@ -9,16 +9,16 @@
 # =============================================================================
 
 # Local application
-from .._types cimport DTYPE_t, DTYPE_t_1D, INT64_t, SIZE_t
+from .._types cimport BOOL_t, DTYPE_t, DTYPE_t_1D, INT64_t, SIZE_t
 
 
 # =============================================================================
 # Structs
 # =============================================================================
 
-# Index tracking structure to know the index
-# and the value of a pointer element
-cdef struct IndexedElement:
+# Index tracking data structure to know
+# the index and the value of a pointer
+cdef struct Indexed:
     SIZE_t index
     DTYPE_t value
 
@@ -27,4 +27,4 @@ cdef struct IndexedElement:
 # Methods
 # =============================================================================
 
-cdef void argsort(DTYPE_t *data, SIZE_t **order, INT64_t n_values) nogil
+cdef SIZE_t* argsort(DTYPE_t *data, INT64_t n_values) nogil

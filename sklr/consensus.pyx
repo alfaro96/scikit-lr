@@ -25,8 +25,8 @@ np.import_array()
 
 # Local application
 from .utils._memory cimport copy_pointer_INT64_1D, copy_pointer_INT64_2D
-from .utils._ranking_fast cimport rank_data_pointer
-from .utils._ranking_fast cimport RANK_METHOD
+from .utils._ranking cimport rank_data_pointer
+from .utils._ranking cimport RANK_METHOD
 from .utils.ranking import (
     check_label_ranking_targets, check_partial_label_ranking_targets,
     _transform_rankings)
@@ -387,7 +387,10 @@ cdef class BordaCountAlgorithm(RankAggregationAlgorithm):
 
         # Rank the negative count to obtain the consensus ranking
         rank_data_pointer(
-            data=negative_count, y=consensus, method=RANK_METHOD.ORDINAL)
+            data=negative_count,
+            y=&consensus[0],
+            method=RANK_METHOD.ORDINAL,
+            n_classes=n_classes)
 
         # The negative count is not needed anymore,
         # so release the allocated memory
@@ -494,8 +497,10 @@ cdef class BordaCountAlgorithm(RankAggregationAlgorithm):
             # Rank again using the order of the consensus ranking to break
             # the ties when two classes inserted at the same position
             rank_data_pointer(
-                data=y, y=Y[sample],
-                method=RANK_METHOD.ORDINAL)
+                data=y,
+                y=&Y[sample, 0],
+                method=RANK_METHOD.ORDINAL,
+                n_classes=n_classes)
 
         # Once all the rankings have been completed,
         # release the allocated memory for the auxiliar
