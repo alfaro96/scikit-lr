@@ -12,8 +12,8 @@
 from libc.math cimport NAN, INFINITY
 
 # Local application
-from ..utils._ranking_fast cimport RANK_METHOD
-from ..utils._ranking_fast cimport rank_data_view
+from ..utils._ranking cimport RANK_METHOD
+from ..utils._ranking cimport rank_data_view
 
 
 # =============================================================================
@@ -50,7 +50,7 @@ cpdef void miss_classes(INT64_t_2D Y, DTYPE_t_2D Yt,
                 else:
                     Yt[sample, label] = INFINITY
 
-    # Rank the randomly deleted classes to ensure that the
+    # Rank the randomly missed classes to ensure that the
     # rankings are properly formatted for the estimators
     if strategy == RANDOM:
         for sample in range(n_samples):

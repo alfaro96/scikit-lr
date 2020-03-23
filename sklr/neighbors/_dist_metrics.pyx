@@ -124,7 +124,8 @@ cdef class DistanceMetric:
     cdef DTYPE_t dist(self, DTYPE_t_1D x1, DTYPE_t_1D x2) nogil:
         """Compute the distance between vectors x1 and x2.
 
-        This should be overridden in a subclass."""
+        This should be overridden in a subclass.
+        """
         pass
 
     cdef void pdist(self, DTYPE_t_2D X, DTYPE_t_2D dist) nogil:

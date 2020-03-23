@@ -9,7 +9,7 @@
 # =============================================================================
 
 # Third party
-import numpy as np
+from libc.limits cimport INT_MAX
 cimport numpy as np
 
 # Always include this statement after cimporting
@@ -21,9 +21,11 @@ np.import_array()
 # Enums
 # =============================================================================
 
+# NaN values are ranked
+# after positive infinity
 cdef enum RANK_TYPE:
-    RANDOM = 2147483646
-    TOP = 2147483645
+    RANDOM = INT_MAX
+    TOP = INT_MAX - 1
 
 
 # =============================================================================
