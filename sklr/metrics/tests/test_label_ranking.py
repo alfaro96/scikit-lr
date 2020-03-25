@@ -33,7 +33,7 @@ def _kendall_distance(Y_true, Y_pred, normalize=True, sample_weight=None):
     dists = np.zeros(n_samples)
 
     for sample in range(n_samples):
-        for f_class in range(n_classes):
+        for f_class in range(n_classes - 1):
             for s_class in range(f_class + 1, n_classes):
                 a = Y_true[sample, f_class] - Y_true[sample, s_class]
                 b = Y_pred[sample, f_class] - Y_pred[sample, s_class]
@@ -62,7 +62,7 @@ def _tau_score(Y_true, Y_pred, sample_weight=None):
     scores = np.zeros(n_samples)
 
     for sample in range(n_samples):
-        for f_class in range(n_classes):
+        for f_class in range(n_classes - 1):
             for s_class in range(f_class + 1, n_classes):
                 a = Y_true[sample, f_class] - Y_true[sample, s_class]
                 b = Y_pred[sample, f_class] - Y_pred[sample, s_class]

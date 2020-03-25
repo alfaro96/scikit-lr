@@ -163,10 +163,13 @@ cdef void rank_data_pointer(DTYPE_t *data,
             if label == 0:
                 y[curr_ranked] = 1
             else:
-                if y[curr_ranked] == y[prev_ranked]:
-                    y[curr_ranked] = y[prev_ranked]
-                else:
-                    y[curr_ranked] = y[prev_ranked] + 1
+                # Assign the rank of the previous class and,
+                # in case that the values in data are different,
+                # increase the rank to the one inmediately after
+                y[curr_ranked] = y[prev_ranked]
+                
+                if data[curr_ranked] != data[prev_ranked]:
+                    y[curr_ranked] += 1
 
         prev_ranked = curr_ranked
 

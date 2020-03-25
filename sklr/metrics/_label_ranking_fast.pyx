@@ -36,7 +36,7 @@ cpdef void kendall_distance_fast(INT64_t_2D Y_true,
         y_true = Y_true[sample]
         y_pred = Y_pred[sample]
 
-        for f_class in range(n_classes):
+        for f_class in range(n_classes - 1):
             for s_class in range(f_class + 1, n_classes):
                 # There exist a disagreement among the rankings
                 # if the compared classes are in opposite order
@@ -68,7 +68,7 @@ cpdef void tau_score_fast(INT64_t_2D Y_true,
         y_true = Y_true[sample]
         y_pred = Y_pred[sample]
 
-        for f_class in range(n_classes):
+        for f_class in range(n_classes - 1):
             for s_class in range(f_class + 1, n_classes):
                 # There exist an agreement among the rankings
                 # if the compared classes are in the same order
