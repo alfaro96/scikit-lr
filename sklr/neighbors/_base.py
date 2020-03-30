@@ -46,10 +46,11 @@ def _get_weights(Y, dist, weights):
         # points, those training points are weighted
         # as one and the other points as zero
         with np.errstate(divide="ignore"):
-            sample_weight *= 1 / dist
-        inf_mask = np.isinf(sample_weight)
+            dist = 1 / dist
+        inf_mask = np.isinf(dist)
         inf_row = np.any(inf_mask, axis=1)
-        sample_weight[inf_row] = inf_mask[inf_row]
+        dist[inf_row] = inf_mask[inf_row]
+        sample_weight *= dist
 
     return sample_weight
 
