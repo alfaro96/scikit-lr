@@ -40,10 +40,7 @@ def _check_targets(Y_true, Y_pred):
     return (Y_true, Y_pred)
 
 
-def kendall_distance(Y_true, Y_pred,
-                     normalize=True,
-                     sample_weight=None,
-                     return_dists=False):
+def kendall_distance(Y_true, Y_pred, normalize=True, sample_weight=None):
     """Kendall distance.
 
     The Kendall distance is a metric that counts the number of pairwise
@@ -66,17 +63,11 @@ def kendall_distance(Y_true, Y_pred,
             default=None
         The sample weights. If ``None``, then samples are equally weighted.
 
-    return_dists : bool, default=False
-        If ``True``, return the array of Kendall distances.
-
     Returns
     -------
     dist : float
          If ``normalize=True``, return the fraction of pairwise disagrements,
          else returns the number of pairwise disagreements.
-
-    dists : ndarray of shape (n_samples,), dtype=np.float64
-        The array of Kendall distances.
 
     See also
     --------
@@ -103,10 +94,7 @@ def kendall_distance(Y_true, Y_pred,
     dists = np.zeros(Y_true.shape[0], dtype=np.float64)
     kendall_distance_fast(Y_true, Y_pred, normalize, dists)
 
-    if not return_dists:
-        return np.average(a=dists, weights=sample_weight)
-    else:
-        return (np.average(a=dists, weights=sample_weight), dists)
+    return np.average(a=dists, weights=sample_weight)
 
 
 def tau_score(Y_true, Y_pred, sample_weight=None):

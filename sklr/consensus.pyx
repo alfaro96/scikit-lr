@@ -236,8 +236,7 @@ cdef class RankAggregationAlgorithm:
         """Check whether the rankings in Y can be
         aggregated with the Rank Aggregation algorithm."""
 
-    def aggregate(self, Y, sample_weight=None,
-                  apply_mle=False, return_Yt=False):
+    def aggregate(self, Y, sample_weight=None):
         """Aggregate the rankings in Y according to the sample weights.
 
         Parameters
@@ -249,29 +248,10 @@ cdef class RankAggregationAlgorithm:
                 default=None
             Sample weights. If None, then samples are equally weighted.
 
-        apply_mle : bool, default=False
-            If True, apply the MLE process to complete the
-            rankings before obtaining the consensus ranking,
-            else aggregate the rankings without completing.
-            Note that this is only available for the Borda count algorithm.
-
-        return_Yt : bool, default=False
-            If True, return the completed rankings with the MLE process.
-
         Returns
         -------
         consensus : np.ndarray of shape (n_classes,)
             The consensus ranking.
-
-        Yt : np.ndarray of shape (n_samples, n_classes)
-            The completed rankings.
-
-        Raises
-        ------
-        ValueError
-            If the MLE process should be done and the
-            Rank Aggregation algorithm is the Bucket
-            Pivot Algorithm with multiple pivots and two-stages.
         """
         # Check the format of the input rankings
         # (allowing classes with infinite values since the
@@ -281,19 +261,6 @@ cdef class RankAggregationAlgorithm:
         # Check whether the rankings can be
         # aggregated with the selected algorithm
         self.check_targets(Y)
-
-        # Check whether the MLE process can be
-        # applied with this Rank Aggregation algorithm
-        if apply_mle and self.__class__ is not BordaCountAlgorithm:
-            raise ValueError("The MLE process can only be carried "
-                             "out with the Borda count algorithm.")
-
-        # Check whether the completed rankings can be returned
-        # (only possible if the MLE process is performed)
-        if not apply_mle and return_Yt:
-            warn("The completed rankings cannot be returned "
-                 "without applying the MLE process. Only "
-                 "the consensus ranking will be returned.")
 
         # Initialize some values from the input arrays
         cdef INT64_t n_samples = Y.shape[0]
@@ -316,17 +283,14 @@ cdef class RankAggregationAlgorithm:
 
         # Aggregate the rankings to build the consensus ranking
         # (properly applying the MLE process when it corresponds)
-        if apply_mle:
+        if self.__class__ is BordaCountAlgorithm:
             self.aggregate_mle(Yt, sample_weight, consensus)
         else:
             self.aggregate_rankings(Yt, sample_weight, consensus)
 
         # Return the built consensus ranking (and,
         # if specified, the completed rankings)
-        if apply_mle and return_Yt:
-            return (consensus, Yt)
-        else:
-            return consensus
+        return consensus
 
 
 # =============================================================================
