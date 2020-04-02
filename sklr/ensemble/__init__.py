@@ -12,7 +12,6 @@ Label Ranking and Partial Label Ranking problems.
 from ._base import BaseEnsemble
 from ._bagging import BaggingLabelRanker, BaggingPartialLabelRanker
 from ._forest import RandomForestLabelRanker, RandomForestPartialLabelRanker
-from ._weight_boosting import AdaBoostLabelRanker
 
 
 # =============================================================================
@@ -24,6 +23,5 @@ from ._weight_boosting import AdaBoostLabelRanker
 __all__ = [
     "BaggingLabelRanker", "BaggingPartialLabelRanker",
     "BaseEnsemble",
-    "RandomForestLabelRanker", "RandomForestPartialLabelRanker",
-    "AdaBoostLabelRanker"
+    "RandomForestLabelRanker", "RandomForestPartialLabelRanker"
 ]

@@ -62,33 +62,6 @@ def test_aggregate_borda_count():
     np.testing.assert_array_equal(consensus_random_pred, consensus_random_true)
     np.testing.assert_array_equal(consensus_top_pred, consensus_top_true)
 
-    # Also, compute the consensus ranking from the rankings
-    # with missed classes using the MLE process and return
-    # the completed rankings to ensure that they are correct
-
-    # Initialize the true consensus and completed rankings
-    consensus_random_true = np.array([2, 3, 1])
-    consensus_top_true = np.array([1, 3, 2])
-    Yt_top_true = np.array([[1, 2, 3], [2, 3, 1], [2, 3, 1]])
-    Yt_random_true = np.array([[2, 3, 1], [2, 3, 1], [2, 3, 1]])
-
-    # Initialize the predicted consensus and completed rankings
-    (consensus_random_pred, Yt_random_pred) = borda_count.aggregate(
-        Y_random, apply_mle=True, return_Yt=True)
-    (consensus_top_pred, Yt_top_pred) = borda_count.aggregate(
-        Y_top, apply_mle=True, return_Yt=True)
-
-    # Assert that the consensus and completed rankings are the same
-    np.testing.assert_array_equal(consensus_random_pred, consensus_random_true)
-    np.testing.assert_array_equal(consensus_top_pred, consensus_top_true)
-    np.testing.assert_array_equal(Yt_random_pred, Yt_random_true)
-    np.testing.assert_array_equal(Yt_top_pred, Yt_top_true)
-
-    # Assert that the proper warning is raised when trying to
-    # return the completed rankings without applying the MLE process
-    with pytest.warns(UserWarning):
-        borda_count.aggregate(Y, return_Yt=True)
-
 
 @pytest.mark.aggregate_bpa_lia_mp2
 def test_aggregate_bpa_lia_mp2():
@@ -118,11 +91,6 @@ def test_aggregate_bpa_lia_mp2():
     np.testing.assert_array_equal(consensus_pred, consensus_true)
     np.testing.assert_array_equal(consensus_random_pred, consensus_random_true)
     np.testing.assert_array_equal(consensus_top_true, consensus_top_pred)
-
-    # Assert that the proper error is raised when trying
-    # to compute the consensus ranking using the MLE process
-    with pytest.raises(ValueError):
-        bpa_lia_mp2.aggregate(Y, apply_mle=True, return_Yt=True)
 
 
 @pytest.mark.beta_invalid
