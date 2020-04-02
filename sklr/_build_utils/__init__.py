@@ -7,6 +7,7 @@
 
 # Standard
 from distutils.version import LooseVersion
+from glob import glob
 import os
 import sys
 
@@ -52,17 +53,22 @@ def make_config(config):
     path = config.name.replace(".", "/")
     (_, dirs, files) = next(os.walk(path))
 
+    # Find the C++ source files available in the current module, since
+    # they must be included along with (some of) the Cython extensions
+    cpp_files = glob(os.path.join(path, "src", "**/*.cpp"), recursive=True)
+    cpp_files = [cpp_file.replace(path + "/", "") for cpp_file in cpp_files]
+
     for module_dir in dirs:
         if module_dir == "data":
             config.add_data_dir(module_dir)
-        else:
+        elif module_dir != "src":
             config.add_subpackage(module_dir)
 
     for module_file in files:
         if module_file.endswith(".pxd"):
             config.add_data_files(module_file)
         elif module_file.endswith(".pyx"):
-            add_extension(config, module_file)
+            add_extension(config, module_file, *cpp_files)
 
     # Skip cythonization as it is not wanted to include the
     # generated C/C++ files in the release tarballs as they
