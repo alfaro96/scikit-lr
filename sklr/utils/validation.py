@@ -207,8 +207,8 @@ def has_fit_parameter(estimator, parameter):
 def check_X_Y(X, Y):
     """Input validation for standard estimators.
 
-    Check ``X`` and ``Y`` for consistent length, enforces ``X`` to be
-    a floating 2-D array and ``Y`` to be a 2-D array mantaining the data
+    Checks ``X`` and ``Y`` for consistent length, enforces ``X`` to be a
+    floating 2-D array and ``Y`` to be a 2-D array mantaining the data
     type. ``X`` is checked to be non-empty and containing only finite values
     while ``Y`` is checked to be non-empty and can contain infinite values.
 

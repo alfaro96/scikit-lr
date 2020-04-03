@@ -27,8 +27,12 @@ from ._label_ranking_fast import kendall_distance_fast, tau_score_fast
 # =============================================================================
 
 def _check_targets(Y_true, Y_pred):
-    """Check that ``Y_true`` and ``Y_pred``
-    belong to a Label Ranking task."""
+    """Check that ``Y_true`` and ``Y_pred`` belong to a Label Ranking task.
+
+    Checks ``Y_true`` and ``Y_pred`` for consistent length, enforces to be
+    integer 2-D arrays and are checked to be non-empty and containing only
+    finite values.
+    """
     Y_true = check_array(Y_true, dtype=np.int64)
     Y_pred = check_array(Y_pred, dtype=np.int64)
 
