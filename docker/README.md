@@ -1,29 +1,41 @@
-![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/alfaro96/scikit-lr.svg)
+![Docker Cloud Automated Build](https://img.shields.io/docker/cloud/automated/alfaro96/scikit-lr.svg)
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/alfaro96/scikit-lr.svg)
+![Docker Pulls](https://img.shields.io/docker/pulls/alfaro96/scikit-lr.svg)
+![Docker Image Size](https://img.shields.io/docker/image-size/alfaro96/scikit-lr/latest.svg)
 
-# docker-scikit-lr
+# Using scikit-lr via Docker
 
-Docker image to work on the development of the `scikit-lr` package.
+This directory contains a `Dockerfile` to make it easy to get up and running with `scikit-lr` via [`Docker`](https://docker.com).
 
-## Build
+## Installing Docker
+
+General installation instructions are [on the `Docker` site](https://docs.docker.com/get-docker/), but we give some quick links here:
+
+* [Installing Docker Engine](https://docs.docker.com/engine/install/)
+
+## Building the image
+
+We are using a `Makefile` to simplify `Docker` commands within `make` commands.
 
 To build the image from the `Dockerfile`:
 
 ```
-docker build -t alfaro96/scikit-lr:latest .
+make build
 ```
 
-Alternatively, to pull the image:
+## Pulling the image
+
+To pull the image from [`Docker Hub`](https://hub.docker.com):
 
 ```
-docker pull alfaro96/scikit-lr:latest
+make pull
 ```
 
-## Run
+## Running the container
 
-To run the image with the default command (mounting the current directory as workspace):
+To run the container and start a `bash`:
 
 ```
-docker run -it -v $(pwd)/:/home/scikit-lr/workspace/ --rm alfaro96/scikit-lr:latest
+make run
 ```
 
