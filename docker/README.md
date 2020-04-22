@@ -12,13 +12,13 @@ Docker image to work on the development of the `scikit-lr` package.
 To build the image from the `Dockerfile`:
 
 ```
-docker build -t alfaro96/scikit-lr:latest .
+make build
 ```
 
 Alternatively, to pull the image:
 
 ```
-docker pull alfaro96/scikit-lr:latest
+make pull
 ```
 
 ## Run
@@ -26,6 +26,6 @@ docker pull alfaro96/scikit-lr:latest
 To run the image with the default command (mounting the current directory as workspace):
 
 ```
-docker run -it -v $(pwd)/:/home/scikit-lr/workspace/ --rm alfaro96/scikit-lr:latest
+make run
 ```
 
