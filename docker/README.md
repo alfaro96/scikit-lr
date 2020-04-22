@@ -9,13 +9,13 @@ Docker image to work on the development of the `scikit-lr` package.
 
 ## Build
 
-To build the image from the `Dockerfile`:
+To build the docker image from the `Dockerfile`:
 
 ```
 make build
 ```
 
-Alternatively, to pull the image from `Docker Hub`:
+Alternatively, to pull the docker image from the `Docker Hub`:
 
 ```
 make pull
@@ -23,7 +23,7 @@ make pull
 
 ## Run
 
-To run the image with the default command (mounting the current directory as workspace):
+To run the docker image in a container, mounting the current directory as workspace:
 
 ```
 make run
