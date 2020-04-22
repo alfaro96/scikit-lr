@@ -1,5 +1,7 @@
-![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/alfaro96/scikit-lr.svg)
+![Docker Cloud Automated Build](https://img.shields.io/docker/cloud/automated/alfaro96/scikit-lr.svg)
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/alfaro96/scikit-lr.svg)
+![Docker Pulls](https://img.shields.io/docker/pulls/alfaro96/scikit-lr.svg)
+![Docker Image Size](https://img.shields.io/docker/image-size/alfaro96/scikit-lr/latest.svg)
 
 # docker-scikit-lr
 
