@@ -9,7 +9,7 @@ This directory contains a `Dockerfile` to make it easy to get up and running wit
 
 ## Installing Docker
 
-General installation instructions are [on the Docker site](https://docs.docker.com/get-docker/), but we give some quick links here:
+General installation instructions are [on the `Docker` site](https://docs.docker.com/get-docker/), but we give some quick links here:
 
 * [Installing Docker Engine](https://docs.docker.com/engine/install/)
 
