@@ -11,11 +11,11 @@ RUN apt-get update; \
 # execute the benchmarks (including some utils)
 COPY requirements/*.txt /req/
 RUN pip install --upgrade pip; \
-    pip install -r /req/benchmark.txt \
+    pip install -r /req/benchmarks.txt \
                 -r /req/build.txt \
                 -r /req/docs.txt \
                 -r /req/style.txt \
-                -r /req/test.txt
+                -r /req/tests.txt
 
 # Install the R requirements with the tools to apply
 # the standard statistical tests to the benchmarking
