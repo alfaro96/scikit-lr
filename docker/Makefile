@@ -4,7 +4,7 @@
 build:
 	docker build -t alfaro96/scikit-lr:latest .
 
-# Pull the docker image from the Docker Hub
+# Pull the docker image from Docker Hub
 pull:
 	docker pull alfaro96/scikit-lr:latest
 
