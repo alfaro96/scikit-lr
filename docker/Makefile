@@ -1,13 +1,19 @@
-# Makefile to simplify repetitive tasks
+# Makefile to simplify repetitive tasks
 
-# Build the docker image from the Dockerfile
+# The tag of the image must be
+# the scikit-lr package version
+TAG = latest
+
 build:
-	docker build -t alfaro96/scikit-lr:latest .
+	docker build -t alfaro96/scikit-lr:$(TAG) .
 
-# Pull the docker image from Docker Hub
 pull:
-	docker pull alfaro96/scikit-lr:latest
+	docker pull alfaro96/scikit-lr:$(TAG)
 
-# Run the docker image in a container, mounting the current directory as workspace
+# Run the container allocating a pseudo-TTY (terminal),
+# binding mount the current directory as workspace and
+# automatically removing the container when it exits
 run:
-	docker run -it -v $(pwd)/:/home/scikit-lr/workspace/ --rm alfaro96/scikit-lr:latest
+	docker run -it \
+			   -v $(PWD)/:/home/scikit-lr/workspace/ \
+			   --rm alfaro96/scikit-lr:$(TAG)

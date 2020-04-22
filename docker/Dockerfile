@@ -6,14 +6,15 @@ FROM python:3.6-slim
 RUN apt-get update; \
     apt-get install -y git gcc g++ make r-base
 
-# Install the Python requirements to build, lint,
-# test the package, create the documentation and
-# execute the benchmarks (including some utils)
+# Install the Python requirements to build, lint
+# and test the package, create the documentation
+# and execute (possible) examples and benchmarks
 COPY requirements/*.txt /req/
 RUN pip install --upgrade pip; \
     pip install -r /req/benchmarks.txt \
                 -r /req/build.txt \
                 -r /req/docs.txt \
+                -r /req/examples.txt \
                 -r /req/style.txt \
                 -r /req/tests.txt
 
