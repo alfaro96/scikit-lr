@@ -15,7 +15,7 @@ To build the image from the `Dockerfile`:
 make build
 ```
 
-Alternatively, to pull the image:
+Alternatively, to pull the image from `Docker Hub`:
 
 ```
 make pull
