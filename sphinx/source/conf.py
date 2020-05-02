@@ -41,6 +41,9 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None)
 }
 
+# The document name of the "master" document
+master_doc = "index"
+
 # Whether parentheses are appended to function and method role text
 add_function_parentheses = False
 
