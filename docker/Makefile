@@ -1,7 +1,7 @@
 # Makefile to simplify repetitive tasks
 
-# The tag of the image must be
-# the scikit-lr package version
+# The tag of the Docker image must
+# be the scikit-lr package version
 TAG = latest
 
 build:
@@ -12,7 +12,7 @@ pull:
 
 # Run the container allocating a pseudo-TTY (terminal),
 # binding mount the current directory as workspace and
-# automatically removing the container when it exits
+# automatically cleaning up the container when stopped
 run:
 	docker run -it \
 			   -v $(PWD)/:/home/scikit-lr/workspace/ \
