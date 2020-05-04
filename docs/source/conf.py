@@ -58,5 +58,5 @@ html_theme = "sphinx_rtd_theme"
 # Whether links to the reST sources will be added to the sidebar
 html_show_sourcelink = False
 
-# Whether "Created using Sphinx is shown in the HTML footer
+# Whether "Created using Sphinx" is shown in the HTML footer
 html_show_sphinx = False

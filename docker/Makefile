@@ -1,7 +1,7 @@
 # Makefile to simplify repetitive tasks
 
-# The tag of the Docker image must
-# be the scikit-lr package version
+# Substitute this value by the release version
+# (use the "latest" tag for the master branch)
 TAG = latest
 
 build:
@@ -10,9 +10,6 @@ build:
 pull:
 	docker pull alfaro96/scikit-lr:$(TAG)
 
-# Run the container allocating a pseudo-TTY (terminal),
-# binding mount the current directory as workspace and
-# automatically cleaning up the container when stopped
 run:
 	docker run -it \
 			   -v $(PWD)/:/home/scikit-lr/workspace/ \
