@@ -3,4 +3,5 @@
 # Immediately exit with a non-zero status command
 set -e
 
-make test-docs
+# Activate once there are interactive examples in the documentation
+# make test-docs

@@ -32,7 +32,7 @@ docs: inplace
 
 # Analyze the style of the code
 code-analysis:
-	flake8 sklr | grep -v __init__ || true
+	flake8 sklr
 
 # Find the changed files and analyze their style
 flake8-diff:
