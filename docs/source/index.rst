@@ -27,10 +27,10 @@ to illustrate some of the main features that scikit-lr provides.
     :hidden:
     :caption: GETTING STARTED
 
-    docs/getting_started/install
-    docs/getting_started/features
-    docs/getting_started/support
-    docs/getting_started/faq
+    getting_started/install
+    getting_started/features
+    getting_started/support
+    getting_started/faq
 
 ==========
 User Guide
@@ -43,7 +43,7 @@ This contains an in-depth description of all algorithms and how to apply them.
     :hidden:
     :caption: ADVANCED FEATURES
 
-    docs/user_guide/index
+    user_guide/index
 
 =============
 API Reference
@@ -56,7 +56,7 @@ functions, and all parameters available for the algorithms.
     :maxdepth: 2
     :hidden:
 
-    docs/api_reference/index
+    api_reference/index
 
 ========
 Glossary
@@ -69,7 +69,7 @@ and its API, while providing a reference for users and contributors.
     :maxdepth: 2
     :hidden:
 
-    docs/glossary/index
+    glossary/index
 
 ============
 Benchmarking
@@ -93,7 +93,7 @@ This provides the log of the scikit-lr history.
     :hidden:
     :caption: ADDITIONAL INFORMATION
 
-    docs/whats_new/index
+    whats_new/index
 
 ========
 About us

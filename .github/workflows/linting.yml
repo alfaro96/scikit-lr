@@ -1,9 +1,8 @@
 name: Linting tests
 
-# This workflow will be triggered on each push or pull request
-# but only for the master and release branches, since feature
-# and bug-fix branches will be merged via pull request. Thus,
-# it ensures that changes are integrated without any issue
+# Triggered on each push or PR only for the master
+# and release branches because feature and bug-fix
+# branches are merged via PR
 on:
   push:
     branches:
@@ -15,31 +14,22 @@ on:
       - "[0-9]+.[0-9]+.X"
 
 jobs:
-  # Linux environment to test that PRs do not add
-  # obvious flake8 violations. It relies on two things:
-  #   - Find common ancestor between branch
-  #     and scikit-lr/scikit-lr remote.
-  #   - run flake8 --diff on the diff between
-  #     the branch and the common ancestor.
+  # Linux environment to assert that PRs
+  # do not add obvious flake8 violations
   linting:
-    # Use the latest Ubuntu version
     runs-on: ubuntu-latest
-    # Execute the following steps in the workflow
+
     steps:
-      # Checkout the branch that issue the workflow
       - name: Checkout branch
         uses: actions/checkout@v1
 
-      # Setup the Python 3.8 version
-      - name: Setup Python 3.8
+      - name: Setup Python 3.6
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.6
 
-      # Install the dependencies
       - name: Install dependencies
         run: source $GITHUB_WORKSPACE/.github/tools/linting/install.sh
 
-      # Test the linting
       - name: Test linting
         run: bash $GITHUB_WORKSPACE/.github/tools/linting/test.sh

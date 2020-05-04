@@ -1,28 +1,18 @@
-# Disable the comments of the coverage to avoid
-# that the console outputs useless messages
+# Avoid useless messages
 comment: off
 
-# Coverage configuration
 coverage:
   status:
     project:
       default:
-        # Commits pushed to master should not make the
-        # overall project coverage decrease by more than 1%
+        # Commits pushed to master should not make
+        # the overall project coverage decrease by
+        # more than 1%
         target: auto
         threshold: 1%
     patch:
       default:
-        # Be tolerant on slight code coverage diff on PRs to limit noisy red coverage
-        # status on GitHub PRs. Note the coverage stats are still uploaded to codecov
-        # so that PR reviewers can see uncovered lines in the GitHub diff if they install
-        # the codecov browser extension: https://github.com/codecov/browser-extension
+        # Be tolerant on slight code coverage diff on
+        # PR to limit noisy coverage status on GitHub
         target: auto
         threshold: 1%
-
-# Ignore the following directories and files from the
-# coverage because they are not needed to be tested
-ignore:
-- "sklr/_build_utils"
-- "**/setup.py"
-- "setup.py"

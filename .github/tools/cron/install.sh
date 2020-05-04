@@ -1,26 +1,18 @@
 #!/bin/bash
 
-# This script is meant to be called by the "Install dependencies" step
-# defined in cron.yml. The behaviour of the script is controlled by the named
-# step defined in the cron.yml in the folder .github/workflows of the project.
-
-# Exit immediately if a command
-# exits with a non-zero status
+# Immediately exit with a non-zero status command
 set -e
 
-# Install gcc-6 and g++-6 since they are
-# needed to compile some of the extensions
+# Install GCC and G++ to compile the Cython extensions
 sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update
 sudo apt-get install -y gcc-6 g++-6
 
-# Set gcc-6 and g++-6 as default
-# compilers so that they are used
 export CC=/usr/bin/gcc-6
 export CXX=/usr/bin/g++-6
 
-# Install and update the dependencies to the latest and nightly versions of the packages
-# and thus being able to anticipate future errors before stable versions are released
+# Use the latest and nightly versions of the packages
+# to anticipate future errors before stable releases
 echo "Upgrading pip and setuptools"
 pip install --upgrade pip setuptools
 
@@ -35,10 +27,9 @@ echo "Installing codecov"
 pip install --upgrade codecov
 
 python --version
-python -c 'import numpy; print("NumPy {}".format(numpy.__version__))'
-python -c 'import scipy; print("SciPy {}".format(scipy.__version__))'
+python -c "import numpy; print('NumPy {0}'.format(numpy.__version__))"
+python -c "import scipy; print('SciPy {0}'.format(scipy.__version__))"
 
-# Build scikit-lr in the "install.sh" script
-# to collapse the verbose build output in the
-# GitHub Actions output when it succeeds
+# Build scikit-lr in this script to collapse the verbose
+# build output in GitHub Actions output when it succeeds
 python setup.py develop

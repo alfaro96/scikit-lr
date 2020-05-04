@@ -1,7 +1,7 @@
 <!--- Standard template for submitting PRs -->
 
-#### Reference Issues/PRs
+#### Reference issues
 
-#### What does this implement/fix?
+#### What does this implement?
 
 #### Any other comments?

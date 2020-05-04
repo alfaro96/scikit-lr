@@ -4,7 +4,6 @@ about: Create a report to help us improve the documentation
 title: "[DOC]"
 labels: documentation
 assignees: alfaro96
-
 ---
 
 #### Describe the issue linked to the documentation
