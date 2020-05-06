@@ -5,8 +5,19 @@
 # Imports
 # =============================================================================
 
+# Standard
+import os
+import sys
+
 # Local application
 import sklr
+
+# If the extensions (or modules to document with autodoc) are in another
+# directory, add these directories here. If the directory is relative to
+# the documentation root, use os.path.abspath to make this path absolute
+sys.path.insert(0, os.path.abspath("../sphinxext"))
+
+from github_link import make_linkcode_resolve  # noqa
 
 
 # =============================================================================
@@ -29,11 +40,58 @@ release = version
 # General configuration
 # =============================================================================
 
-# A list of strings that are module names of extensions. Note
-# that extensions coming with Sphinx are named "sphinx.ext.*"
+# A list of strings that are module names of extensions,
+# coming with Sphinx (named sphinx.ext.*) or custom ones
 extensions = [
-    "sphinx.ext.intersphinx"
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.linkcode",
+    "sphinx.ext.napoleon"
 ]
+
+# The document name of the "master" document
+master_doc = "index"
+
+# A list of paths that contain extra templates
+templates_path = ["../templates"]
+
+# The style name to use for Pygments highlighting of source code
+pygments_style = "sphinx"
+
+# Whether parentheses are appended to function and
+# method text to signify that the name is callable
+add_function_parentheses = False
+
+# Whether doctest flags at the ends of lines are detached
+# for all code blocks showing interactive Python sessions
+trim_doctest_flags = True
+
+
+# =============================================================================
+# Options for autodoc extension
+# =============================================================================
+
+# Map the option names for autodoc directives to the default values
+autodoc_default_options = {
+    "members": True,
+    "inherited-members": True
+}
+
+
+# =============================================================================
+# Options for autosummary extension
+# =============================================================================
+
+# Whether to scan all found documents for autosummary
+# directives, and to generate stub pages for each one
+autosummary_generate = True
+
+
+# =============================================================================
+# Options for intersphinx extension
+# =============================================================================
 
 # Map the name to the location of other projects
 # that should be linked to in this documentation
@@ -41,11 +99,23 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None)
 }
 
-# The document name of the "master" document
-master_doc = "index"
 
-# Whether parentheses are appended to function and method role text
-add_function_parentheses = False
+# =============================================================================
+# Options for linkcode extension
+# =============================================================================
+
+# Link the source code of an object to the GitHub repository
+linkcode_resolve = make_linkcode_resolve(author="alfaro96",
+                                         package="scikit-lr")
+
+
+# =============================================================================
+# Options for napoleon extension
+# =============================================================================
+
+# This is required to format the attributes of a class.
+# See: https://github.com/sphinx-doc/sphinx/issues/7582
+napoleon_use_ivar = True
 
 
 # =============================================================================
