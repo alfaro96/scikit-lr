@@ -75,8 +75,8 @@ trim_doctest_flags = True
 
 # Map the option names for autodoc directives to the default values
 autodoc_default_options = {
-    "members": True,
-    "inherited-members": True
+    "members": None,
+    "inherited-members": None
 }
 
 
