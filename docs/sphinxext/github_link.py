@@ -9,7 +9,7 @@
 from functools import partial
 from importlib import import_module
 from inspect import getsourcefile, getsourcelines
-from packaging import parse
+from packaging.version import parse
 from operator import attrgetter
 from os.path import dirname, relpath
 

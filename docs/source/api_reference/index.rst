@@ -20,6 +20,6 @@ uses. For reference on concepts repeated across the API, see: :ref:`glossary`.
 
 .. autosummary::
    :toctree: generated/
-   :template: class.rst
+   :template: class_without_init.rst
 
    exceptions.NotFittedError
