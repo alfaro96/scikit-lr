@@ -15,7 +15,7 @@ inplace:
 test-code: inplace
 	pytest -l -v sklr --durations=$(or ${DURATIONS}, 20)
 
-# Produce a coverage report in HTML format
+# Create a coverage report in HTML format
 test-coverage:
 	rm -rf coverage .coverage
 	pytest -l -v --cov=sklr --cov-report=html:coverage
@@ -26,9 +26,23 @@ test-docs:
 
 test: test-code test-docs
 
-# Create the documentation in HTML format
+# Build the documentation in HTML format
 docs: inplace
 	make -C docs html
+
+# Build the docker image from the Dockerfile
+docker-build:
+	make -C docker build
+
+# Pull the docker image from Docker Hub
+docker-pull:
+	make -C docker pull
+
+# Run the docker image in a container and start a bash
+docker-run:
+	make -C docker run
+
+docker: docker-build docker-run
 
 # Analyze the style of the code
 code-analysis:
