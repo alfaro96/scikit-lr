@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Immediately exit with a non-zero status command
 set -e
 
 # Install GCC and G++ to compile the Cython extensions
@@ -11,8 +10,9 @@ sudo apt-get install -y gcc-6 g++-6
 export CC=/usr/bin/gcc-6
 export CXX=/usr/bin/g++-6
 
-# Use the latest and nightly versions of the packages
-# to anticipate future errors before stable releases
+# Use the continuous integration wheel of NumPy, SciPy
+# and Cython to detect deprecation and future warnings
+
 echo "Upgrading pip and setuptools"
 pip install --upgrade pip setuptools
 

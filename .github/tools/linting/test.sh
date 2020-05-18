@@ -3,7 +3,6 @@
 PROJECT=alfaro96/scikit-lr
 PROJECT_URL=https://github.com/$PROJECT.git
 
-# Immediately exit with a non-zero status command
 set -e
 
 # Find the remote with the project name (upstream in most cases)
