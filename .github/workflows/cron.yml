@@ -1,22 +1,22 @@
-name: Daily wheels tests
+name: Daily tests
 
-# Triggered every day to anticipate future errors
+# Triggered daily to detect deprecation and future warnings
 on:
   schedule:
     - cron: "0 0 * * *"
 
 jobs:
-  # Linux environment to build and test scikit-lr against
-  # NumPy, SciPy and Cython installed from their CI wheels
-  build:
+  # Linux environment to test scikit-lr against NumPy, SciPy and Cython installed from
+  # their continuous integration wheels with the Python interpreter provided by GitHub
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout master branch
-        uses: actions/checkout@v1
+      - name: Checkout branch
+        uses: actions/checkout@v2
 
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v1
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
