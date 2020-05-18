@@ -1,8 +1,7 @@
 name: Linting tests
 
-# Triggered on each push or PR only for the master
-# and release branches because feature and bug-fix
-# branches are merged via PR
+# Triggered on each push and PR for the master and release branches
+# because feature and bug-fix branches will be merged via these PRs
 on:
   push:
     branches:
@@ -21,12 +20,12 @@ jobs:
 
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
-      - name: Setup Python 3.6
-        uses: actions/setup-python@v1
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.8
 
       - name: Install dependencies
         run: source $GITHUB_WORKSPACE/.github/tools/linting/install.sh
