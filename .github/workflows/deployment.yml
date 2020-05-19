@@ -49,6 +49,7 @@ jobs:
       - name: Copy files
         run: |
           cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/config.sh $GITHUB_WORKSPACE
+          cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/extra_functions.sh $GITHUB_WORKSPACE
 
       - name: Show variables
         run: |
@@ -66,6 +67,7 @@ jobs:
           pip install virtualenv
           source multibuild/common_utils.sh
           source multibuild/travis_steps.sh
+          source extra_functions.sh
           before_install
           clean_code $REPO_DIR $BUILD_COMMIT
           build_wheel $REPO_DIR $PLAT
@@ -74,7 +76,11 @@ jobs:
         run: |
           if [ $(uname | tr "[:upper:]" "[:lower:]") == "darwin" ]; then TRAVIS_OS_NAME=osx; else TRAVIS_OS_NAME=linux; fi
           set -e
+          PYTHON_EXE=`which python`
           source multibuild/common_utils.sh
           source multibuild/travis_steps.sh
+          source extra_functions.sh
+          setup_test_venv
           install_run $PLAT
+          teardown_test_venv
           
