@@ -84,3 +84,18 @@ jobs:
           install_run $PLAT
           teardown_test_venv
           
+      - name: Add conda to path
+        run: |
+          echo ::add-path::$CONDA/bin
+
+      - name: Install anaconda-client
+        run: |
+          conda install -q -y anaconda-client
+      
+      - name: Submit package
+        env:
+          CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
+        run: |
+          set -e
+          ls wheelhouse/*.whl
+          anaconda -t $CONDA_TOKEN upload --force -u alfaro96 wheelhouse/*.whl
