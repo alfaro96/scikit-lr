@@ -19,11 +19,13 @@ jobs:
           - 3.6
           - 3.7
           - 3.8
-    
+
     env:
-      NUMPY_VERSION: 1.17.3
-      SCIPY_VERSION: 1.3.2
-      CYTHON_VERSION: 0.29.14
+      REPO_DIR: scikit-lr
+      BUILD_COMMIT: ${{ github.sha }}
+      PLAT: x86_64
+      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2"
+      TEST_DEPENDS: pytest==4.6.4
       MB_PYTHON_VERSION: ${{ matrix.python }}
 
     steps:
@@ -31,17 +33,37 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: scikit-lr
-      
+
       - name: Checkout multibuild
         uses: actions/checkout@v2
         with:
           repository: matthew-brett/multibuild
           path: multibuild
 
-      - name: Copy configuration
+      - name: Copy files
         run: |
-          ls -al
-          ls -al $GITHUB_WORKSPACE
-          cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/config.sh $GITHUB_WORKSPACE
-          ls -al
-          ls -al $GITHUB_WORKSPACE
+        cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/config.sh $GITHUB_WORKSPACE
+
+      - name: Show variables
+        run: |
+          echo $REPO_DIR
+          echo $BUILD_COMMIT
+          echo $PLAT
+          echo $BUILD_DEPENDS
+          echo $TEST_DEPENDS
+          echo $MB_PYTHON_VERSION
+
+      - name: Source common utils
+        run: |
+          if [ $(uname | tr "[:upper:]" "[:lower:]") == "darwin" ]; then TRAVIS_OS_NAME=osx; else TRAVIS_OS_NAME=linux; fi
+          source multibuild/common_utils.sh
+          source multibuild/travis_steps.sh
+          before_install
+ 
+      - name: Build wheel
+        run: |
+          clean_code $REPO_DIR $BUILD_COMMIT
+          build_wheel $REPO_DIR $PLAT
+
+      - name: Install package
+          run: install_run $PLAT
