@@ -40,6 +40,12 @@ jobs:
           repository: matthew-brett/multibuild
           path: multibuild
 
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+
       - name: Copy files
         run: |
           cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/config.sh $GITHUB_WORKSPACE
@@ -57,7 +63,6 @@ jobs:
         run: |
           if [ $(uname | tr "[:upper:]" "[:lower:]") == "darwin" ]; then TRAVIS_OS_NAME=osx; else TRAVIS_OS_NAME=linux; fi
           set -e
-          pip install wheel
           pip install virtualenv
           source multibuild/common_utils.sh
           source multibuild/travis_steps.sh
