@@ -56,6 +56,7 @@ jobs:
       - name: Source common utils
         run: |
           if [ $(uname | tr "[:upper:]" "[:lower:]") == "darwin" ]; then TRAVIS_OS_NAME=osx; else TRAVIS_OS_NAME=linux; fi
+          set pip install virtualenv
           source multibuild/common_utils.sh
           source multibuild/travis_steps.sh
           before_install
