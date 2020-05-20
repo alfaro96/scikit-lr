@@ -1,22 +1,22 @@
 name: Daily tests
 
-# Triggered daily to detect deprecation and future warnings
 on:
   schedule:
     - cron: "0 0 * * *"
 
 jobs:
-  # Linux environment to test scikit-lr against NumPy, SciPy and Cython installed from
-  # their continuous integration wheels with the Python interpreter provided by GitHub
+  # Linux environment to build and test scikit-lr against NumPy,
+  # SciPy and Cython installed from their continuous integration
+  # wheels to determine possible deprecation and future warnings
   test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
@@ -34,5 +34,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
-          yml: ./.codecov.yml
           fail_ci_if_error: true

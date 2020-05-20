@@ -11,6 +11,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      # Linux and macOS environments to build nightly and release
+      # staging wheels for scikit-lr against the minimum required
+      # versions of NumPy, SciPy and Cython. If built wheels pass
+      # the tests, are uploaded to: https://anaconda.org/alfaro96
       matrix:
         os:
           - ubuntu-latest
@@ -24,9 +28,9 @@ jobs:
       REPO_DIR: scikit-lr
       BUILD_COMMIT: ${{ github.sha }}
       PLAT: x86_64
+      MB_PYTHON_VERSION: ${{ matrix.python }}
       BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2"
       TEST_DEPENDS: pytest==4.6.4
-      MB_PYTHON_VERSION: ${{ matrix.python }}
 
     steps:
       - name: Checkout scikit-lr
@@ -47,56 +51,25 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Copy files
+        env:
+          FILES_PATH: ${{ github.workspace }}/scikit-lr/.github/tools/deployment
         run: |
-          cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/config.sh $GITHUB_WORKSPACE
-          cp $GITHUB_WORKSPACE/scikit-lr/.github/tools/deployment/extra_functions.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/extra_functions.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/before_install.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/config.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/build_wheel.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/upload_wheel.sh $GITHUB_WORKSPACE
 
-      - name: Show variables
-        run: |
-          echo $REPO_DIR
-          echo $BUILD_COMMIT
-          echo $PLAT
-          echo $BUILD_DEPENDS
-          echo $TEST_DEPENDS
-          echo $MB_PYTHON_VERSION
+      - name: Source utils
+        run: source before_install.sh
 
-      - name: Source common utils
-        run: |
-          if [ $(uname | tr "[:upper:]" "[:lower:]") == "darwin" ]; then TRAVIS_OS_NAME=osx; else TRAVIS_OS_NAME=linux; fi
-          set -e
-          pip install virtualenv
-          source multibuild/common_utils.sh
-          source multibuild/travis_steps.sh
-          source extra_functions.sh
-          before_install
-          clean_code $REPO_DIR $BUILD_COMMIT
-          build_wheel $REPO_DIR $PLAT
- 
       - name: Build wheel
-        run: |
-          if [ $(uname | tr "[:upper:]" "[:lower:]") == "darwin" ]; then TRAVIS_OS_NAME=osx; else TRAVIS_OS_NAME=linux; fi
-          set -e
-          PYTHON_EXE=`which python`
-          source multibuild/common_utils.sh
-          source multibuild/travis_steps.sh
-          source extra_functions.sh
-          setup_test_venv
-          install_run $PLAT
-          teardown_test_venv
-          
-      - name: Add conda to path
-        run: |
-          echo ::add-path::$CONDA/bin
-          sudo chown -R $USER $CONDA
+        run: bash build_wheel.sh
 
-      - name: Install anaconda-client
-        run: |
-          conda install -q -y anaconda-client
-      
-      - name: Submit package
+      - name: Test wheel
+        run: bash test_wheel.sh
+
+      - name: Upload package
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
-        run: |
-          set -e
-          ls wheelhouse/*.whl
-          anaconda -t $CONDA_TOKEN upload --force -u alfaro96 wheelhouse/*.whl
+        run: bash upload_package.sh

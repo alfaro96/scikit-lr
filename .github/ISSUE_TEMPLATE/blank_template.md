@@ -1,8 +1,8 @@
 ---
 name: Blank template
-about: For all other issues to reach the community
+about: For all other issues to reach the community.
 title: "[OTH]"
-labels: ""
+labels: "invalid"
 assignees: alfaro96
 ---
 

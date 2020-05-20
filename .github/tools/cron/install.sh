@@ -2,17 +2,6 @@
 
 set -e
 
-# Install GCC and G++ to compile the Cython extensions
-sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-sudo apt-get update
-sudo apt-get install -y gcc-6 g++-6
-
-export CC=/usr/bin/gcc-6
-export CXX=/usr/bin/g++-6
-
-# Use the continuous integration wheel of NumPy, SciPy
-# and Cython to detect deprecation and future warnings
-
 echo "Upgrading pip and setuptools"
 pip install --upgrade pip setuptools
 

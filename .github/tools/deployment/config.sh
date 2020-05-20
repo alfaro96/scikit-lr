@@ -1,14 +1,13 @@
 # Define custom utilities
 
-# Stuff to do before starting building the wheels
 function pre_build
 {
-    # No necessary, skip
+    # Stuff to do before starting building the wheels
     :
 }
 
-# Run tests on installed distribution from an empty directory
 function run_tests
 {
+    # Run tests on installed distribution from an empty directory
     pytest -l -v --pyargs sklr
 }
