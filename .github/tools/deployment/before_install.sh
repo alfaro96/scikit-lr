@@ -12,7 +12,7 @@ fi
 
 # Store the original Python path to be able to create
 # a testing environment using the same Python version
-PYTHON_EXE=`which python`
+echo "::set-env name=PYTHON_EXE::`which python`"
 
 pip install virtualenv
 

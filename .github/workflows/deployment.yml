@@ -61,8 +61,8 @@ jobs:
           cp $FILES_PATH/test_wheel.sh $GITHUB_WORKSPACE
           cp $FILES_PATH/upload_wheel.sh $GITHUB_WORKSPACE
 
-      - name: Source utils
-        run: source before_install.sh
+      - name: Install dependencies
+        run: bash before_install.sh
 
       - name: Build wheel
         run: bash build_wheel.sh
