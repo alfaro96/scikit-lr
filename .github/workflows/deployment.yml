@@ -52,12 +52,13 @@ jobs:
 
       - name: Copy files
         env:
-          FILES_PATH: ${{ github.workspace }}/scikit-lr/.github/tools/deployment
+          FILES_PATH: ${{ github.workspace }}/.github/tools/deployment
         run: |
           cp $FILES_PATH/extra_functions.sh $GITHUB_WORKSPACE
           cp $FILES_PATH/before_install.sh $GITHUB_WORKSPACE
           cp $FILES_PATH/config.sh $GITHUB_WORKSPACE
           cp $FILES_PATH/build_wheel.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/test_wheel.sh $GITHUB_WORKSPACE
           cp $FILES_PATH/upload_wheel.sh $GITHUB_WORKSPACE
 
       - name: Source utils
@@ -69,7 +70,7 @@ jobs:
       - name: Test wheel
         run: bash test_wheel.sh
 
-      - name: Upload package
+      - name: Upload wheel
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
-        run: bash upload_package.sh
+        run: bash upload_wheel.sh
