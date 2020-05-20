@@ -13,3 +13,7 @@ fi
 # Store the original Python path to be able to create
 # a testing environment using the same Python version
 echo "::set-env name=PYTHON_EXE::`which python`"
+
+# Add Conda directory to PATH environment variable
+echo "::add-path::$CONDA/bin"
+sudo chown -R $USER $CONDA
