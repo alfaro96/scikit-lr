@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Immediately exit with a non-zero status command
 set -e
 
 echo "Upgrading pip"

@@ -1,19 +1,7 @@
 #!/bin/bash
 
-# Immediately exit with a non-zero status command
 set -e
 
-# Install GCC and G++ in Linux to compile the Cython extensions
-if [ $(uname | tr "[:upper:]" "[:lower:]") == "linux" ]; then
-    sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
-    sudo apt-get update
-    sudo apt-get install -y gcc-6 g++-6
-    export CC=/usr/bin/gcc-6
-    export CXX=/usr/bin/g++-6
-fi
-
-# Use the specified versions of the packages to ensure
-# that all the operating systems use the same version
 echo "Upgrading pip and setuptools"
 pip install --upgrade pip setuptools
 

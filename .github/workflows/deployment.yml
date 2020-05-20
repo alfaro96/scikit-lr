@@ -1,0 +1,77 @@
+name: Continuous deployment wheels
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # Linux and macOS environments to build nightly and release
+      # staging wheels for scikit-lr against the minimum required
+      # versions of NumPy, SciPy and Cython. If built wheels pass
+      # the tests, are uploaded to: https://anaconda.org/alfaro96
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        python:
+          - 3.6
+          - 3.7
+          - 3.8
+
+    env:
+      REPO_DIR: scikit-lr
+      BUILD_COMMIT: ${{ github.sha }}
+      PLAT: x86_64
+      MB_PYTHON_VERSION: ${{ matrix.python }}
+      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2"
+      TEST_DEPENDS: pytest==4.6.4
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v2
+        with:
+          path: scikit-lr
+
+      - name: Checkout multibuild
+        uses: actions/checkout@v2
+        with:
+          repository: matthew-brett/multibuild
+          ref: devel
+          path: multibuild
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Copy files
+        env:
+          FILES_PATH: ${{ github.workspace }}/scikit-lr/.github/tools/deployment
+        run: |
+          cp $FILES_PATH/extra_functions.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/before_install.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/config.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/build_wheel.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/test_wheel.sh $GITHUB_WORKSPACE
+          cp $FILES_PATH/upload_wheel.sh $GITHUB_WORKSPACE
+
+      - name: Define variables
+        run: source before_install.sh
+
+      - name: Build wheel
+        run: bash build_wheel.sh
+
+      - name: Test wheel
+        run: bash test_wheel.sh
+
+      - name: Upload wheel
+        env:
+          CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
+        run: bash upload_wheel.sh
