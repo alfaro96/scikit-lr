@@ -13,12 +13,3 @@ fi
 # Store the original Python path to be able to create
 # a testing environment using the same Python version
 echo "::set-env name=PYTHON_EXE::`which python`"
-
-pip install virtualenv
-
-source multibuild/common_utils.sh
-source multibuild/travis_steps.sh
-source extra_functions.sh
-
-# Setup build dependencies
-before_install
