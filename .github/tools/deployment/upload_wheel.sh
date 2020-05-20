@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Add Conda directory to PATH environment variable
-echo ::add-path::$CONDA/bin
+echo "::add-path::$CONDA/bin"
 sudo chown -R $USER $CONDA
 
 conda install -q -y anaconda-client
