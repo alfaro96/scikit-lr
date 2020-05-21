@@ -82,5 +82,5 @@ jobs:
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
         # The wheel should not be uploaded on PRs
-        if: ${{ github.event_name != pull_request }}
+        if: ${{ github.event_name != "pull_request" }}
         run: bash upload_wheel.sh
