@@ -1,6 +1,7 @@
 [![Continuous integration tests](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20integration%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+integration+tests%22)
+[![Continuous deployment wheels](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20deployment%20wheels/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+deployment+wheels%22)
 [![Linting tests](https://github.com/alfaro96/scikit-lr/workflows/Linting%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Linting+tests%22)
-[![Daily wheels tests](https://github.com/alfaro96/scikit-lr/workflows/Daily%20wheels%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+wheels+tests%22)
+[![Daily tests](https://github.com/alfaro96/scikit-lr/workflows/Daily%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+tests%22)
 [![Code coverage](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
 [![PyPi package](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
 [![Python version](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
