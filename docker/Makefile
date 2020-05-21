@@ -1,16 +1,26 @@
 # Makefile to simplify repetitive tasks
 
-# Substitute this value by the release version
-# (use the "latest" tag for the master branch)
-TAG = latest
+# Leave these variables to the release version
+# (using the latest tag for the master branch)
+DOCKER_TAG=latest
+SOURCE_BRANCH=master
 
 build:
-	docker build -t alfaro96/scikit-lr:$(TAG) .
+	docker build --build-arg SOURCE_COMMIT=$(SOURCE_BRANCH) \
+				 -t alfaro96/scikit-lr:$(DOCKER_TAG) .
 
 pull:
-	docker pull alfaro96/scikit-lr:$(TAG)
+	docker pull alfaro96/scikit-lr:$(DOCKER_TAG)
 
-run:
+bash:
 	docker run -it \
 			   -v $(PWD)/:/home/scikit-lr/workspace/ \
-			   --rm alfaro96/scikit-lr:$(TAG)
+			   --rm alfaro96/scikit-lr:$(DOCKER_TAG) \
+			   /bin/bash
+
+notebook:
+	docker run -it \
+			   -p 8888:8888 \
+			   -v $(PWD)/:/home/scikit-lr/workspace/ \
+			   --rm alfaro96/scikit-lr:$(DOCKER_TAG) \
+			   jupyter lab --ip=0.0.0.0

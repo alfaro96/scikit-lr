@@ -1,21 +1,28 @@
 name: Continuous deployment wheels
 
+# Triggered on each PR for the master and release branches
+# because feature and bug-fix branches will be merged with
+# these PRs. Moreover, is triggered on push for the master
+# branch and tags to create and upload nightly and release
+# wheels to cloud: https://anaconda.org/alfaro96/scikit-lr
 on:
-  schedule:
-    - cron: "0 0 * * *"
   push:
+    branches:
+      - master
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Linux and macOS environments to build nightly and release
-      # staging wheels for scikit-lr against the minimum required
-      # versions of NumPy, SciPy and Cython. If built wheels pass
-      # the tests, are uploaded to: https://anaconda.org/alfaro96
+      # Linux and macOS environments to build the wheels against
+      # the minimum required versions of NumPy, SciPy and Cython
       matrix:
         os:
           - ubuntu-latest
@@ -74,4 +81,6 @@ jobs:
       - name: Upload wheel
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
+        # The wheel should not be uploaded on PRs
+        if: ${{ github.event_name != 'pull_request' }}
         run: bash upload_wheel.sh
