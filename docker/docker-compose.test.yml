@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  sut:
+    build:
+      dockerfile: $DOCKERFILE_PATH
+      context: .
+      args:
+        # Provide the hash of the commit to install from source
+        SOURCE_COMMIT: $SOURCE_COMMIT
+
+    # Get the notebook version to test the image
+    command: jupyter lab --version
