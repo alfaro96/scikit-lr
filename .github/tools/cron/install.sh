@@ -19,6 +19,4 @@ python --version
 python -c "import numpy; print('NumPy {0}'.format(numpy.__version__))"
 python -c "import scipy; print('SciPy {0}'.format(scipy.__version__))"
 
-# Build scikit-lr in this script to collapse the verbose
-# build output in GitHub Actions output when it succeeds
 python setup.py develop

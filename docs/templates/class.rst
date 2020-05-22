@@ -11,8 +11,10 @@
     {% if methods %}
     .. autosummary::
     {% for item in methods %}
+        {% if item != "__init__" %}
         ..
         ~{{ name }}.{{ item }}
-    {%- endfor %}
+        {% endif %}
+    {% endfor %}
     {% endif %}
     {% endblock %}

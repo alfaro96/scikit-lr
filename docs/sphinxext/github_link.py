@@ -8,7 +8,7 @@
 # Standard
 from functools import partial
 from importlib import import_module
-from inspect import getsourcefile, getsourcelines
+from inspect import getsourcefile, getsourcelines, unwrap
 from packaging.version import parse
 from operator import attrgetter
 from os.path import dirname, relpath
@@ -27,7 +27,9 @@ def linkcode_resolve(domain, info, author, package):
         # any module, or the module cannot be imported
         return None
 
-    obj = attrgetter(info["fullname"])(module)
+    # Unwrap the object to get the correct source
+    # file in case that is wrapped by a decorator
+    obj = unwrap(attrgetter(info["fullname"])(module))
 
     try:
         filename = getsourcefile(obj)
