@@ -12,7 +12,6 @@ import sys
 # Local application
 import sklr
 
-# Add the directory with the extensions
 sys.path.insert(0, os.path.abspath("../sphinxext"))
 
 from github_link import make_linkcode_resolve  # noqa
