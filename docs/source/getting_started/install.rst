@@ -10,10 +10,12 @@ There are different ways to install scikit-lr:
       This is the best approach for most users. It will provide a stable
       version and pre-built packages are available for most platforms.
 
-    * :ref:`Building the package from source <building_from_source>`. This
-      is best for users who want the latest-and-greatest features and are
-      not afraid of running brand-new code. This is also needed for users
-      who wish to contribute to the project.
+    * :ref:`Install the development build <install_development_build>`. This
+      is best for users who want the latest-and-greatest features and are not
+      afraid of running brand-new code.
+
+    * :ref:`Building the package from source <building_from_source>`.
+      This is needed for users who wish to contribute to the project.
 
 .. _install_latest_release:
 
@@ -26,8 +28,8 @@ Scikit-lr can be installed via pip from `PyPi`_::
 
 In order to check your installation, you can use::
 
-    python -m pip show scikit-lr
-    python -m pip freeze
+    pip show scikit-lr
+    pip freeze
     python -c "import sklr; sklr.__version__"
 
 Note that in order to avoid potential conflicts with other packages, it is
@@ -51,6 +53,33 @@ and hardware. You can install scikit-lr and its dependencies with ``scikit-lr[al
 
     You should always remember to activate the environment of your choice prior
     to running any Python command whenever you start a new terminal session.
+
+.. note::
+    
+    To make it easier to get up and running with scikit-lr, you can use the `official Docker image`_.
+
+.. _install_development_build:
+
+Installing the development build
+================================
+
+The continuous deployment servers of the scikit-lr project build,
+test and upload wheel packages for the supported Python versions
+based on push to the master branch.
+
+Installing a development build is the quickest way to:
+
+- Try a new feature that will be shipped in the next release.
+
+- Check whether a bug you encountered has been fixed since the last release.
+
+To install the development build from the `Anaconda repository`_::
+
+    pip install --index https://pypi.anaconda.org/alfaro96/simple scikit-lr
+
+.. note::
+
+    The development build of scikit-lr is also provided via the `official Docker image`_.
 
 .. _building_from_source:
 
@@ -86,11 +115,11 @@ Building from source is required to work on a contribution
 
 .. note::
 
-    To make it easy to get up with scikit-lr, you can use the official `official Docker image`_.
+    You can use the `official Docker image`_ to setup a development environment.
 
 .. note::
-    If you plan on submitting a pull-request, you should clone from your fork instead.
 
+    If you plan on submitting a pull-request, you should clone from your fork instead.
 
 .. note::
     
@@ -124,9 +153,11 @@ Scikit-lr requires the following dependencies:
 
 .. References
 
+.. _Anaconda repository: https://anaconda.org/alfaro96/scikit-lr
 .. _conda environment: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 .. _conda-force: https://anaconda.org/conda-forge/compilers
 .. _Cython: https://cython.org
+.. _Docker: https://hub.docker.com/repository/docker/alfaro96/scikit-lr
 .. _official Docker image: https://hub.docker.com/repository/docker/alfaro96/scikit-lr
 .. _Git: https://git-scm.com
 .. _Linux: https://gcc.gnu.org/wiki/InstallingGCC
