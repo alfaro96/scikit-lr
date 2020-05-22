@@ -157,7 +157,6 @@ Scikit-lr requires the following dependencies:
 .. _conda environment: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 .. _conda-force: https://anaconda.org/conda-forge/compilers
 .. _Cython: https://cython.org
-.. _Docker: https://hub.docker.com/repository/docker/alfaro96/scikit-lr
 .. _official Docker image: https://hub.docker.com/repository/docker/alfaro96/scikit-lr
 .. _Git: https://git-scm.com
 .. _Linux: https://gcc.gnu.org/wiki/InstallingGCC
