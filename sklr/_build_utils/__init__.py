@@ -34,23 +34,20 @@ NUMPY_HEADERS_PATH = d
 # Methods
 # =============================================================================
 
-def create_extension(file_path):
+def create_extension(extension_path):
     """Create and return an extension module."""
-    # Replace the slash by a point in the
-    # file path to get the extension name
-    (extension_name, _) = os.path.splitext(file_path)
+    # Replace the slash by a dot to get the extension name
+    (extension_name, _) = os.path.splitext(extension_path)
     extension_name = extension_name.replace("/", ".")
 
-    file_path = [file_path]
+    extension_path = [extension_path]
     include_dirs = [NUMPY_HEADERS_PATH]
 
-    # Compile against C++11 and produce code
-    # with the highest level of optimization
     extra_link_args = ["-std=c++11"]
     extra_compile_args = ["-O3", "-std=c++11"]
 
     return Extension(extension_name,
-                     file_path,
+                     extension_path,
                      language="c++",
                      include_dirs=include_dirs,
                      extra_link_args=extra_link_args,
@@ -63,11 +60,11 @@ def cythonize_extensions(module_name):
     # the generated C++ source files are not necessary
     if "sdist" not in sys.argv:
         pattern = os.path.join(module_name, "**/*.pyx")
-        file_paths = glob.glob(pattern, recursive=True)
+        extensions_paths = glob.glob(pattern, recursive=True)
 
-        for (extension, file_path) in enumerate(file_paths):
-            file_paths[extension] = create_extension(file_path)
+        for (extension, extension_path) in enumerate(extensions_paths):
+            extensions_paths[extension] = create_extension(extension_path)
 
-        extensions = cythonize(file_paths)
+        extensions = cythonize(extensions_paths)
 
         return extensions
