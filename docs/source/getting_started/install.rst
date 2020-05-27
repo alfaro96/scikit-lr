@@ -10,9 +10,9 @@ There are different ways to install scikit-lr:
       This is the best approach for most users. It will provide a stable
       version and pre-built packages are available for most platforms.
 
-    * :ref:`Install the development build <install_development_build>`. This
-      is best for users who want the latest-and-greatest features and are not
-      afraid of running brand-new code.
+    * :ref:`Install the development build <install_development_build>`.
+      This is best for users who want the latest-and-greatest features
+      and are not afraid of running brand-new code.
 
     * :ref:`Building the package from source <building_from_source>`.
       This is needed for users who wish to contribute to the project.
@@ -40,32 +40,36 @@ scikit-lr and its dependencies independently of any previously installed Python
 packages. In particular, under Linux is it discouraged to install pip packages
 alongside the packages managed by the package manager of the distribution.
 
-If you have not installed NumPy or SciPy yet, you can also install these. Please,
-ensure that *binary wheels* are used, and NumPy and SciPy are not recompiled from
-source, which can happen when using particular configurations of operating system
-and hardware. You can install scikit-lr and its dependencies with ``scikit-lr[alldeps]``.
+If you have not installed NumPy or SciPy yet, you can also install these.
+Please, ensure that *binary wheels* are used, and NumPy and SciPy are not
+recompiled from source, which can happen when using particular configurations
+of operating system and hardware. You can install scikit-lr and its
+dependencies with ``scikit-lr[alldeps]``.
 
 .. warning::
 
-    Scikit-lr requires Python 3.6 or newer, and Windows is not currently supported.
+    Scikit-lr requires Python 3.6 or newer, and Windows is not currently
+    supported.
 
 .. note::
 
-    You should always remember to activate the environment of your choice prior
-    to running any Python command whenever you start a new terminal session.
+    You should always remember to activate the environment of your choice
+    prior to running any Python command whenever you start a new terminal
+    session.
 
 .. note::
-    
-    To make it easier to get up and running with scikit-lr, you can use the `official Docker image`_.
+
+    To make it easier to get up and running with scikit-lr, you can use the
+    `official Docker image`_.
 
 .. _install_development_build:
 
 Installing the development build
 ================================
 
-The continuous deployment servers of the scikit-lr project build,
-test and upload wheel packages for the supported Python versions
-based on push to the master branch.
+The continuous deployment servers of the scikit-lr project build, test
+and upload wheel packages for the supported Python versions based on
+push to the master branch.
 
 Installing a development build is the quickest way to:
 
@@ -79,7 +83,8 @@ To install the development build from the `Anaconda repository`_::
 
 .. note::
 
-    The development build of scikit-lr is also provided via the `official Docker image`_.
+    The development build of scikit-lr is also provided via the
+    `official Docker image`_.
 
 .. _building_from_source:
 
@@ -89,25 +94,26 @@ Building from source
 Building from source is required to work on a contribution
 (bug fix, new feature, code or documentation improvement):
 
-1. Use `Git`_ to checkout the latest source
-   from the `scikit-lr repository`_ on GitHub::
+1. Use `Git`_ to checkout the latest source from the `scikit-lr repository`_
+   on GitHub::
 
     git clone git://github.com/alfaro96/scikit-lr.git
     cd scikit-lr
 
-2. Optional (but recommended): Create and activate a
-   dedicated `virtual environment`_  or `conda environment`_.
+2. Optional (but recommended): Create and activate a dedicated
+   `virtual environment`_  or `conda environment`_.
 
-3. Install a C and C++ compiler for your platform, either
-   system-wise (see instructions for `Linux`_ and `macOS`_)
-   or with `conda-force`_ to get full isolation.
+3. Install a C and C++ compiler for your platform, either system-wise (see
+   instructions for `Linux`_ and `macOS`_) or with `conda-force`_ to get full
+   isolation.
 
 4. Install `Cython`_ and build the project with pip in editable mode::
 
     pip install cython
     pip install --verbose --no-build-isolation --editable .
 
-5. Check that the installed scikit-lr has a version number ending with ``.dev0``::
+5. Check that the installed scikit-lr has a version number ending with
+   ``.dev0``::
 
     python -c "import sklr; sklr.__version__"
 
@@ -115,16 +121,19 @@ Building from source is required to work on a contribution
 
 .. note::
 
-    You can use the `official Docker image`_ to setup a development environment.
+    You can use the `official Docker image`_ to setup a development
+    environment.
 
 .. note::
 
-    If you plan on submitting a pull-request, you should clone from your fork instead.
+    If you plan on submitting a pull-request, you should clone from your fork
+    instead.
 
 .. note::
-    
-    If you want to build a stable version, you can ``git checkout <VERSION>`` after
-    checking out the latest source to get the code for that particular version.
+
+    If you want to build a stable version, you can ``git checkout <VERSION>``
+    after checking out the latest source to get the code for that particular
+    version.
 
 .. note::
 

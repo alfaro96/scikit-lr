@@ -7,8 +7,8 @@ There are several ways to get in touch with the developers.
 Bug tracker
 ===========
 
-If you think you have encountered a bug, report it
-to the `issue tracker`_. Do not forget to include:
+If you think you have encountered a bug, report it to the `issue tracker`_.
+Do not forget to include:
 
 * Description.
 

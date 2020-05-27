@@ -1,4 +1,4 @@
-"""Testing for the base methods to load all the popular datasets."""
+"""Testing of the base code for all datasets."""
 
 
 # =============================================================================
@@ -38,8 +38,7 @@ def _num_unique_rankings(Y):
 # Initialization
 # =============================================================================
 
-# Define the lists with the different problems so that they can be
-# used to parametrize the testing methods for loading the datasets
+# The different problems are used to parametrize the tests
 LABEL_RANKING = ["label_ranking"]
 PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
 BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
@@ -51,7 +50,7 @@ BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
 
 def check_data(load_data, problem, shape):
     """Check the shape of the data provided by the method."""
-    (data, ranks) = load_data(problem)
+    (data, ranks) = load_data(problem=problem)
 
     n_samples = shape[0]
     n_features = shape[1]
