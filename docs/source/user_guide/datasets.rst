@@ -6,8 +6,8 @@
 Dataset loading utilities
 =========================
 
-The ``sklr.datasets`` module provides some toy and real-world datasets commonly
-used by the Machine Learning community to benchmark algorithms.
+The :mod:`sklr.datasets` module provides some toy and real-world datasets
+commonly used by the Machine Learning community to benchmark algorithms.
 
 General dataset API
 ===================
@@ -17,8 +17,9 @@ The main dataset interface can be used to load
 :ref:`real-world datasets <real_world_datasets>`.
 
 These functions return a tuple ``(X, Y)`` consisting of a
-``(n_samples, n_features)`` :func:`numpy.array` ``X`` and an array of shape
-``(n_samples, n_classes)`` containing the target rankings ``Y``.
+``(n_samples, n_features)`` :func:`numpy.array` ``X`` and
+an array of shape ``(n_samples, n_classes)`` containing
+the target rankings ``Y``.
 
 .. _toy_datasets:
 
@@ -90,42 +91,43 @@ page layout of a document.
 .. topic:: References:
 
     * D. Malerba, F. Esposito and G. Semeraro, "A Further Comparison of
-      Simplification Methods for Decision-Tree Induction", In Learning from
-      Data: Artificial Intelligence and Statistics, pp. 365-374, 1995.
+      Simplification Methods for Decision-Tree Induction", In Learning
+      from Data: Artificial Intelligence and Statistics, pp. 365-374,
+      1995.
 
-    * F. Esposito, D. Malerba and G. Semeraro, "Multistrategy Learning for
-      Document Recognition", Applied Artificial Intelligence, vol. 8,
-      pp. 33-84, 1994.
+    * F. Esposito, D. Malerba and G. Semeraro, "Multistrategy Learning
+      for Document Recognition", Applied Artificial Intelligence,
+      vol. 8, pp. 33-84, 1994.
 
 .. _bodyfat_dataset:
 
 Body fat dataset
 ----------------
 
-This dataset contains estimates of the percentage of body fat determined by
-underwater weighting and body circumference measurements for men.
+This dataset contains estimates of the percentage of body fat determined
+by underwater weighting and body circumference measurements for men.
 
 .. topic:: References:
 
-    * A. R. Behnke and J. H. Wilmore, "Evaluation and Regulation of Body Build
-      and Composition", Prentice-Hall, 1974.
+    * A. R. Behnke and J. H. Wilmore, "Evaluation and Regulation
+      of Body Build and Composition", Prentice-Hall, 1974.
 
-    * W. E. Siri, "The Gross Composition of the Body", Advances in Biological
-      and Medical Physics, vol. 4, pp. 239-280, 1956.
+    * W. E. Siri, "The Gross Composition of the Body", Advances in
+      Biological and Medical Physics, vol. 4, pp. 239-280, 1956.
 
 .. _breast_dataset:
 
 Breast tissue dataset
 ---------------------
 
-This dataset measures freshly excised breast tissues, which, plotted in the
-plane, constitute the impedance spectrum from where the breast tissue features
-are computed.
+This dataset measures freshly excised breast tissues, which, plotted
+in the plane, constitute the impedance spectrum from where the breast
+tissue features are computed.
 
 .. topic:: References:
 
-    * J. Jossinet, "Variability of impedivity in normal and pathological breast
-      tissue", Medical & Biological Engineering & Computing, vol. 34,
+    * J. Jossinet, "Variability of impedivity in normal and pathological
+      breast tissue", Medical & Biological Engineering & Computing, vol. 34,
       pp. 346-350, 1996.
 
     * J. E. Silva, J. P. de Sá, J. Jossinet, "Classification of Breast
@@ -137,28 +139,29 @@ are computed.
 California housing dataset
 --------------------------
 
-This dataset was derived from the 1990 U.S. census, using one row per census
-block group (a block group is the smallest geographical unit for which the U.S.
-Census Bureau publishes sample data).
+This dataset was derived from the 1990 U.S. census, using one row per
+census block group (a block group is the smallest geographical unit
+for which the U.S. Census Bureau publishes sample data).
 
 .. topic:: References:
 
-    * R. K. Pace and R. Barry, "Sparse Spatial Autoregressions", Statistics and
-      Probability Letters, vol. 33, pp. 291-297, 1997.
+    * R. K. Pace and R. Barry, "Sparse Spatial Autoregressions",
+      Statistics and Probability Letters, vol. 33, pp. 291-297,
+      1997.
 
 .. _cpu_dataset:
 
 CPU small dataset
 -----------------
 
-This dataset measure computer systems activity by means of (restricted)
-attributes and the objective is to predict when the CPU is free in a certain
-portion of time.
+This dataset measure computer systems activity by means of
+(restricted) attributes and the objective is to predict
+when the CPU is free in a certain portion of time.
 
 .. topic:: References:
 
-    * O. Okun, G. Valentini and M. Re, "Ensembles in Machine Learning
-      Applications", Springer-Verlag, 2011.
+    * O. Okun, G. Valentini and M. Re, "Ensembles in Machine
+      Learning Applications", Springer-Verlag, 2011.
 
 .. _ecoli_dataset:
 
@@ -179,9 +182,9 @@ This dataset contains protein localization sites.
 Elevators dataset
 -----------------
 
-This dataset is obtained from the task of controlling a F16 aircraft, and the
-objective is related to an action taken on the elevators of the aircraft
-according to the status attributes of the aeroplane.
+This dataset is obtained from the task of controlling a F16 aircraft,
+and the objective is related to an action taken on the elevators of
+the aircraft according to the status attributes of the aeroplane.
 
 .. topic:: References:
 
@@ -193,9 +196,9 @@ according to the status attributes of the aeroplane.
 Friedman dataset
 ----------------
 
-This is an artificial dataset consisting of independent attributes which are
-uniformly distributed. To obtain the value of the target variable, the
-following equation is used:
+This is an artificial dataset consisting of independent attributes which
+are uniformly distributed. To obtain the value of the target variable,
+the following equation is used:
 
 .. math::
 
@@ -203,11 +206,11 @@ following equation is used:
 
 .. topic:: References:
 
-    * J. Friedman, "Multivariate Adaptative Regression Splines", The Annals of
-      Statistics, vol. 19, pp. 1-67, 1991.
+    * J. Friedman, "Multivariate Adaptative Regression Splines",
+      The Annals of Statistics, vol. 19, pp. 1-67, 1991.
 
-    * L. Breiman, "Bagging predictors", Machine Learning, vol. 24, pp. 123–140,
-      1996.
+    * L. Breiman, "Bagging predictors", Machine Learning,
+      vol. 24, pp. 123–140, 1996.
 
 .. _glass_dataset:
 
@@ -226,47 +229,47 @@ classification of types of glass according to their chemical properties.
 Boston housing dataset
 ----------------------
 
-This dataset contains information collected by the U.S Census Service
-concerning housing in the area of Boston Mass.
+This dataset contains information collected by the U.S Census
+Service concerning housing in the area of Boston Mass.
 
 .. topic:: References:
 
-    * D. Harrison and D. L. Rubinfeld, "Hedonic prices and the demand for clean
-      air", Journal of Environmental Economics and Management, vol. 5,
-      pp. 81-102, 1978.
+    * D. Harrison and D. L. Rubinfeld, "Hedonic prices and the demand
+      for clean air", Journal of Environmental Economics and Management,
+      vol. 5, pp. 81-102, 1978.
 
 .. _iris_dataset:
 
 Iris dataset
 ------------
 
-This is perhaps the best known dataset to be found in the pattern recognition
-literature. Fisher's paper is a classic in the field and is referenced
-frequently to this day.
+This is perhaps the best known dataset to be found in the pattern
+recognition literature. Fisher's paper is a classic in the field
+and is referenced frequently to this day.
 
 .. topic:: References:
 
-    * R. A. Fisher, "The use of multiple measurements in taxonomic problems",
-      Annual Eugenics, vol. 7, pp. 179-188, 1936.
+    * R. A. Fisher, "The use of multiple measurements in taxonomic
+      problems", Annual Eugenics, vol. 7, pp. 179-188, 1936.
 
-    * R. O. Duda and P. E. Hart, "Pattern Classification and Scene Analysis",
-      John Wiley & Sons, 1973.
+    * R. O. Duda and P. E. Hart, "Pattern Classification and Scene
+      Analysis", John Wiley & Sons, 1973.
 
-    * B. V. Dasarathy, "Nosing Around the Neighborhood: A New System Structure
-      and Classification Rule for Recognition in Partially Exposed
-      Environments", IEEE Transactions on Pattern Analysis and Machine
-      Intelligence, vol. 2, pp. 67-71, 1980.
+    * B. V. Dasarathy, "Nosing Around the Neighborhood: A New System
+      Structure and Classification Rule for Recognition in Partially
+      Exposed Environments", IEEE Transactions on Pattern Analysis
+      and Machine Intelligence, vol. 2, pp. 67-71, 1980.
 
-    * G. W. Gates, "The Reduced Nearest Neighbor Rule", IEEE Transactions on
-      Information Theory, vol. 18, pp. 431-433, 1972.
+    * G. W. Gates, "The Reduced Nearest Neighbor Rule", IEEE Transactions
+      on Information Theory, vol. 18, pp. 431-433, 1972.
 
 .. _letter_dataset:
 
 Letter recognition dataset
 --------------------------
 
-This dataset contains a large number of black-and-white rectangular pixel
-displays as one of the capital letters in the English alphabet.
+This dataset contains a large number of black-and-white rectangular
+pixel displays as one of the capital letters in the English alphabet.
 
 .. topic:: References:
 
@@ -293,18 +296,19 @@ according to a mapping operation representing the coordinates of movement.
 Pen-based recognition of handwritten digits dataset
 ---------------------------------------------------
 
-This dataset contains samples arising from handwritten digits characterized by
-pen trajectories (successive pen points on a coordinate system).
+This dataset contains samples arising from handwritten digits characterized
+by pen trajectories (successive pen points on a coordinate system).
 
 .. topic:: References:
 
-    * F. Alimoglu, "Combining Multiple Classifiers for Pen-Based Handwritten
-      Digit Recognition", 1996. 
+    * F. Alimoglu, "Combining Multiple Classifiers for Pen-Based
+      Handwritten Digit Recognition", 1996. 
 
-    * F. Alimoglu and E. Alpaydin, "Methods of Combining Multiple Classifiers
-      Based on Different Representations for Pen-based Handwriting Recognition",
-      In Proceedings of the Fifth Turkish Artificial Intelligence and
-      Artificial Neural Networks Symposium, 1996.
+    * F. Alimoglu and E. Alpaydin, "Methods of Combining Multiple
+      Classifiers Based on Different Representations for Pen-based
+      Handwriting Recognition", In Proceedings of the Fifth Turkish
+      Artificial Intelligence and Artificial Neural Networks Symposium,
+      1996.
 
 .. _satimage_dataset:
 
@@ -312,16 +316,17 @@ Landsat satellite dataset
 -------------------------
 
 This dataset consists of the multi-spectral values of pixels in 3x3
-neighbourhoods in a satellite image, and the classification associated with the
-central pixel in each neighbourhood.
+neighbourhoods in a satellite image, and the classification associated
+with the central pixel in each neighbourhood.
 
 .. _segment_dataset:
 
 Image segmentation dataset
 --------------------------
 
-This dataset contains image data described by high-level attributes of outdoor
-images (hand-segmented to create a classification for every pixel).
+This dataset contains image data described by high-level attributes
+of outdoor images (hand-segmented to create a classification for
+every pixel).
 
 .. _stock_dataset:
 
@@ -342,9 +347,10 @@ of the 10th company given the prices of the rest.
 Vehicle silhouettes dataset
 ---------------------------
 
-This dataset purpose is to classify a given silhouette as one of four types of
-vehicle, using a set of features extracted from the silhouette (the vehicle may
-be viewed from one of many different angles).
+This dataset purpose is to classify a given silhouette as one of
+four types of vehicle, using a set of features extracted from the
+silhouette (the vehicle may be viewed from one of many different
+angles).
 
 .. topic:: References:
 
@@ -355,24 +361,25 @@ be viewed from one of many different angles).
 Vowel recognition dataset
 -------------------------
 
-This dataset consists of a three dimensional array: speaker, vowel and input.
-The speakers and vowels are indexed by integers and, for each utterance, there
-are floating-point input values. 
+This dataset consists of a three dimensional array: speaker, vowel and
+input. The speakers and vowels are indexed by integers and, for each
+utterance, there are floating-point input values. 
 
 .. _wine_dataset:
 
 Wine dataset
 ------------
 
-This dataset is the result of a chemical analysis of wines grown in the same
-region in Italy but derived from three different cultivars. The analysis
-determined the quantities of constituents found in each of the types of wines.
+This dataset is the result of a chemical analysis of wines grown in the
+same region in Italy but derived from three different cultivars. The
+analysis determined the quantities of constituents found in each of
+the types of wines.
 
 .. topic:: References:
 
-    * S. Aeberhard, D. Coomans and O. de Vel, "Comparative analysis of
-      statistical pattern recognition methods in high dimensional settings",
-      Pattern Recognition, vol. 27, pp. 1065-1077, 1994.
+    * S. Aeberhard, D. Coomans and O. de Vel, "Comparative analysis
+      of statistical pattern recognition methods in high dimensional
+      settings", Pattern Recognition, vol. 27, pp. 1065-1077, 1994.
 
     * S. Aeberhard, D. Coomans and O. de Vel, "Improvements to the
       classification performance of RDA", Journal of Chemometrics,
@@ -383,39 +390,43 @@ determined the quantities of constituents found in each of the types of wines.
 Breast cancer wisconsin dataset
 -------------------------------
 
-This dataset contains features computed from a digitized image of a fine needle
-aspirate of a breast mass. They describe characteristics of the cell nuclei
-present in the image.
+This dataset contains features computed from a digitized image of a fine
+needle aspirate of a breast mass. They describe characteristics of the
+cell nuclei present in the image.
 
 .. topic:: References:
 
-    * W. N. Street, O. L. Mangasarian and W. H. Wolberg, "An inductive learning
-      approach to prognostic prediction", In Proceedings of the Twelfth
-      International Conference on Machine Learning, pp. 522-530, 1995.
+    * W. N. Street, O. L. Mangasarian and W. H. Wolberg, "An inductive
+      learning approach to prognostic prediction", In Proceedings of the
+      Twelfth International Conference on Machine Learning, pp. 522-530,
+      1995.
 
     * O. L. Mangasarian, W. N. Street and W. H. Wolberg, "Breast cancer
       diagnosis and prognosis via linear programming", Operations Research,
       vol. 43, pp. 570-577, 1995.
 
     * W. H. Wolberg, W. N. Street, D. M. Heisey and O. L. Mangasarian,
-      "Computerized breast cancer diagnosis and prognosis from fine needle
-      aspirates", Archives of Surgery, vol. 130, pp. 511-516, 1995.
+      "Computerized breast cancer diagnosis and prognosis from fine
+      needle aspirates", Archives of Surgery, vol. 130, pp. 511-516,
+      1995.
 
-    * W. H. Wolberg, W. N. Street and O. L. Mangasarian, "Image analysis and
-      Machine Learning applied to breast cancer diagnosis and prognosis",
+    * W. H. Wolberg, W. N. Street and O. L. Mangasarian, "Image analysis
+      and Machine Learning applied to breast cancer diagnosis and prognosis",
       Analytical and Quantitative Cytology and Histology, vol. 17, pp. 77-87,
-      1995. 
+      1995.
 
     * W. H. Wolberg, W. N. Street, D. M. Heisey and O. L. Mangasarian,
-      "Computer-derived nuclear grade and breast cancer prognosis", Analytical
-      and Quantitative Cytology and Histology, vol. 17, pp. 257-264, 1995.
+      "Computer-derived nuclear grade and breast cancer prognosis",
+      Analytical and Quantitative Cytology and Histology, vol. 17,
+      pp. 257-264, 1995.
 
 .. _yeast_dataset:
 
 Yeast dataset
 -------------
 
-This dataset consists of predicting the cellular localization sites of proteins.
+This dataset consists of predicting the cellular localization sites of
+proteins.
 
 .. topic:: References:
 
@@ -433,20 +444,20 @@ We provide the following functions to load real-world datasets:
 
 .. autosummary::
 
-   load_cold
-   load_diau
-   load_dtt
-   load_heat
-   load_spo
+    load_cold
+    load_diau
+    load_dtt
+    load_heat
+    load_spo
 
 These datasets originate from the bioinformatics fields considering two types
 of genetic data, namely phylogenetic profiles and microarray expression data
-for the Yeast genome. The genome consists of genes, and each gene is
+for the Yeast genome. The Yeast genome consists of genes, and each gene is
 represented by an associated phylogenetic profile. Using these profiles as
 input features, the expression profile of a gene is ordered into ranks. The
-use of five microarray experiments (spo, heat, dtt, cold, diau), gives rise to
-five prediction problems allusing the same input features but different target
-rankings.
+use of five microarray experiments (spo, heat, dtt, cold, diau), gives rise
+to five prediction problems allusing the same input features but different
+target rankings.
 
 .. topic:: References:
 

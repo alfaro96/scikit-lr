@@ -6,16 +6,16 @@ Installation
 
 There are different ways to install scikit-lr:
 
-    * :ref:`Install the latest official release <install_latest_release>`. This
-      is the best approach for most users. It will provide a stable version and
-      pre-built packages are available for most platforms.
+    * :ref:`Install the latest official release <install_latest_release>`.
+      This is the best approach for most users. It will provide a stable
+      version and pre-built packages are available for most platforms.
 
-    * :ref:`Install the development build <install_development_build>`. This is
-      best for users who want the latest-and-greatest features and are not
-      afraid of running brand-new code.
+    * :ref:`Install the development build <install_development_build>`.
+      This is best for users who want the latest-and-greatest features
+      and are not afraid of running brand-new code.
 
-    * :ref:`Building the package from source <building_from_source>`. This is
-      needed for users who wish to contribute to the project.
+    * :ref:`Building the package from source <building_from_source>`.
+      This is needed for users who wish to contribute to the project.
 
 .. _install_latest_release:
 
@@ -53,11 +53,12 @@ dependencies with ``scikit-lr[alldeps]``.
 
 .. note::
 
-    You should always remember to activate the environment of your choice prior
-    to running any Python command whenever you start a new terminal session.
+    You should always remember to activate the environment of your choice
+    prior to running any Python command whenever you start a new terminal
+    session.
 
 .. note::
-    
+
     To make it easier to get up and running with scikit-lr, you can use the
     `official Docker image`_.
 
@@ -66,9 +67,9 @@ dependencies with ``scikit-lr[alldeps]``.
 Installing the development build
 ================================
 
-The continuous deployment servers of the scikit-lr project build, test and
-upload wheel packages for the supported Python versions based on push to the
-master branch.
+The continuous deployment servers of the scikit-lr project build, test
+and upload wheel packages for the supported Python versions based on
+push to the master branch.
 
 Installing a development build is the quickest way to:
 
@@ -90,11 +91,11 @@ To install the development build from the `Anaconda repository`_::
 Building from source
 ====================
 
-Building from source is required to work on a contribution (bug fix,
-new feature, code or documentation improvement):
+Building from source is required to work on a contribution
+(bug fix, new feature, code or documentation improvement):
 
-1. Use `Git`_ to checkout the latest source from the `scikit-lr repository`_ on
-   GitHub::
+1. Use `Git`_ to checkout the latest source from the `scikit-lr repository`_
+   on GitHub::
 
     git clone git://github.com/alfaro96/scikit-lr.git
     cd scikit-lr
@@ -156,8 +157,8 @@ Scikit-lr requires the following dependencies:
 
 .. note::
 
-    The runtime dependencies are automatically installed by pip if they were
-    missing when building scikit-lr from source.
+    The runtime dependencies are automatically installed by pip
+    if they were missing when building scikit-lr from source.
 
 .. References
 

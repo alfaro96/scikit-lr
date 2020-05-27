@@ -7,9 +7,9 @@ Here we try to give some answers to questions that regularly pop-up.
 Why scikit?
 ===========
 
-SciKits (short for SciPy Toolkits) are add-on packages for SciPy, hosted and
-developed separately from the main SciPy distribution. You can find a list at
-https://scikits.appspot.com/scikits.
+SciKits (short for SciPy Toolkits) are add-on packages for SciPy,
+hosted and developed separately from the main SciPy distribution.
+You can find a list at: https://scikits.appspot.com/scikits.
 
 How can I install scikit-lr?
 ============================
@@ -23,23 +23,23 @@ What is the best way to get help on scikit-lr usage?
 
 Please, make sure to include a minimal reproduction code snippet (ideally,
 shorter than 10 lines) that highlights your problem on a toy dataset (for
-instance, from :mod:`sklr.datasets` or randomly generated with functions of
-:mod:`numpy.random` with a fixed random seed). Remove any line of code that
-is not necessary to reproduce your problem.
+instance, from :mod:`sklr.datasets` or randomly generated with functions
+of :mod:`numpy.random` with a fixed random seed). Remove any line of code
+that is not necessary to reproduce your problem.
 
-The problem should be reproducible by simply *copy-pasting* your code snippet
-in a Python shell with scikit-lr installed. Do not forget to include the import
-statements. More guidance to write good reproduction code snippets can be found
-at https://stackoverflow.com/help/mcve.
+The problem should be reproducible by simply *copy-pasting* your code
+snippet in a Python shell with scikit-lr installed. Do not forget to
+include the import statements. More guidance to write good reproduction
+code snippets can be found at: https://stackoverflow.com/help/mcve.
 
-If your problem raises an exception that you do not understand, make sure to
-include the full traceback that you obtain when running the reproduction
+If your problem raises an exception that you do not understand, make sure
+to include the full traceback that you obtain when running the reproduction
 script.
 
 For bug reports, make use of the `issue tracker`_.
 
-**Do not email any authors directly to ask for assistance, report bugs, or for
-any other issue related to scikit-lr.**
+**Do not email any authors directly to ask for assistance,
+report bugs, or for any other issue related to scikit-lr.**
 
 How do I set a ``random_state`` for an entire execution?
 ========================================================
@@ -57,11 +57,11 @@ following in their script::
     import numpy as np
     np.random.seed(42)
 
-However, a global random state is prone to modification by other code during
-execution. Thus, the only way to ensure reproducibility is to pass
-:class:`numpy.random.RandomState` instances everywhere, and ensure that both,
-estimators and cross-validation splitters have their ``random_state`` parameter
-set.
+However, a global random state is prone to modification by other
+code during execution. Thus, the only way to ensure reproducibility
+is to pass :class:`numpy.random.RandomState` instances everywhere,
+and ensure that both, estimators and cross-validation splitters have
+their ``random_state`` parameter set.
 
 .. References
 

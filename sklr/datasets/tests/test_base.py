@@ -38,6 +38,7 @@ def _num_unique_rankings(Y):
 # Initialization
 # =============================================================================
 
+# The different problems are used to parametrize the tests
 LABEL_RANKING = ["label_ranking"]
 PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
 BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]

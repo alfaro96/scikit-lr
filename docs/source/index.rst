@@ -62,7 +62,7 @@ and its API, while providing a reference for users and contributors.
     :maxdepth: 2
     :hidden:
 
-    glossary/index
+    glossary
 
 ============
 Benchmarking
@@ -86,7 +86,7 @@ This provides the log of the scikit-lr history.
     :hidden:
     :caption: ADDITIONAL INFORMATION
 
-    whats_new/index
+    whats_new
 
 ========
 About us
