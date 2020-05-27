@@ -1,7 +1,4 @@
-"""
-The :mod:`sklr.datasets` module includes utilities to load datasets, including
-methods to load and fetch popular reference datasets.
-"""
+"""The :mod:`sklr.datasets` module includes utilities to load datasets."""
 
 
 # =============================================================================

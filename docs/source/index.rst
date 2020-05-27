@@ -2,16 +2,9 @@
 Welcome to scikit-lr documentation!
 ***********************************
 
-Scikit-lr is an open source Machine Learning library that supports Label Ranking problems.
-It also provides various tools for model fitting and evaluation, and many other utilities.
-
-..
-    Hackish: We are forcing an empty structure of the
-    documentation to ensure that the title is correct
-
-.. toctree::
-    :hidden:
-    :caption: Contents
+Scikit-lr is an open source Machine Learning library that supports Label
+Ranking problems. It also provides various tools for model fitting and
+evaluation, and many other utilities.
 
 .. Structure of the documentation
 
