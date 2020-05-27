@@ -17,6 +17,7 @@ import numpy as np
 # Constants
 # =============================================================================
 
+# The module path is used to locate the datasets
 MODULE_PATH = dirname(__file__)
 
 
