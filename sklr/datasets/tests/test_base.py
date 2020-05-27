@@ -21,7 +21,17 @@ from sklr.datasets import (load_authorship, load_bodyfat, load_blocks,
 
 
 # =============================================================================
-# Methods
+# Constants
+# =============================================================================
+
+# The different problems are used to parametrize the tests
+LABEL_RANKING = ["label_ranking"]
+PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
+BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
+
+
+# =============================================================================
+# Functions
 # =============================================================================
 
 def _num_buckets(Y):
@@ -33,20 +43,6 @@ def _num_unique_rankings(Y):
     """Find the number of unique rankings."""
     return np.unique(Y, axis=0).shape[0]
 
-
-# =============================================================================
-# Initialization
-# =============================================================================
-
-# The different problems are used to parametrize the tests
-LABEL_RANKING = ["label_ranking"]
-PARTIAL_LABEL_RANKING = ["partial_label_ranking"]
-BOTH_PROBLEMS = [*LABEL_RANKING, *PARTIAL_LABEL_RANKING]
-
-
-# =============================================================================
-# Testing
-# =============================================================================
 
 def check_data(load_data, problem, shape):
     """Check the shape of the data provided by the method."""
