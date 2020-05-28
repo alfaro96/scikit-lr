@@ -3,14 +3,4 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-# Map the rank type string identifier
-# to the rank type integer identifier
-RANK_TYPE_MAPPING = {
-    "random": RANDOM,
-    "top": TOP
-}
+# Wrapper file to turn the enumeration in an extension module

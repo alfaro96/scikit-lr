@@ -10,7 +10,7 @@ import numpy as np
 
 # Local application
 from .validation import check_array
-from .._types import RANK_TYPE_MAPPING
+from .._types import RANK_TYPE
 from ._ranking import is_label_ranking, is_partial_label_ranking
 
 
@@ -90,7 +90,7 @@ def _transform_rankings(Y):
     Yt = np.zeros(Y.shape, dtype=np.int64)
 
     Yt[np.isfinite(Y)] = Y[np.isfinite(Y)]
-    Yt[np.isnan(Y)] = RANK_TYPE_MAPPING["random"]
-    Yt[np.isinf(Y)] = RANK_TYPE_MAPPING["top"]
+    Yt[np.isnan(Y)] = RANK_TYPE.RANDOM.value
+    Yt[np.isinf(Y)] = RANK_TYPE.TOP.value
 
     return Yt

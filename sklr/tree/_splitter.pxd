@@ -11,6 +11,7 @@
 # Third party
 from libcpp.unordered_set cimport unordered_set
 from libcpp.vector cimport vector
+cimport numpy as np
 
 # Local application
 from ._criterion cimport Criterion
@@ -18,13 +19,14 @@ from .._types cimport (
     BOOL_t,
     DTYPE_t, DTYPE_t_1D, DTYPE_t_2D, DTYPE_t_3D, DTYPE_t_4D,
     INT64_t, INT64_t_1D, INT64_t_2D,
-    SIZE_t, SIZE_t_1D, SIZE_t_2D,
-    UINT8_t)
+    SIZE_t, SIZE_t_1D, SIZE_t_2D)
 
 
 # =============================================================================
 # Types
 # =============================================================================
+
+ctypedef np.npy_uint8 UINT8_t
 
 # Useful attributes
 ctypedef vector[SIZE_t] USEFUL_FEATURES

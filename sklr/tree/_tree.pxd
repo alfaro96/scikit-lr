@@ -23,8 +23,7 @@ from .._types cimport (
     BOOL_t,
     DTYPE_t, DTYPE_t_1D, DTYPE_t_2D, DTYPE_t_3D,
     INT64_t, INT64_t_1D, INT64_t_2D,
-    SIZE_t, SIZE_t_1D, SIZE_t_2D,
-    UINT8_t_1D)
+    SIZE_t, SIZE_t_1D, SIZE_t_2D)
 from .._types cimport RANK_TYPE
 
 
