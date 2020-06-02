@@ -15,10 +15,10 @@ __all__ = ["NotFittedError"]
 # =============================================================================
 
 class NotFittedError(ValueError, AttributeError):
-    """Exception class to raise if estimator is used before fitting.
+    """Exception to raise if :term:`estimator` is used before :term:`fitting`.
 
-    This class inherits from both ``ValueError`` and ``AttributeError``
-    to help with exception handling and backward compatibility.
+    This class inherits from :class:`ValueError` and :class:`AttributeError`
+    to help with exception handling and :term:`backwards compatibility`.
 
     Examples
     --------
