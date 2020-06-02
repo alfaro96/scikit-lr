@@ -121,8 +121,7 @@ def test_load_fried(problem):
 @pytest.mark.parametrize("problem", BOTH_PROBLEMS)
 def test_load_glass(problem):
     """Test the load_glass function."""
-    check_data(load_glass, problem,
-               (214, 9, 6, 30, 105, 6, 4.08879))
+    check_data(load_glass, problem, (214, 9, 6))
 
 
 @pytest.mark.parametrize("problem", LABEL_RANKING)
