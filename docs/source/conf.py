@@ -79,7 +79,8 @@ autosummary_generate = True
 # Map the name to the location of other projects
 intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "scikit-learn": ("https://scikit-learn.org/stable", None),
+    "python": ("https://docs.python.org/3/", None),
+    "scikit-learn": ("https://scikit-learn.org/stable", None)
 }
 
 # Link the source code of an object to the repository
