@@ -17,9 +17,9 @@ The main dataset interface can be used to load
 :ref:`real-world datasets <real_world_datasets>`.
 
 These functions return a tuple ``(X, Y)`` consisting of a
-``(n_samples, n_features)`` :func:`numpy.array` ``X`` and
-an array of shape ``(n_samples, n_classes)`` containing
-the target rankings ``Y``.
+``(n_samples, n_features)`` :class:`numpy.ndarray` ``X`` and
+an array of shape ``(n_samples, n_classes)`` containing the
+:term:`target` :term:`rankings` ``Y``.
 
 .. _toy_datasets:
 
@@ -54,9 +54,10 @@ We provide standard datasets that can be loaded using the following functions:
     load_wisconsin
     load_yeast
 
-These datasets were obtained by transforming multi-class and regression
-problems of the `UCI Machine Learning Repository`_ to the Label Ranking
-problem and the Partial Label Ranking problem.
+These datasets were obtained by transforming :term:`multiclass`
+and :term:`continuous` (regression) problems of the `UCI Machine
+Learning Repository`_ to the label ranking problem and the partial
+label ranking problem.
 
 .. topic:: References:
 
@@ -454,10 +455,10 @@ These datasets originate from the bioinformatics fields considering two types
 of genetic data, namely phylogenetic profiles and microarray expression data
 for the Yeast genome. The Yeast genome consists of genes, and each gene is
 represented by an associated phylogenetic profile. Using these profiles as
-input features, the expression profile of a gene is ordered into ranks. The
-use of five microarray experiments (spo, heat, dtt, cold, diau), gives rise
-to five prediction problems allusing the same input features but different
-target rankings.
+input :term:`features`, the expression profile of a gene is ordered into
+ranks. The use of five microarray experiments (spo, heat, dtt, cold, diau),
+gives rise to five prediction problems allusing the same input features but
+different target rankings.
 
 .. topic:: References:
 
