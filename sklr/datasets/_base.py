@@ -26,7 +26,7 @@ MODULE_PATH = dirname(__file__)
 # =============================================================================
 
 def load_data(module_path, problem, data_file_name):
-    """Load data from ``module_path/data/problem/data_file_name``.
+    """Load data from module_path/data/problem/data_file_name.
 
     Parameters
     ----------
@@ -37,19 +37,18 @@ def load_data(module_path, problem, data_file_name):
         The problem for which the data will be loaded.
 
     data_file_name : str
-        The name of ``.csv`` file to be loaded from
-        ``module_path/data/problem/data_file_name``.
-        For example, '``wine.csv``'.
+        The name of .csv file to be loaded from
+        module_path/data/problem/data_file_name.
 
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
+        A 2d array with each row representing one sample and each
         column representing the features of a given sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding target rankings for all samples in data.
+        For example, ranks[0] is the target ranking of data[0].
     """
     with open(join(module_path, "data", problem, data_file_name)) \
             as csv_file:
@@ -93,12 +92,14 @@ def load_authorship(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -142,12 +143,14 @@ def load_blocks(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -186,12 +189,14 @@ def load_bodyfat(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -230,12 +235,14 @@ def load_breast(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -274,12 +281,14 @@ def load_calhousing(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -318,12 +327,14 @@ def load_cold(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -362,12 +373,14 @@ def load_cpu(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -406,12 +419,14 @@ def load_diau(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -450,12 +465,14 @@ def load_dtt(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -494,12 +511,14 @@ def load_ecoli(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -538,12 +557,14 @@ def load_elevators(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -582,12 +603,14 @@ def load_fried(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -627,12 +650,14 @@ def load_glass(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -676,12 +701,14 @@ def load_heat(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -720,12 +747,14 @@ def load_housing(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -765,12 +794,14 @@ def load_iris(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -814,12 +845,14 @@ def load_letter(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -861,12 +894,14 @@ def load_libras(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -906,12 +941,14 @@ def load_pendigits(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -955,12 +992,14 @@ def load_satimage(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1000,12 +1039,14 @@ def load_segment(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1049,12 +1090,14 @@ def load_spo(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1093,12 +1136,14 @@ def load_stock(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1138,12 +1183,14 @@ def load_vehicle(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1188,12 +1235,14 @@ def load_vowel(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1238,12 +1287,14 @@ def load_wine(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1287,12 +1338,14 @@ def load_wisconsin(*, problem="label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------
@@ -1331,12 +1384,14 @@ def load_yeast(*, problem="partial_label_ranking"):
     Returns
     -------
     data : ndarray of shape (n_samples, n_features), dtype=np.float64
-        A 2-D array with each row representing one sample and each
-        column representing the features of a given sample.
+        A :term:`2d array` with each row representing one :term:`sample`
+        and each column representing the :term:`features` of a given
+        sample.
 
     ranks : ndarray of shape (n_samples, n_classes), dtype=np.int64
-        A 2-D array holding target rankings for all the samples in `data`.
-        For example, ``ranks[0]`` is the target ranking for ``data[0]``.
+        A 2d array holding :term:`target` :term:`rankings` for all samples
+        in `data`. For example, ``ranks[0]`` is the target ranking of
+        ``data[0]``.
 
     Examples
     --------

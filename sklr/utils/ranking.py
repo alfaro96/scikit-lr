@@ -18,6 +18,16 @@ from ._ranking import is_label_ranking, is_partial_label_ranking
 # Methods
 # =============================================================================
 
+def num_buckets(Y):
+    """Find the mean number of buckets."""
+    return np.mean([np.unique(y).shape[0] for y in Y])
+
+
+def unique_rankings(Y):
+    """Find the number of unique rankings."""
+    return np.unique(Y, axis=0)
+
+
 def check_label_ranking_targets(Y):
     """Ensure that target ``Y`` is of a Label Ranking type.
 
