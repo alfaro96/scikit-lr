@@ -3,4 +3,4 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 
-# Wrapper file to turn the enumeration in an extension module
+# Wrapper file to turn the enumeration in an extension module.
