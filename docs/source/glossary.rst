@@ -25,7 +25,7 @@ General concepts
         An order of preference of (some) discrete values defined over a
         finite set. Rankings may be *complete* (all values are ranked)
         or *incomplete* (only some values are ranked). Rankings may also
-        be classified as *with-ties* (partial rankings) or without-ties
+        be classified as *with-ties* (partial rankings) or *without-ties*
         (rankings) depending on if they present lack of preference
         information among some of the ranked values.
 
