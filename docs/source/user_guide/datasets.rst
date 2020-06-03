@@ -17,7 +17,7 @@ The main dataset interface can be used to load
 :ref:`real-world datasets <real_world_datasets>`.
 
 These functions return a tuple ``(X, Y)`` consisting of a
-``(n_samples, n_features)`` :class:`numpy.ndarray` ``X`` and
+``(n_samples, n_features)`` :class:`~numpy.ndarray` ``X`` and
 an array of shape ``(n_samples, n_classes)`` containing the
 :term:`target` :term:`rankings` ``Y``.
 
@@ -462,7 +462,7 @@ different target rankings.
 
 .. topic:: References:
 
-    * E. Hüllermeier, J. Fürnkranz, W. Cheng and K. Brinker, "Label ranking
+    * E. Hüllermeier, J. Fürnkranz, W. Cheng and K. Brinker, "Label ranking
       by learning pairwise preferences", Artificial Intelligence, vol. 172,
       pp. 1897–1916, 2008.
 
