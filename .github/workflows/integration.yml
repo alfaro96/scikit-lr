@@ -1,7 +1,5 @@
 name: Continuous integration tests
 
-# Triggered on each push and PR for the master and release branches
-# because feature and bug-fix branches will be merged via these PRs
 on:
   push:
     branches:
@@ -17,7 +15,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Build and test using the minimum required versions
       matrix:
         os:
           - ubuntu-latest

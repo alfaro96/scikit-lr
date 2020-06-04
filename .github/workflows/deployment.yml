@@ -1,7 +1,5 @@
 name: Continuous deployment wheels
 
-# Triggered on push for the master branch and release tags
-# to build, test and upload development and release wheels
 on:
   push:
     branches:
@@ -18,7 +16,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Build the wheels using the minimum required versions
       matrix:
         os:
           - ubuntu-latest
