@@ -18,8 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Linux and macOS environments to build the wheels against
-      # the minimum required versions of NumPy, SciPy and Cython
+      # Build the wheels using the minimum required versions
       matrix:
         os:
           - ubuntu-latest
@@ -34,7 +33,7 @@ jobs:
       BUILD_COMMIT: ${{ github.sha }}
       PLAT: x86_64
       MB_PYTHON_VERSION: ${{ matrix.python }}
-      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2"
+      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2 scikit-learn==0.22.0"
       TEST_DEPENDS: pytest==4.6.4
 
     steps:
@@ -78,6 +77,6 @@ jobs:
       - name: Upload wheel
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
-        # The wheel should not be uploaded on PRs
+        # Avoid that the wheel is uploaded on PRs
         if: ${{ github.event_name != 'pull_request' }}
         run: bash upload_wheel.sh

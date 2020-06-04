@@ -14,12 +14,11 @@ on:
 
 jobs:
   test:
-    # Linux environment to assert that PRs
-    # do not add obvious flake8 violations
+    # Assert that do not add obvious violations
     runs-on: ubuntu-latest
 
     steps:
-      # Use the first version to checkout because in the second
+      # Checkout using the first version because, in the second
       # version, the workflow payload contains a wrong revision
       - name: Checkout branch
         uses: actions/checkout@v1
