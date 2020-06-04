@@ -2,7 +2,7 @@
 
 function setup_test_venv
 {
-    # Test in new empty virtual environment
+    # Test in a new empty virtual environment
     if [ $(uname) == "Darwin" ]; then
         $PYTHON_EXE -m venv test_venv
         source test_venv/bin/activate
