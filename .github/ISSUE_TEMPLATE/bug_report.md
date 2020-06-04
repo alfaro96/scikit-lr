@@ -45,8 +45,11 @@ Paste or specifically describe the actual output or traceback.
 
 <!--
 Run the following snippet and paste the output below.
+
 import platform; print(platform.platform())
 import sys; print("Python", sys.version)
 import numpy; print("NumPy", numpy.__version__)
 import scipy; print("SciPy", scipy.__version__)
+import sklearn; print("Scikit-learn", sklearn.__version__)
+import sklr; print("Scikit-lr", sklr.__version__)
 -->

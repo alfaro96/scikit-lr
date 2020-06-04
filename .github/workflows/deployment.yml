@@ -1,7 +1,5 @@
 name: Continuous deployment wheels
 
-# Triggered on push for the master branch and release tags
-# to build, test and upload development and release wheels
 on:
   push:
     branches:
@@ -18,8 +16,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Linux and macOS environments to build the wheels against
-      # the minimum required versions of NumPy, SciPy and Cython
       matrix:
         os:
           - ubuntu-latest
@@ -34,7 +30,7 @@ jobs:
       BUILD_COMMIT: ${{ github.sha }}
       PLAT: x86_64
       MB_PYTHON_VERSION: ${{ matrix.python }}
-      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2"
+      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2 scikit-learn==0.22.0"
       TEST_DEPENDS: pytest==4.6.4
 
     steps:
@@ -78,6 +74,6 @@ jobs:
       - name: Upload wheel
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
-        # The wheel should not be uploaded on PRs
+        # The wheels should not be uploaded on PRs
         if: ${{ github.event_name != 'pull_request' }}
         run: bash upload_wheel.sh

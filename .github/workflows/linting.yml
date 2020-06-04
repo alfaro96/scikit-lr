@@ -1,7 +1,5 @@
 name: Linting tests
 
-# Triggered on each push and PR for the master and release branches
-# because feature and bug-fix branches will be merged via these PRs
 on:
   push:
     branches:
@@ -14,14 +12,12 @@ on:
 
 jobs:
   test:
-    # Linux environment to assert that PRs
-    # do not add obvious flake8 violations
     runs-on: ubuntu-latest
 
     steps:
-      # Use the first version to checkout because in the second
+      # Checkout using the first version because, in the second
       # version, the workflow payload contains a wrong revision
-      - name: Checkout branch
+      - name: Checkout scikit-lr
         uses: actions/checkout@v1
 
       - name: Setup Python
