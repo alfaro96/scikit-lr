@@ -74,6 +74,6 @@ jobs:
       - name: Upload wheel
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
-        # Avoid that the wheel is uploaded on PRs
+        # The wheel should not be uploaded on pull requests
         if: ${{ github.event_name != 'pull_request' }}
         run: bash upload_wheel.sh
