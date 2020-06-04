@@ -28,7 +28,7 @@ make build
 
 ## Pulling the image
 
-To pull the image from [Docker Hub](https://hub.docker.com):
+To pull the image from [Docker Hub](https://hub.docker.com/r/alfaro96/scikit-lr):
 
 ```
 make pull
