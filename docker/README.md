@@ -5,11 +5,14 @@
 
 # Using scikit-lr via Docker
 
-This directory contains a `Dockerfile` to make it easy to get up and running with scikit-lr via [Docker](https://docker.com).
+This directory contains a `Dockerfile` to make it easy to get
+up and running with scikit-lr via [Docker](https://docker.com).
 
 ## Installing Docker
 
-General installation instructions are [on the Docker site](https://docs.docker.com/get-docker/), but we give some quick links here:
+General installation instructions are
+[on the Docker site](https://docs.docker.com/get-docker/),
+but we give some quick links here:
 
 * [Installing Docker Engine](https://docs.docker.com/engine/install/)
 
@@ -25,7 +28,7 @@ make build
 
 ## Pulling the image
 
-To pull the image from [Docker Hub](https://hub.docker.com):
+To pull the image from [Docker Hub](https://hub.docker.com/r/alfaro96/scikit-lr):
 
 ```
 make pull
