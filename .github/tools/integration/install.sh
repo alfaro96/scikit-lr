@@ -17,10 +17,4 @@ pip install pytest==4.6.4 pytest-cov
 echo "Installing codecov"
 pip install --upgrade codecov
 
-python --version
-python -c "import numpy; print('NumPy {0}'.format(numpy.__version__))"
-python -c "import scipy; print('SciPy {0}'.format(scipy.__version__))"
-python -c "import cython; print('Cython {0}'.format(cython.__version__))"
-python -c "import sklearn; print('Scikit-learn {0}'.format(sklearn.__version__))"
-
 python setup.py develop
