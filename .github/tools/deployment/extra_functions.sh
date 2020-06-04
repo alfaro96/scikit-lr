@@ -2,8 +2,7 @@
 
 function setup_test_venv
 {
-    # Create a new empty virtual environment to testing for macOS
-    # platforms. On Linux the tests are run in a Docker container
+    # Test in new empty virtual environment
     if [ $(uname) == "Darwin" ]; then
         $PYTHON_EXE -m venv test_venv
         source test_venv/bin/activate
