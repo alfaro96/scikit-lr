@@ -13,8 +13,7 @@ from sklr._build_utils import cythonize_extensions
 # Constants
 # =============================================================================
 
-# The module name is not package metadata, and
-# cannot be declared in the configuration file
+# The module name is used to locate the extension modules
 MOD_NAME = "sklr"
 
 
