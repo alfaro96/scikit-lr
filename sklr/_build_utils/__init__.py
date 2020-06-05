@@ -7,8 +7,8 @@
 
 # Standard
 from distutils.core import Extension
-import glob
-import os
+from glob import glob
+from os.path import dirname, join, split, splitext
 import sys
 
 # Third party
@@ -23,31 +23,26 @@ import numpy as np
 # The extension modules that need to compile against NumPy should locate
 # the corresponding include directory (source directory or core headers)
 if np.show_config is None:
-    d = os.path.join(os.path.dirname(np.__file__), "core", "include")
+    NUMPY_HEADERS_PATH = join(dirname(np.__file__), "core", "include")
 else:
-    d = os.path.join(os.path.dirname(np.core.__file__), "include")
-
-NUMPY_HEADERS_PATH = d
+    NUMPY_HEADERS_PATH = join(dirname(np.core.__file__), "include")
 
 
 # =============================================================================
-# Methods
+# Functions
 # =============================================================================
 
-def create_extension(extension_path):
+def create_extension(sources):
     """Create and return an extension module."""
-    # Replace the slash by a dot to get the extension name
-    (extension_name, _) = os.path.splitext(extension_path)
-    extension_name = extension_name.replace("/", ".")
+    (name, _) = splitext(sources[0].replace("/", "."))
 
-    extension_path = [extension_path]
     include_dirs = [NUMPY_HEADERS_PATH]
 
     extra_link_args = ["-std=c++11"]
     extra_compile_args = ["-O3", "-std=c++11"]
 
-    return Extension(extension_name,
-                     extension_path,
+    return Extension(name,
+                     sources,
                      language="c++",
                      include_dirs=include_dirs,
                      extra_link_args=extra_link_args,
@@ -55,16 +50,21 @@ def create_extension(extension_path):
 
 
 def cythonize_extensions(module_name):
-    """Find and cythonize the extension modules."""
-    # Skip cythonization in the release tarballs since
-    # the generated C++ source files are not necessary
+    """Locate and cythonize the extension modules."""
+    # Skip cythonization in source distributions
+    # (release tarballs) for later compatibility
     if "sdist" not in sys.argv:
-        pattern = os.path.join(module_name, "**/*.pyx")
-        extensions_paths = glob.glob(pattern, recursive=True)
+        pyx_pattern = join(module_name, "**/*.pyx")
+        pyx_files = glob(pyx_pattern, recursive=True)
 
-        for (extension, extension_path) in enumerate(extensions_paths):
-            extensions_paths[extension] = create_extension(extension_path)
+        for (pyx_index, pyx_file) in enumerate(pyx_files):
+            (pyx_path, _) = split(pyx_file)
+            cpp_pattern = join(pyx_path, "src/**/*.cpp")
+            cpp_files = glob(cpp_pattern, recursive=True)
 
-        extensions = cythonize(extensions_paths)
+            sources = [pyx_file] + cpp_files
+            pyx_files[pyx_index] = create_extension(sources)
+
+        extensions = cythonize(pyx_files)
 
         return extensions
