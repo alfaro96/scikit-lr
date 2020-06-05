@@ -11,7 +11,7 @@ pip install --pre --upgrade --timeout=60 -f $dev_url numpy scipy cython
 
 echo "Installing scikit-learn."
 dev_url=https://pypi.anaconda.org/scipy-wheels-nightly/simple
-pip install --pre --upgrade --timeout=60 -i $dev_url scikit-learn
+pip install --pre --upgrade --timeout=60 --extra-index $dev_url scikit-learn
 
 echo "Installing pytest."
 pip install pytest==4.6.4 pytest-cov
