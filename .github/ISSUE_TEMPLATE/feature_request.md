@@ -3,7 +3,6 @@ name: Feature request
 about: Suggest a new algorithm, enhancement to an existing algorithm, etc.
 title: "[FEA]"
 labels: feature
-assignees: alfaro96
 ---
 
 <!--

@@ -1,9 +1,6 @@
 ---
-name: Blank template
+name: Other template
 about: For all other issues to reach the community.
-title: "[OTH]"
-labels: "invalid"
-assignees: alfaro96
 ---
 
 #### Description
