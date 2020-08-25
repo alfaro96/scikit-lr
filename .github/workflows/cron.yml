@@ -1,8 +1,14 @@
 name: Daily tests
 
+# on:
+#  schedule:
+# - cron: "0 0 * * *"
+
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
 
 jobs:
   test:
