@@ -42,6 +42,8 @@ jobs:
 
       - name: Install dependencies
         run: source $GITHUB_WORKSPACE/.github/tools/integration/install.sh
+        # Specify the bash shell to provide the source command in Windows
+        shell: bash
 
       - name: Execute code tests
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/test_script.sh
