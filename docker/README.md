@@ -36,14 +36,14 @@ make pull
 
 ## Running the container
 
-To start a notebook:
-
-```
-make notebook
-```
-
 To start a bash:
 
 ```
 make bash
+```
+
+To start a notebook:
+
+```
+make notebook
 ```

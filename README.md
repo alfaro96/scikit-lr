@@ -27,7 +27,7 @@ Scikit-lr requires:
     * Python (>= 3.6)
     * Numpy (>= 1.17.3)
     * SciPy (>= 1.3.2)
-    * Scikit-learn (>= 0.22.0)
+    * Scikit-learn (>= 0.23.0)
 
 **Windows is not currently supported.**
 
