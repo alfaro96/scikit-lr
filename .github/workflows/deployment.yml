@@ -21,59 +21,30 @@ jobs:
           - ubuntu-latest
           - macos-latest
         python:
-          - 3.6
-          - 3.7
-          - 3.8
-
-    env:
-      REPO_DIR: scikit-lr
-      BUILD_COMMIT: ${{ github.sha }}
-      PLAT: x86_64
-      MB_PYTHON_VERSION: ${{ matrix.python }}
-      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2 scikit-learn==0.22.0"
-      TEST_DEPENDS: pytest==4.6.4
+          - 36
+          - 37
+          - 38
 
     steps:
       - name: Checkout scikit-lr
         uses: actions/checkout@v2
-        with:
-          path: scikit-lr
-
-      - name: Checkout multibuild
-        uses: actions/checkout@v2
-        with:
-          repository: matthew-brett/multibuild
-          ref: devel
-          path: multibuild
 
       - name: Setup Python
         uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
 
-      - name: Copy files
-        env:
-          FILES_PATH: ${{ github.workspace }}/scikit-lr/.github/tools/deployment
-        run: |
-          cp $FILES_PATH/extra_functions.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/before_install.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/config.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/build_wheel.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/test_wheel.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/upload_wheel.sh $GITHUB_WORKSPACE
+      - name: Install dependencies
+        run: source $GITHUB_WORKSPACE/.github/tools/deployment/install.sh
 
-      - name: Define variables
-        run: source before_install.sh
+      - name: Build wheels
+        run: bash $GITHUB_WORKSPACE/.github/tools/deployment/build_wheels.sh
+        env: 
+          CIBW_BUILD: cp${{ matrix.python }}-*
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: pytest --showlocals --durations=20 --pyargs sklr
 
-      - name: Build wheel
-        run: bash build_wheel.sh
-
-      - name: Test wheel
-        run: bash test_wheel.sh
-
-      - name: Upload wheel
+      - name: Upload wheels
         env:
           CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
         # The wheels should not be uploaded on PRs
         if: ${{ github.event_name != 'pull_request' }}
-        run: bash upload_wheel.sh
+        run: bash upload_wheels.sh
