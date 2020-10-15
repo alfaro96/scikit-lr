@@ -49,11 +49,11 @@ def create_extension(extension_path):
     extra_compile_args = ["-O3", "-std=c++11"]
 
     print(Extension(extension_name,
-                     extension_path,
-                     language="c++",
-                     include_dirs=include_dirs,
-                     extra_link_args=extra_link_args,
-                     extra_compile_args=extra_compile_args))
+                    extension_path,
+                    language="c++",
+                    include_dirs=include_dirs,
+                    extra_link_args=extra_link_args,
+                    extra_compile_args=extra_compile_args))
 
     return Extension(extension_name,
                      extension_path,
