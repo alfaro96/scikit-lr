@@ -40,20 +40,11 @@ def create_extension(extension_path):
     (extension_name, _) = os.path.splitext(extension_path)
     extension_name = extension_name.replace(os.path.sep, ".")
 
-    print(extension_name)
-
     extension_path = [extension_path]
     include_dirs = [NUMPY_HEADERS_PATH]
 
     extra_link_args = ["-std=c++11"]
     extra_compile_args = ["-O3", "-std=c++11"]
-
-    print(Extension(extension_name,
-                    extension_path,
-                    language="c++",
-                    include_dirs=include_dirs,
-                    extra_link_args=extra_link_args,
-                    extra_compile_args=extra_compile_args))
 
     return Extension(extension_name,
                      extension_path,
