@@ -29,8 +29,6 @@ Scikit-lr requires:
     * SciPy (>= 1.3.2)
     * Scikit-learn (>= 0.23.0)
 
-**Windows is not currently supported.**
-
 ### User installation
 
 If you already have a working installation, the easiest way to install
