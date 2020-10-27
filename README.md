@@ -16,7 +16,7 @@ The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
 Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
 Martín.
 
-Website: https://scikit-lr.readthedocs.io/
+Website: https://scikit-lr.readthedocs.io
 
 ## Installation
 
