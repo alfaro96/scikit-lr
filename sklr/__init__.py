@@ -8,6 +8,8 @@ packages.
 
 It aims is to provide simple and efficient solutions to Label Ranking
 problems that are accessible to everybody and reusable in all contexts.
+
+See: https://scikit-lr.readthedocs.io for complete documentation.
 """
 
 
@@ -21,14 +23,14 @@ problems that are accessible to everybody and reusable in all contexts.
 # https://www.python.org/dev/peps/pep-0440/
 #
 # Generic release markers:
-#   - X.Y
-#   - X.Y.Z   # For bugfix releases
+#   * X.Y
+#   * X.Y.Z   # For bug-fix releases
 #
 # Admissible pre-release markers:
-#   - X.YaN   # Alpha release
-#   - X.YbN   # Beta release
-#   - X.YrcN  # Release Candidate
-#   - X.Y     # Final release
+#   * X.YaN   # Alpha release
+#   * X.YbN   # Beta release
+#   * X.YrcN  # Release candidate
+#   * X.Y     # Final release
 #
 # Dev branch marker is: "X.Y.dev" or "X.Y.devN", where N is an integer.
 # "X.Y.dev0" is the canonical version of "X.Y.dev".
