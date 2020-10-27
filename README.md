@@ -90,4 +90,4 @@ Martín.
 ### Communication
 
 * Issue tracker: https://github.com/alfaro96/scikit-lr/issues
-* Website: https://scikit-lr.readthedocs.io/
+* Website: https://scikit-lr.readthedocs.io
