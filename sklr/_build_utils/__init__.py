@@ -36,9 +36,8 @@ NUMPY_HEADERS_PATH = d
 
 def create_extension(extension_path):
     """Create and return an extension module."""
-    # Replace the slash by a dot to get the extension name
     (extension_name, _) = os.path.splitext(extension_path)
-    extension_name = extension_name.replace("/", ".")
+    extension_name = extension_name.replace(os.path.sep, ".")
 
     extension_path = [extension_path]
     include_dirs = [NUMPY_HEADERS_PATH]

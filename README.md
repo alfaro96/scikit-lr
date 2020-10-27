@@ -9,7 +9,7 @@
 
 # Scikit-lr
 
-Scikit-lr is a Python module for Label Ranking problems and distributed under
+Scikit-lr is a Python package for Label Ranking problems and distributed under
 MIT license.
 
 This project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
@@ -25,7 +25,7 @@ Website: https://scikit-lr.readthedocs.io/
 Scikit-lr requires:
 
     * Python (>= 3.6)
-    * Numpy (>= 1.17.3)
+    * NumPy (>= 1.17.3)
     * SciPy (>= 1.3.2)
     * Scikit-learn (>= 0.23.0)
 
@@ -69,7 +69,7 @@ git clone https://github.com/alfaro96/scikit-lr.git
 ### Testing
 
 After installation, you can launch the test suite from outside the
-source directory (you will need to have ``pytest`` >= 4.6.4 installed):
+source directory (you will need to have ``pytest (>= 5.0.1)`` installed):
 
 ```
 pytest sklr
