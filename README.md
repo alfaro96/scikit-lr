@@ -33,8 +33,8 @@ Scikit-lr requires:
 
 ### User installation
 
-If you already have a working installation, the
-easiest way to install scikit-lr is using ``pip``:
+If you already have a working installation, the easiest way to install
+scikit-lr is using ``pip``:
 
 ```
 pip install -U scikit-lr
@@ -49,8 +49,8 @@ for a history of notable changes to scikit-lr.
 
 ## Development
 
-Feel free to contribute to the package, but
-be sure that the standards are followed.
+Feel free to contribute to the package, but be sure that the standards
+are followed.
 
 ### Important links
 
@@ -68,8 +68,8 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Testing
 
-After installation, you can launch the test suite from outside the
-source directory (you will need to have ``pytest (>= 5.0.1)`` installed):
+After installation, you can launch the test suite from outside the source
+directory (you will need to have ``pytest (>= 5.0.1)`` installed):
 
 ```
 pytest sklr
