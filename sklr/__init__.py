@@ -6,7 +6,7 @@ Scikit-lr is a Python package integrating Machine Learning algorithms
 for Label Ranking problems in the tightly-knit world of Scientific Python
 packages.
 
-It aims is to provide simple and efficient solutions to Label Ranking
+It aims to provide simple and efficient solutions to Label Ranking
 problems that are accessible to everybody and reusable in all contexts.
 
 See: https://scikit-lr.readthedocs.io for complete documentation.
