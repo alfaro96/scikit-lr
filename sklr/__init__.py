@@ -24,7 +24,7 @@ See: https://scikit-lr.readthedocs.io for complete documentation.
 #
 # Generic release markers:
 #   * X.Y
-#   * X.Y.Z   # For bug-fix releases
+#   * X.Y.Z   # Bug-fix release
 #
 # Admissible pre-release markers:
 #   * X.YaN   # Alpha release
