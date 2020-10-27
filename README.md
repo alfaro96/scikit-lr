@@ -53,7 +53,7 @@ are followed.
 ### Important links
 
 * Official source code repository: https://github.com/alfaro96/scikit-lr
-* Download releases: https://pypi.org/project/scikit-lr/
+* Download releases: https://pypi.org/project/scikit-lr
 * Issue tracker: https://github.com/alfaro96/scikit-lr/issues
 
 ### Source code
