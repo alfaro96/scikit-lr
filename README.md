@@ -12,7 +12,7 @@
 Scikit-lr is a Python package for Label Ranking problems and distributed under
 MIT license.
 
-This project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
+The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
 Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
 Martín.
 
@@ -74,6 +74,12 @@ source directory (you will need to have ``pytest (>= 5.0.1)`` installed):
 ```
 pytest sklr
 ```
+
+## Project history
+
+The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
+Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
+Martín.
 
 ## Help and support
 
