@@ -18,7 +18,7 @@ See: https://scikit-lr.readthedocs.io for complete documentation.
 # =============================================================================
 
 # PEP0440 compatible formatted version, see:
-# https://www.python.org/dev/peps/pep-0440/
+# https://www.python.org/dev/peps/pep-0440
 #
 # Generic release markers:
 #   * X.Y
