@@ -17,8 +17,6 @@ See: https://scikit-lr.readthedocs.io for complete documentation.
 # Constants
 # =============================================================================
 
-# Scikit-lr package version
-
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/
 #
@@ -34,6 +32,8 @@ See: https://scikit-lr.readthedocs.io for complete documentation.
 #
 # Dev branch marker is: "X.Y.dev" or "X.Y.devN", where N is an integer.
 # "X.Y.dev0" is the canonical version of "X.Y.dev".
+
+# Scikit-lr package version
 __version__ = "0.3.dev0"
 
 
