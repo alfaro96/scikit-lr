@@ -36,6 +36,7 @@ from numbers import Integral, Real
 
 # Third party
 import numpy as np
+from sklearn.utils.validation import check_is_fitted
 
 # Local application
 from ._base import BaseEnsemble
@@ -182,7 +183,7 @@ class BaseForest(BaseEnsemble, ABC):
         self : object
         """
         # Check the training data and rankings
-        (X, Y, _) = self._validate_train_data(X, Y, sample_weight)
+        (X, Y) = self._validate_data(X, Y, multi_output=True)
 
         # Obtain the random state
         random_state = check_random_state(self.random_state)
@@ -236,8 +237,10 @@ class BaseForest(BaseEnsemble, ABC):
         Y: np.ndarray of shape (n_samples, n_classes)
             The predicted rankings.
         """
+        check_is_fitted(self)
+
         # Check the test data
-        X = self._validate_test_data(X)
+        X = self._validate_data(X, reset=False)
 
         # Obtain the prediction of each tree over all the samples
         predictions = np.array([

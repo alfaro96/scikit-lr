@@ -21,7 +21,7 @@ from sklr.dummy import DummyLabelRanker, DummyPartialLabelRanker
 
 def _check_dummy_score(dummy_model, strategy, X, Y):
     """Check that the score is too low for "real" problems."""
-    dummy_model = dummy_model.set_hyperparams(strategy=strategy)
+    dummy_model = dummy_model.set_params(strategy=strategy)
 
     assert dummy_model.fit(X, Y).score(X, Y) < 0.5
 

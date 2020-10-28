@@ -49,7 +49,7 @@ class TestSimpleMisser:
         deleted (up to one decimal of precision).
         """
         self.probability = self.misser.probability
-        self.random_misser = self.misser.set_hyperparams(strategy="random")
+        self.random_misser = self.misser.set_params(strategy="random")
 
         Yt = self.random_misser.fit_transform(self.Y)
         nan_mean = np.mean(np.isnan(Yt))
@@ -62,7 +62,7 @@ class TestSimpleMisser:
         In particular, asserts that the latest ranked classes are deleted
         (maintaining the specified arbitrariness).
         """
-        self.top_misser = self.misser.set_hyperparams(strategy="top")
+        self.top_misser = self.misser.set_params(strategy="top")
 
         Yt = self.top_misser.fit_transform(self.Y)
         idx_last_ranked = np.argmax(self.Y, axis=1)

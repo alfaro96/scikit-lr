@@ -112,7 +112,7 @@ def test_toy_example(BaggingRanker):
 
     # For the sake of fully-tested code, apply
     # the same procedure without boostrapping
-    clf = model.set_hyperparams(bootstrap=False).fit(X_train, Y_train)
+    clf = model.set_params(bootstrap=False).fit(X_train, Y_train)
     Y_pred = clf.predict(X_test)
     np.testing.assert_array_equal(Y_pred, Y_test)
 
@@ -128,27 +128,27 @@ def test_error(BaggingRanker):
     # Assert that an error is raised when the maximum number
     # of samples is an integer type less or equal than zero
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_samples=0).fit(X_train, Y_train)
+        model.set_params(max_samples=0).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum number of
     # samples is an integer type greater than the number of samples
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_samples=100).fit(X_train, Y_train)
+        model.set_params(max_samples=100).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum number
     # of samples is a floating type less than or equal zero
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_samples=0.0).fit(X_train, Y_train)
+        model.set_params(max_samples=0.0).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum number
     # of samples is a floating type greater than one
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_samples=2.0).fit(X_train, Y_train)
+        model.set_params(max_samples=2.0).fit(X_train, Y_train)
 
     # Asssert that an error is raised when the maximum
     # number of samples in not an integer or floating type
     with pytest.raises(TypeError):
-        model.set_hyperparams(max_samples="foo").fit(X_train, Y_train)
+        model.set_params(max_samples="foo").fit(X_train, Y_train)
 
     # The same procedure with the maximum number of features
 
@@ -159,27 +159,27 @@ def test_error(BaggingRanker):
     # Assert that an error is raised when the maximum number
     # of features is an integer type less or equal than zero
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=0).fit(X_train, Y_train)
+        model.set_params(max_features=0).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum number of
     # features is an integer type greater than the number of features
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=10).fit(X_train, Y_train)
+        model.set_params(max_features=10).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum number
     # of features is a floating type less than or equal zero
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=0.0).fit(X_train, Y_train)
+        model.set_params(max_features=0.0).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum number
     # of features is a floating type greater than one
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=2.0).fit(X_train, Y_train)
+        model.set_params(max_features=2.0).fit(X_train, Y_train)
 
     # Asssert that an error is raised when the maximum
     # number of features in not an integer or floating type
     with pytest.raises(TypeError):
-        model.set_hyperparams(max_features="foo").fit(X_train, Y_train)
+        model.set_params(max_features="foo").fit(X_train, Y_train)
 
 
 @pytest.mark.base_estimator
