@@ -42,7 +42,6 @@ def create_extension(extension_path):
     (sources_head, _) = os.path.split(extension_path)
     sources_pattern = os.path.join(sources_head, "src", "**", "*.cpp")
 
-    # Wrap the C++ source files into the Cython extension
     sources = glob.glob(sources_pattern, recursive=True)
     sources += [extension_path]
 
