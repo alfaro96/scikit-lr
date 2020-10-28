@@ -4,19 +4,19 @@
 [![Daily tests](https://github.com/alfaro96/scikit-lr/workflows/Daily%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+tests%22)
 [![Code coverage](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/alfaro96/scikit-lr.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/alfaro96/scikit-lr/context:python)
-[![PyPi package](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
-[![Python version](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr/)
+[![PyPi package](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr)
+[![Python version](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr)
 
 # Scikit-lr
 
-Scikit-lr is a Python module for Label Ranking problems and distributed under
+Scikit-lr is a Python package for Label Ranking problems and distributed under
 MIT license.
 
-This project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
+The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
 Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
 Martín.
 
-Website: https://scikit-lr.readthedocs.io/
+Website: https://scikit-lr.readthedocs.io
 
 ## Installation
 
@@ -25,16 +25,14 @@ Website: https://scikit-lr.readthedocs.io/
 Scikit-lr requires:
 
     * Python (>= 3.6)
-    * Numpy (>= 1.17.3)
+    * NumPy (>= 1.17.3)
     * SciPy (>= 1.3.2)
     * Scikit-learn (>= 0.23.0)
 
-**Windows is not currently supported.**
-
 ### User installation
 
-If you already have a working installation, the
-easiest way to install scikit-lr is using ``pip``:
+If you already have a working installation, the easiest way to install
+scikit-lr is using ``pip``:
 
 ```
 pip install -U scikit-lr
@@ -49,13 +47,13 @@ for a history of notable changes to scikit-lr.
 
 ## Development
 
-Feel free to contribute to the package, but
-be sure that the standards are followed.
+Feel free to contribute to the package, but be sure that the standards
+are followed.
 
 ### Important links
 
 * Official source code repository: https://github.com/alfaro96/scikit-lr
-* Download releases: https://pypi.org/project/scikit-lr/
+* Download releases: https://pypi.org/project/scikit-lr
 * Issue tracker: https://github.com/alfaro96/scikit-lr/issues
 
 ### Source code
@@ -68,12 +66,18 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Testing
 
-After installation, you can launch the test suite from outside the
-source directory (you will need to have ``pytest`` >= 4.6.4 installed):
+After installation, you can launch the test suite from outside the source
+directory (you will need to have ``pytest (>= 5.0.1)`` installed):
 
 ```
 pytest sklr
 ```
+
+## Project history
+
+The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
+Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
+Martín.
 
 ## Help and support
 
@@ -86,4 +90,4 @@ pytest sklr
 ### Communication
 
 * Issue tracker: https://github.com/alfaro96/scikit-lr/issues
-* Website: https://scikit-lr.readthedocs.io/
+* Website: https://scikit-lr.readthedocs.io

@@ -31,23 +31,26 @@ NUMPY_HEADERS_PATH = d
 
 
 # =============================================================================
-# Methods
+# Functions
 # =============================================================================
 
 def create_extension(extension_path):
     """Create and return an extension module."""
-    # Replace the slash by a dot to get the extension name
     (extension_name, _) = os.path.splitext(extension_path)
-    extension_name = extension_name.replace("/", ".")
+    extension_name = extension_name.replace(os.path.sep, ".")
 
-    extension_path = [extension_path]
+    (sources_head, _) = os.path.split(extension_path)
+    sources_pattern = os.path.join(sources_head, "src", "**", "*.cpp")
+
+    sources = glob.glob(sources_pattern, recursive=True)
+    sources += [extension_path]
+
     include_dirs = [NUMPY_HEADERS_PATH]
-
     extra_link_args = ["-std=c++11"]
     extra_compile_args = ["-O3", "-std=c++11"]
 
     return Extension(extension_name,
-                     extension_path,
+                     sources,
                      language="c++",
                      include_dirs=include_dirs,
                      extra_link_args=extra_link_args,
@@ -59,12 +62,12 @@ def cythonize_extensions(module_name):
     # Skip cythonization in the release tarballs since
     # the generated C++ source files are not necessary
     if "sdist" not in sys.argv:
-        pattern = os.path.join(module_name, "**/*.pyx")
-        extensions_paths = glob.glob(pattern, recursive=True)
+        extensions_pattern = os.path.join(module_name, "**", "*.pyx")
+        extensions_path = glob.glob(extensions_pattern, recursive=True)
 
-        for (extension, extension_path) in enumerate(extensions_paths):
-            extensions_paths[extension] = create_extension(extension_path)
+        for (extension, extension_path) in enumerate(extensions_path):
+            extensions_path[extension] = create_extension(extension_path)
 
-        extensions = cythonize(extensions_paths)
+        extensions = cythonize(extensions_path)
 
         return extensions
