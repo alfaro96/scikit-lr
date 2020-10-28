@@ -63,11 +63,11 @@ def cythonize_extensions(module_name):
     # the generated C++ source files are not necessary
     if "sdist" not in sys.argv:
         extensions_pattern = os.path.join(module_name, "**", "*.pyx")
-        extensions_paths = glob.glob(extensions_pattern, recursive=True)
+        extensions_path = glob.glob(extensions_pattern, recursive=True)
 
-        for (extension, extension_path) in enumerate(extensions_paths):
-            extensions_paths[extension] = create_extension(extension_path)
+        for (extension, extension_path) in enumerate(extensions_path):
+            extensions_path[extension] = create_extension(extension_path)
 
-        extensions = cythonize(extensions_paths)
+        extensions = cythonize(extensions_path)
 
         return extensions
