@@ -45,7 +45,6 @@ __all__ = [
     "datasets",
     "dummy",
     "ensemble",
-    "exceptions",
     "metrics",
     "miss",
     "neighbors",
