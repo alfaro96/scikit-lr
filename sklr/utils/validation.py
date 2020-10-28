@@ -11,8 +11,6 @@ from numbers import Integral
 
 # Third party
 import numpy as np
-
-# Local application
 from sklearn.exceptions import NotFittedError
 
 
