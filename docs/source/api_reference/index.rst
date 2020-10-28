@@ -55,18 +55,3 @@ Loaders
     datasets.load_wine
     datasets.load_wisconsin
     datasets.load_yeast
-
-:mod:`sklr.exceptions`: Exceptions and warnings
-===============================================
-
-.. automodule:: sklr.exceptions
-    :no-members:
-    :no-inherited-members:
-
-.. currentmodule:: sklr
-
-.. autosummary::
-    :toctree: generated/
-    :template: class.rst
-
-    exceptions.NotFittedError

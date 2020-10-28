@@ -11,9 +11,7 @@ from numbers import Integral
 
 # Third party
 import numpy as np
-
-# Local application
-from ..exceptions import NotFittedError
+from sklearn.exceptions import NotFittedError
 
 
 # =============================================================================

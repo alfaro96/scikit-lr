@@ -11,9 +11,9 @@ from itertools import product, chain
 # Third party
 import numpy as np
 import pytest
+from sklearn.exceptions import NotFittedError
 
 # Local application
-from sklr.exceptions import NotFittedError
 from sklr.tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 from sklr.utils import check_random_state
 
