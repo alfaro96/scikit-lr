@@ -113,7 +113,7 @@ def is_label_ranker(estimator):
     Returns
     -------
     out : bool
-        ``True`` if ``estimator`` is a label ramnker and ``False`` otherwise.
+        ``True`` if ``estimator`` is a label ranker and ``False`` otherwise.
     """
     return estimator._estimator_type == "label_ranker"
 
