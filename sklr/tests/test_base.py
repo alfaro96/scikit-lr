@@ -9,8 +9,8 @@
 from sklearn.base import BaseEstimator
 
 # Local application
-from sklr.base import is_label_ranker, is_partial_label_ranker
 from sklr.base import LabelRankerMixin, PartialLabelRankerMixin
+from sklr.base import is_label_ranker, is_partial_label_ranker
 
 
 # =============================================================================
