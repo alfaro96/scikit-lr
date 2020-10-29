@@ -131,7 +131,7 @@ def test_toy_example(DecisionTreeRanker, criterion, splitter, distance):
     # Now, apply the same procedure but only
     # using one feature. By this way, it is
     # ensured that the full code is tested
-    model = model.set_hyperparams(max_features=1)
+    model = model.set_params(max_features=1)
     clf = model.fit(X_train, Y_train)
     Y_pred = clf.predict(X_test)
     np.testing.assert_array_equal(Y_pred, Y_test)
@@ -166,7 +166,7 @@ def test_weighted_toy_example(DecisionTreeRanker,
     # Now, apply the same procedure but only using
     # one feature and a half of the sample weight
     sample_weight *= 0.5
-    model = model.set_hyperparams(max_features=1)
+    model = model.set_params(max_features=1)
     clf = model.fit(X_train, Y_train)
     Y_pred = clf.predict(X_test)
     np.testing.assert_array_equal(Y_pred, Y_test)
@@ -201,32 +201,32 @@ def test_max_features(DecisionTreeRanker):
     model = DecisionTreeRanker(random_state=seed)
 
     # Assert "auto" maximum number of features
-    model = model.set_hyperparams(max_features="auto")
+    model = model.set_params(max_features="auto")
     clf = model.fit(X_train, Y_train)
     assert clf.max_features_ == int(np.sqrt(X_train.shape[1]))
 
     # Assert "sqrt" maximum number of features
-    model = model.set_hyperparams(max_features="sqrt")
+    model = model.set_params(max_features="sqrt")
     clf = model.fit(X_train, Y_train)
     assert clf.max_features_ == int(np.sqrt(X_train.shape[1]))
 
     # Assert "log2" maximum number of features
-    model = model.set_hyperparams(max_features="log2")
+    model = model.set_params(max_features="log2")
     clf = model.fit(X_train, Y_train)
     assert clf.max_features_ == int(np.sqrt(X_train.shape[1]))
 
     # Assert one as maximum number of features
-    model = model.set_hyperparams(max_features=1)
+    model = model.set_params(max_features=1)
     clf = model.fit(X_train, Y_train)
     assert clf.max_features_ == 1
 
     # Assert a half of the features as maximum number of features
-    model = model.set_hyperparams(max_features=0.5)
+    model = model.set_params(max_features=0.5)
     clf = model.fit(X_train, Y_train)
     assert clf.max_features_ == int(0.5 * X_train.shape[1])
 
     # Assert "None" maximum number of features
-    model = model.set_hyperparams(max_features=None)
+    model = model.set_params(max_features=None)
     clf = model.fit(X_train, Y_train)
     assert clf.max_features_ == X_train.shape[1]
 
@@ -234,21 +234,21 @@ def test_max_features(DecisionTreeRanker):
     # maximum number of features is greater than
     # the number of features on the dataset
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=10).fit(X_train, Y_train)
+        model.set_params(max_features=10).fit(X_train, Y_train)
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=1.5).fit(X_train, Y_train)
+        model.set_params(max_features=1.5).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum
     # number of features is less than or equal zero
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=-10).fit(X_train, Y_train)
+        model.set_params(max_features=-10).fit(X_train, Y_train)
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features=-1.5).fit(X_train, Y_train)
+        model.set_params(max_features=-1.5).fit(X_train, Y_train)
 
     # Assert that an error is raised when the maximum
     # number of features is not integer or floating type
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_features="foo").fit(X_train, Y_train)
+        model.set_params(max_features="foo").fit(X_train, Y_train)
 
 
 @pytest.mark.max_depth
@@ -261,7 +261,7 @@ def test_max_depth(DecisionTreeRanker):
 
     # Assert that a leaf node is created when
     # the maximum depth of the tree is zero
-    model = model.set_hyperparams(max_depth=0)
+    model = model.set_params(max_depth=0)
     clf = model.fit(X_train, Y_train)
     assert clf.get_depth() == 0
     assert clf.get_n_internal() == 0
@@ -270,7 +270,7 @@ def test_max_depth(DecisionTreeRanker):
 
     # Assert that a one level tree is created
     # when the maximum depth of the tree is one
-    model = model.set_hyperparams(max_depth=1)
+    model = model.set_params(max_depth=1)
     clf = model.fit(X_train, Y_train)
     assert clf.get_depth() == 1
     assert clf.get_n_internal() == 1
@@ -280,7 +280,7 @@ def test_max_depth(DecisionTreeRanker):
     # Assert that an error is raised when the
     # maximum depth of the tree is less than zero
     with pytest.raises(ValueError):
-        model = model.set_hyperparams(max_depth=-1).fit(X_train, Y_train)
+        model = model.set_params(max_depth=-1).fit(X_train, Y_train)
 
 
 @pytest.mark.min_samples_split
@@ -294,7 +294,7 @@ def test_min_samples_split(DecisionTreeRanker):
     # Assert that a one level tree is created when the
     # minimum number of samples to split an internal node is
     # equal than the number of samples on the training dataset
-    model = model.set_hyperparams(min_samples_split=X_train.shape[0])
+    model = model.set_params(min_samples_split=X_train.shape[0])
     clf = model.fit(X_train, Y_train)
     assert clf.get_depth() == 1
     assert clf.get_n_internal() == 1
@@ -303,7 +303,7 @@ def test_min_samples_split(DecisionTreeRanker):
 
     # Assert the same than the above test but using
     # a floating value instead of an integer one
-    model = model.set_hyperparams(min_samples_split=1.0)
+    model = model.set_params(min_samples_split=1.0)
     clf = model.fit(X_train, Y_train)
     assert clf.get_depth() == 1
     assert clf.get_n_internal() == 1
@@ -313,12 +313,12 @@ def test_min_samples_split(DecisionTreeRanker):
     # Assert that an error is raised when the minimum number of
     # samples to split an internal node is an integer less than two
     with pytest.raises(ValueError):
-        model.set_hyperparams(min_samples_split=1).fit(X_train, Y_train)
+        model.set_params(min_samples_split=1).fit(X_train, Y_train)
 
     # Assert that an error is raised when the minimum number of samples
     # to split an internal node is a floating number greater than one
     with pytest.raises(ValueError):
-        model.set_hyperparams(min_samples_split=1.5).fit(X_train, Y_train)
+        model.set_params(min_samples_split=1.5).fit(X_train, Y_train)
 
 
 @pytest.mark.max_splits
@@ -331,26 +331,26 @@ def test_max_splits(DecisionTreeRanker):
 
     # Assert that the maximum number of splits is
     # properly set to two for the binary splitter
-    model = model.set_hyperparams(splitter="binary")
+    model = model.set_params(splitter="binary")
     clf = model.fit(X_train, Y_train)
     assert len(clf.tree_.children) == 2
 
     # Assert that the maximum number of splits is
     # properly set to two for the frequency splitter
-    model = model.set_hyperparams(splitter="frequency")
+    model = model.set_params(splitter="frequency")
     clf = model.fit(X_train, Y_train)
     assert len(clf.tree_.children) > 2
 
     # Assert that the maximum number of splits is
     # properly set to two for the width splitter
-    model = model.set_hyperparams(splitter="width")
+    model = model.set_params(splitter="width")
     clf = model.fit(X_train, Y_train)
     assert len(clf.tree_.children) > 2
 
     # Assert that an error is raised when the
     # maximum number of samples is less than one
     with pytest.raises(ValueError):
-        model.set_hyperparams(max_splits=-1).fit(X_train, Y_train)
+        model.set_params(max_splits=-1).fit(X_train, Y_train)
 
 
 @pytest.mark.error

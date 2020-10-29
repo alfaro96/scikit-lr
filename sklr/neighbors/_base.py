@@ -6,15 +6,16 @@
 # =============================================================================
 
 # Standard
-from abc import ABC
+from abc import ABCMeta
 from abc import abstractmethod
 from numbers import Integral
 
 # Third party
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_is_fitted
 
 # Local application
-from ..base import BaseEstimator
 from ._dist_metrics import DistanceMetric
 
 
@@ -59,7 +60,7 @@ def _get_weights(Y, dist, weights):
 # Classes
 # =============================================================================
 
-class BaseNeighbors(BaseEstimator, ABC):
+class BaseNeighbors(BaseEstimator, metaclass=ABCMeta):
     """Base class for nearest neighbors estimators."""
 
     @abstractmethod
@@ -72,7 +73,9 @@ class BaseNeighbors(BaseEstimator, ABC):
 
     def fit(self, X, Y):
         """Fit the neighbors estimator on the training data and rankings."""
-        (X, Y) = self._validate_train_data(X, Y)
+        (X, Y) = self._validate_data(X, Y, multi_output=True)
+
+        (n_samples, _) = X.shape
 
         if not isinstance(self.n_neighbors, (Integral, np.integer)):
             raise TypeError("The number of nearest neighbors does "
@@ -82,12 +85,12 @@ class BaseNeighbors(BaseEstimator, ABC):
             raise ValueError("The number of nearest neighbors "
                              "must be greater than zero. Got {0}."
                              .format(self.n_neighbors))
-        elif self.n_neighbors > self.n_samples_in_:
+        elif self.n_neighbors > n_samples:
             raise ValueError("The number of nearest neighbors must "
                              "be less than or equal to the number "
                              "of samples. Got {0} number of samples "
                              "and {1} number of nearest neighbors."
-                             .format(self.n_samples_in_, self.n_neighbors))
+                             .format(n_samples, self.n_neighbors))
 
         if self.weights not in VALID_WEIGHTS:
             raise ValueError("Unknown weights: {0}. Expected one of {1}."
@@ -130,7 +133,9 @@ class KNeighborsMixin:
 
     def _k_neighbors(self, X):
         """Return indexes of and distances to the neighbors of each point."""
-        X = self._validate_test_data(X)
+        check_is_fitted(self)
+
+        X = self._validate_data(X, reset=False)
 
         # Reduce the distance matrix to extract the indexes of the nearest
         # neighbors for each point (also returning the neighbors distances)

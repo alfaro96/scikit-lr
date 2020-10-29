@@ -144,7 +144,7 @@ def test_toy_example(RandomForestRanker, criterion, splitter, distance):
 
     # Now, apply the same procedure
     # but only using one feature
-    model = model.set_hyperparams(max_features=1)
+    model = model.set_params(max_features=1)
     clf = model.fit(X_train, Y_train)
     Y_pred = clf.predict(X_test)
     np.testing.assert_array_equal(Y_pred, Y_test)
@@ -153,13 +153,13 @@ def test_toy_example(RandomForestRanker, criterion, splitter, distance):
     # for the sake of fully test the code (coverage)
 
     # All features
-    model = model.set_hyperparams(bootstrap=False, max_features=None)
+    model = model.set_params(bootstrap=False, max_features=None)
     clf = model.fit(X_train, Y_train, sample_weight)
     Y_pred = clf.predict(X_test)
     np.testing.assert_array_equal(Y_pred, Y_test)
 
     # One feature
-    model = model.set_hyperparams(bootstrap=False, max_features=1)
+    model = model.set_params(bootstrap=False, max_features=1)
     clf = model.fit(X_train, Y_train)
     Y_pred = clf.predict(X_test)
     np.testing.assert_array_equal(Y_pred, Y_test)

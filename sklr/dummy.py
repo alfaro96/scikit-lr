@@ -14,10 +14,12 @@ from abc import abstractmethod
 
 # Third party
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_is_fitted, _check_sample_weight
 
 # Local application
 from .utils import check_array
-from .base import BaseEstimator, LabelRankerMixin, PartialLabelRankerMixin
+from .base import LabelRankerMixin, PartialLabelRankerMixin
 
 
 # =============================================================================
@@ -43,7 +45,10 @@ class BaseDummy(BaseEstimator, ABC):
 
     def fit(self, X, Y, sample_weight):
         """Fit the dummy estimator on the training data and rankings."""
-        (X, Y, sample_weight) = self._validate_train_data(X, Y, sample_weight)
+        (X, Y) = self._validate_data(X, Y, multi_output=True)
+        sample_weight = _check_sample_weight(sample_weight, X)
+
+        (_, n_classes) = Y.shape
 
         if self.strategy not in VALID_STRATEGIES:
             raise ValueError("Unknown strategy type: {0}. Expected one of {1}."
@@ -53,9 +58,9 @@ class BaseDummy(BaseEstimator, ABC):
             if self.constant is None:
                 raise ValueError("The constant target ranking has to be "
                                  "specified for the constant strategy.")
-            elif self.constant.shape[0] != self.n_classes_in_:
+            elif self.constant.shape[0] != n_classes:
                 raise ValueError("The constant target ranking should have "
-                                 "shape {0}.".format(self.n_classes_in_))
+                                 "shape {0}.".format(n_classes))
             else:
                 self.constant = check_array(
                     self.constant, dtype=np.int64, ensure_2d=False)
@@ -84,7 +89,9 @@ class BaseDummy(BaseEstimator, ABC):
         Y: ndarray of shape (n_samples, n_classes), dtype=np.int64
             The predicted rankings.
         """
-        X = self._validate_test_data(X)
+        check_is_fitted(self)
+
+        X = self._validate_data(X, reset=False)
 
         # Repeat the constant target value for all the input samples
         return np.tile((self.constant if self.strategy == "constant"

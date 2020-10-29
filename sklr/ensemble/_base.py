@@ -6,15 +6,15 @@
 # =============================================================================
 
 # Standard
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 from numbers import Integral
 
 # Third party
 import numpy as np
+from sklearn.base import BaseEstimator, MetaEstimatorMixin
 
 # Local application
-from ..base import BaseEstimator, MetaEstimatorMixin
 from ..utils.validation import check_random_state
 
 
@@ -41,7 +41,7 @@ def _set_random_states(estimator, random_state=None):
     -----
     This does not necessarily set *all* ``random_state`` attributes that
     control an estimator's randomness, only those accessible through
-    ``estimator.get_hyperparams()``.
+    ``estimator.get_params()``.
     """
     # Obtain the random state
     random_state = check_random_state(random_state)
@@ -57,14 +57,14 @@ def _set_random_states(estimator, random_state=None):
     # Introduce the random state for
     # this estimator in the dictionary
     # (only if it is supported)
-    for key in sorted(estimator.get_hyperparams(deep=True)):
+    for key in sorted(estimator.get_params(deep=True)):
         if key == "random_state" or key.endswith("__random_state"):
             to_set[key] = random_state.randint(MAX_RAND_SEED)
 
     # Set the random state
     # in the estimator
     if to_set:
-        estimator.set_hyperparams(**to_set)
+        estimator.set_params(**to_set)
 
 
 def _indexes_to_mask(indexes, mask_length):
@@ -86,7 +86,7 @@ def _indexes_to_mask(indexes, mask_length):
 # =============================================================================
 # Base ensemble
 # =============================================================================
-class BaseEnsemble(MetaEstimatorMixin, BaseEstimator, ABC):
+class BaseEnsemble(MetaEstimatorMixin, BaseEstimator, metaclass=ABCMeta):
     """Base class for all ensemble classes.
 
     Warning: This class should not be used directly. Use derived classes
@@ -161,7 +161,7 @@ class BaseEnsemble(MetaEstimatorMixin, BaseEstimator, ABC):
 
         # Set the required hyperparameters
         # in the built estimator
-        estimator.set_hyperparams(**{
+        estimator.set_params(**{
                 p: getattr(self, p) for p in self.estimator_hyperparams
             })
 

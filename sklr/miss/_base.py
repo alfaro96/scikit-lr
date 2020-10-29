@@ -10,19 +10,21 @@ from numbers import Integral, Real
 
 # Third party
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_array, check_is_fitted
 
 # Local application
+from ..base import TransformerMixin
 from ._base_fast import miss_classes
 from ._base_fast import STRATEGY_MAPPING
 from ..utils import check_random_state
-from ..base import BaseEstimator, TransformerMixin
 
 
 # =============================================================================
 # Classes
 # =============================================================================
 
-class SimpleMisser(BaseEstimator, TransformerMixin):
+class SimpleMisser(TransformerMixin, BaseEstimator):
     """Missing transformer for deleting classes from rankings.
 
     Hyperparameters
@@ -90,7 +92,9 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         self : SimpleMisser
             The fitted misser.
         """
-        Y = self._validate_train_rankings(Y)
+        Y = check_array(Y)
+
+        (_, n_classes) = Y.shape
 
         if self.strategy not in STRATEGY_MAPPING:
             raise ValueError("The supported strategies are: {0}. Got '{1}'."
@@ -112,7 +116,7 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
             # the reproducibility between successive fit calls
             self.random_state_ = check_random_state(self.random_state)
         else:
-            self.n_classes_miss_ = int(self.n_classes_in_ * self.probability)
+            self.n_classes_miss_ = int(n_classes * self.probability)
 
         return self
 
@@ -129,7 +133,9 @@ class SimpleMisser(BaseEstimator, TransformerMixin):
         Yt : ndarray of shape (n_samples, n_classes), dtype=np.float64
             The transformed rankings.
         """
-        Y = self._validate_test_rankings(Y)
+        check_is_fitted(self)
+
+        Y = check_array(Y)
 
         Yt = np.array(Y, dtype=np.float64)
         Y = np.zeros(Y.shape, dtype=np.int64)

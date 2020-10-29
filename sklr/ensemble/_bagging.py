@@ -11,6 +11,7 @@ from numbers import Real, Integral
 
 # Third party
 import numpy as np
+from sklearn.utils.validation import check_is_fitted
 
 # Local application
 from ._base import BaseEnsemble
@@ -188,7 +189,9 @@ class BaseBagging(BaseEnsemble, ABC):
         # and, if provided, the sample weights. In fact,
         # they are not stored (only checked) since they
         # will be modified when fitting the estimators
-        (X, Y, _) = self._validate_train_data(X, Y, sample_weight)
+        (X, Y) = self._validate_data(X, Y, multi_output=True)
+
+        (n_samples, _) = X.shape
 
         # Obtain the random state
         random_state = check_random_state(self.random_state)
@@ -203,10 +206,10 @@ class BaseBagging(BaseEnsemble, ABC):
         if isinstance(max_samples, (Integral, np.integer)):
             self._max_samples = max_samples
         elif isinstance(max_samples, (Real, np.floating)):
-            self._max_samples = int(max_samples * self.n_samples_in_)
+            self._max_samples = int(max_samples * n_samples)
         else:
             raise TypeError("max_samples must be int or float.")
-        if self._max_samples <= 0 or self._max_samples > self.n_samples_in_:
+        if self._max_samples <= 0 or self._max_samples > n_samples:
             raise ValueError("max_samples must be in (0, n_samples].")
         self._max_samples = max(1, int(self._max_samples))
 
@@ -277,8 +280,10 @@ class BaseBagging(BaseEnsemble, ABC):
         Y : np.ndarray of shape (n_samples, n_classes)
             The predicted rankings.
         """
+        check_is_fitted(self)
+
         # Check the test data
-        X = self._validate_test_data(X)
+        X = self._validate_data(X, reset=False)
 
         # Obtain the predictions (using the private
         # method for future parallelism purposes)

@@ -10,22 +10,23 @@ problems are both handled.
 # =============================================================================
 
 # Standard
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from math import ceil
 from numbers import Integral
 
 # Third party
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import _check_sample_weight, check_is_fitted
 
 # Local application
 from . import _criterion, _splitter
 from ._criterion import DISTANCES
 from ._tree import Tree, TreeBuilder
-from ..base import (
-    BaseEstimator, LabelRankerMixin, PartialLabelRankerMixin)
+from ..base import LabelRankerMixin, PartialLabelRankerMixin
 from ..base import is_label_ranker
 from ..utils.ranking import _transform_rankings
-from ..utils.validation import check_is_fitted, check_random_state
+from ..utils.validation import check_random_state
 
 
 # =============================================================================
@@ -61,7 +62,7 @@ SPLITTERS = {
 # =============================================================================
 # Base decision tree
 # =============================================================================
-class BaseDecisionTree(BaseEstimator, ABC):
+class BaseDecisionTree(BaseEstimator, metaclass=ABCMeta):
     """Base class for decision trees.
 
     Warning: This class should not be used directly.
@@ -132,7 +133,13 @@ class BaseDecisionTree(BaseEstimator, ABC):
         """Fit the decision tree on the training data and rankings."""
         # Validate the training data, the training
         # rankings and also the sample weights
-        (X, Y, sample_weight) = self._validate_train_data(X, Y, sample_weight)
+        (X, Y) = self._validate_data(X, Y, multi_output=True)
+        sample_weight = _check_sample_weight(sample_weight, X)
+
+        (n_samples, n_classes) = Y.shape
+
+        # Map to the input data type
+        X = X.astype(np.float64)
 
         # Only considers the samples positively weighted. Also,
         # transform the rankings for properly handle them in Cython
@@ -172,7 +179,7 @@ class BaseDecisionTree(BaseEstimator, ABC):
                                  .format(self.min_samples_split))
             min_samples_split = max(
                 2,
-                int(ceil(self.min_samples_split * self.n_samples_in_)))
+                int(ceil(self.min_samples_split * n_samples)))
 
         # Ensure that the maximum number of features is one of the
         # available possible strings (forcing al least to be one).
@@ -227,7 +234,7 @@ class BaseDecisionTree(BaseEstimator, ABC):
                                             random_state)
 
         # Initialize the tree
-        self.tree_ = Tree(self.n_features_in_, self.n_classes_in_)
+        self.tree_ = Tree(self.n_features_in_, n_classes)
 
         # Initialize the builder
         builder = TreeBuilder(splitter, min_samples_split, max_depth)
@@ -255,8 +262,13 @@ class BaseDecisionTree(BaseEstimator, ABC):
         Y: np.ndarray of shape (n_samples, n_classes)
             The predicted rankings.
         """
+        check_is_fitted(self, "tree_")
+
         # Check the test data
-        X = self._validate_test_data(X)
+        X = self._validate_data(X, reset=False)
+
+        # Map to the input data type
+        X = X.astype(np.float64)
 
         # Obtain the predictions using
         # the underlying tree structure
