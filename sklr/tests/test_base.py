@@ -17,7 +17,7 @@ from sklr.base import LabelRankerMixin, PartialLabelRankerMixin
 # Classes
 # =============================================================================
 
-class Foo(BaseEstimator, LabelRankerMixin):
+class Foo(LabelRankerMixin, BaseEstimator):
     """Foo estimator."""
 
     def __init__(self, a=None, b=None):
@@ -26,7 +26,7 @@ class Foo(BaseEstimator, LabelRankerMixin):
         self.b = b
 
 
-class Bar(BaseEstimator, PartialLabelRankerMixin):
+class Bar(PartialLabelRankerMixin, BaseEstimator):
     """Bar estimator."""
 
     def __init__(self, c=None, d=None):
