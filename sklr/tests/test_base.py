@@ -48,11 +48,11 @@ class TestBase:
         self.bar = Bar(c="bar", d="bar")
 
     def test_is_label_ranker(self):
-        """Test the is_label_ranker method."""
+        """Test the is_label_ranker function."""
         assert is_label_ranker(self.foo)
         assert not is_label_ranker(self.bar)
 
     def test_is_partial_label_ranker(self):
-        """Test the is_partial_label_ranker method."""
+        """Test the is_partial_label_ranker function."""
         assert is_partial_label_ranker(self.bar)
         assert not is_partial_label_ranker(self.foo)

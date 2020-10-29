@@ -14,6 +14,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array, check_is_fitted
 
 # Local application
+from ..base import TransformerMixin
 from ._base_fast import miss_classes
 from ._base_fast import STRATEGY_MAPPING
 from ..utils import check_random_state
@@ -23,7 +24,7 @@ from ..utils import check_random_state
 # Classes
 # =============================================================================
 
-class SimpleMisser(BaseEstimator):
+class SimpleMisser(TransformerMixin, BaseEstimator):
     """Missing transformer for deleting classes from rankings.
 
     Hyperparameters
@@ -154,21 +155,3 @@ class SimpleMisser(BaseEstimator):
         miss_classes(Y, Yt, masks, strategy)
 
         return Yt
-
-    def fit_transform(self, Y, **fit_params):
-        """Fit to data, then transform it.
-
-        Parameters
-        ----------
-        Y : ndarray of shape (n_samples, n_classes), dtype=np.int64
-            The input rankings.
-
-        **fit_params : dict
-            Additional fit parameters.
-
-        Returns
-        -------
-        Yt : ndarray of shape (n_samples, n_classes), dtype=np.float64
-            The transformed rankings.
-        """
-        return self.fit(Y, **fit_params).transform(Y)

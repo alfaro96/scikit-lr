@@ -10,6 +10,36 @@ function raw specifications may not be enough to give full guidelines on
 their uses. For reference on concepts repeated across the API, see the
 :ref:`glossary <glossary>`.
 
+:mod:`sklr.base`: Base classes and utility functions
+====================================================
+
+.. automodule:: sklr.base
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: sklr
+
+Base classes
+------------
+
+.. autosummary::
+    :nosignatures:
+    :template: class.rst
+    :toctree: generated/
+
+    base.LabelRankerMixin
+    base.PartialLabelRankerMixin
+    base.TransformerMixin
+
+Functions
+---------
+
+.. autosummary::
+    :toctree: generated/
+
+    base.is_label_ranker
+    base.is_partial_label_ranker
+
 :mod:`sklr.datasets`: Datasets
 ==============================
 
