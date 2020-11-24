@@ -17,7 +17,7 @@ import numpy as np
 # Constants
 # =============================================================================
 
-# The module path is used to locate the datasets
+# Get the path to the current module to locate the datasets
 MODULE_PATH = dirname(__file__)
 
 
@@ -25,8 +25,8 @@ MODULE_PATH = dirname(__file__)
 # Functions
 # =============================================================================
 
-def load_data(module_path, problem, data_file_name):
-    """Load data from module_path/data/problem/data_file_name.
+def load_data(module_path, problem, data_filename):
+    """Load data from module_path/data/problem/data_filename.
 
     Parameters
     ----------
@@ -36,9 +36,9 @@ def load_data(module_path, problem, data_file_name):
     problem : {"label_ranking", "partial_label_ranking"}
         The problem for which the data will be loaded.
 
-    data_file_name : str
+    data_filename : str
         The name of .csv file to be loaded from
-        module_path/data/problem/data_file_name.
+        module_path/data/problem/data_filename.
 
     Returns
     -------
@@ -50,10 +50,8 @@ def load_data(module_path, problem, data_file_name):
         A 2d array holding target rankings for all samples in data.
         For example, ranks[0] is the target ranking of data[0].
     """
-    with open(join(module_path, "data", problem, data_file_name)) \
+    with open(join(module_path, "data", problem, data_filename)) \
             as csv_file:
-        # Extract the number of samples, features and classes from the
-        # first line to know the shape of the data and target rankings
         data_file = reader(csv_file)
         first_line = next(data_file)
         (n_samples, n_features, n_classes) = map(int, first_line)
