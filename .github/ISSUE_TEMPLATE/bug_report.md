@@ -50,5 +50,6 @@ import sys; print("python", sys.version)
 import numpy; print("numpy", numpy.__version__)
 import scipy; print("scipy", scipy.__version__)
 import sklearn; print("scikit-learn", sklearn.__version__)
+import imblearn; print("imbalanced-learn", imblearn.__version__)
 import sklr; print("scikit-lr", sklr.__version__)
 -->
