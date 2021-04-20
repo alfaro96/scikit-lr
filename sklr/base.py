@@ -44,6 +44,10 @@ class LabelRankerMixin:
         """
         return tau_score(Y, self.predict(X), sample_weight)
 
+    def _more_tags(self):
+        """Define more tags for the :term:`label ranker`."""
+        return {"requires_y": True}
+
 
 class PartialLabelRankerMixin:
     """Mixin class for all :term:`partial label rankers` in scikit-lr."""
@@ -75,27 +79,9 @@ class PartialLabelRankerMixin:
         """
         return tau_x_score(Y, self.predict(X), sample_weight)
 
-
-class TransformerMixin:
-    """Mixin class for all transformers in scikit-lr."""
-
-    def fit_transform(self, Y, **fit_params):
-        """Fit to data, then transform it.
-
-        Parameters
-        ----------
-        Y : array-like of shape (n_samples, n_classes)
-            The target rankings.
-
-        **fit_params : dict
-            The additional fit parameters.
-
-        Returns
-        -------
-        Yt : array-like of shape (n_samples, n_classes)
-            The transformed array.
-        """
-        return self.fit(Y, **fit_params).transform(Y)
+    def _more_tags(self):
+        """Define more tags for the :term:`partial label ranker`."""
+        return {"requires_y": True}
 
 
 # =============================================================================
@@ -103,7 +89,7 @@ class TransformerMixin:
 # =============================================================================
 
 def is_label_ranker(estimator):
-    """Return ``True`` if the given estimator is a :term:`label ranker`.
+    """Return ``True`` if the given estimator is :term:`label ranker`.
 
     Parameters
     ----------
@@ -115,7 +101,7 @@ def is_label_ranker(estimator):
     out : bool
         ``True`` if ``estimator`` is a label ranker and ``False`` otherwise.
     """
-    return estimator._estimator_type == "label_ranker"
+    return getattr(estimator, "_estimator_type", None) == "label_ranker"
 
 
 def is_partial_label_ranker(estimator):
@@ -133,4 +119,4 @@ def is_partial_label_ranker(estimator):
         ``True`` if ``estimator`` is a partial label ranker and ``False``
         otherwise.
     """
-    return estimator._estimator_type == "partial_label_ranker"
+    return getattr(estimator, "_estimator_type", None) == "partial_label_ranker"  # noqa
