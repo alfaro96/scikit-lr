@@ -89,7 +89,7 @@ class PartialLabelRankerMixin:
 # =============================================================================
 
 def is_label_ranker(estimator):
-    """Return ``True`` if the given estimator is :term:`label ranker`.
+    """Return ``True`` if the given estimator is a :term:`label ranker`.
 
     Parameters
     ----------
