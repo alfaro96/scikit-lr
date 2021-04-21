@@ -85,3 +85,21 @@ Loaders
     datasets.load_wine
     datasets.load_wisconsin
     datasets.load_yeast
+
+:mod:`sklearn.neighbors`: Nearest neighbors
+===========================================
+
+.. automodule:: sklr.neighbors
+   :no-members:
+   :no-inherited-members:
+
+**User guide:** See the :ref:`neighbors` section for further details.
+
+.. currentmodule:: sklr
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   neighbors.KNeighborsLabelRanker
+   neighbors.KNeighborsPartialLabelRanker
