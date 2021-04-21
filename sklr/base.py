@@ -22,7 +22,7 @@ class LabelRankerMixin:
 
     def score(self, X, Y, sample_weight=None):
         """Return the mean Kendall rank correlation coefficient
-        :math:`\\tau` on the given test data and rankings.
+        :math:`\\tau` on the given test data and :term:`rankings`.
 
         Parameters
         ----------
@@ -44,6 +44,10 @@ class LabelRankerMixin:
         """
         return tau_score(Y, self.predict(X), sample_weight)
 
+    def _more_tags(self):
+        """Define more tags for the label ranker."""
+        return {"requires_y": True}
+
 
 class PartialLabelRankerMixin:
     """Mixin class for all :term:`partial label rankers` in scikit-lr."""
@@ -52,8 +56,8 @@ class PartialLabelRankerMixin:
     _rank_algorithm = RankAggregationAlgorithm.get_algorithm("bpa_lia_mp2")
 
     def score(self, X, Y, sample_weight=None):
-        """Return the mean Kendall rank correlation coefficient
-        :math:`\\tau_X` on the given test data and rankings.
+        """Return the mean Kendall rank correlation coefficient :math:
+        `\\tau_X` on the given test data and :term:`partial rankings`.
 
         Parameters
         ----------
@@ -61,7 +65,7 @@ class PartialLabelRankerMixin:
             The test samples.
 
         Y : array-like of shape (n_samples, n_classes)
-            The true rankings for ``X``.
+            The true partial rankings for ``X``.
 
         sample_weight : array-like of shape (n_samples,), default=None
             The sample weights. If ``None``, then samples are equally
@@ -75,27 +79,9 @@ class PartialLabelRankerMixin:
         """
         return tau_x_score(Y, self.predict(X), sample_weight)
 
-
-class TransformerMixin:
-    """Mixin class for all transformers in scikit-lr."""
-
-    def fit_transform(self, Y, **fit_params):
-        """Fit to data, then transform it.
-
-        Parameters
-        ----------
-        Y : array-like of shape (n_samples, n_classes)
-            The target rankings.
-
-        **fit_params : dict
-            The additional fit parameters.
-
-        Returns
-        -------
-        Yt : array-like of shape (n_samples, n_classes)
-            The transformed array.
-        """
-        return self.fit(Y, **fit_params).transform(Y)
+    def _more_tags(self):
+        """Define more tags for the partial label ranker."""
+        return {"requires_y": True}
 
 
 # =============================================================================
@@ -115,7 +101,7 @@ def is_label_ranker(estimator):
     out : bool
         ``True`` if ``estimator`` is a label ranker and ``False`` otherwise.
     """
-    return estimator._estimator_type == "label_ranker"
+    return getattr(estimator, "_estimator_type", None) == "label_ranker"
 
 
 def is_partial_label_ranker(estimator):
@@ -133,4 +119,4 @@ def is_partial_label_ranker(estimator):
         ``True`` if ``estimator`` is a partial label ranker and ``False``
         otherwise.
     """
-    return estimator._estimator_type == "partial_label_ranker"
+    return getattr(estimator, "_estimator_type", None) == "partial_label_ranker"  # noqa
