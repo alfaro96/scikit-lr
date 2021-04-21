@@ -52,5 +52,5 @@ class KNeighborsPartialLabelRanker(KNeighborsMixin,
         return super(KNeighborsPartialLabelRanker, self)._fit(X, Y)
 
     def predict(self, X):
-        """Predict the target partial rankigns for the provided data."""
+        """Predict the target partial rankings for the provided data."""
         return _predict_k_neighbors(self, X)
