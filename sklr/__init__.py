@@ -44,9 +44,7 @@ __all__ = [
     "consensus",
     "datasets",
     "dummy",
-    "ensemble",
     "metrics",
-    "miss",
     "neighbors",
     "tree",
     "utils"
