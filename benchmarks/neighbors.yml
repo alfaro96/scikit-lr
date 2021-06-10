@@ -1,0 +1,19 @@
+# Configuration file with nearest neighbors models
+
+- include: base.yml
+
+- config: neighbors
+  description: Base object for nearest neighbors models
+  extends: base
+  flags:
+    #
+    n_neighbors:
+      description: The number of neighbors to use for the queries
+      type: int
+      default: 5
+    #
+    weights:
+      description: The weight function used in prediction
+      type: string
+      default: distance
+      choices: [uniform, distance]
