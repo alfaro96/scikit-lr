@@ -1,4 +1,4 @@
-"""Evaluate metrics and record fit and score times."""
+"""Prepare the cross-validation splitting strategy."""
 
 
 # =============================================================================

@@ -1,0 +1,22 @@
+# Configuration file for simple models
+
+- include: ../base.yml
+
+- model: dummy
+  description: Simple model
+  extends: base
+  operations:
+    #
+    evaluate:
+      description: Evaluate a simple model
+      main: evaluate
+      flags:
+        #
+        strategy:
+          description: The strategy to use to generate predictions
+          type: string
+          default: most_frequent
+          choices:
+            #
+            - value: most_frequent
+              description: Always predict the most frequent ranking in the training dataset

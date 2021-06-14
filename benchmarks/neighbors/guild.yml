@@ -1,0 +1,30 @@
+# Configuration file for nearest neighbors models
+
+- include: ../base.yml
+
+- model: neighbors
+  description: Nearest neighbors model
+  extends: base
+  operations:
+    #
+    evaluate:
+      description: Evaluate a nearest neighbors model
+      main: evaluate
+      flags:
+        #
+        n_neighbors:
+          description: The number of neighbors to use for the queries
+          type: int
+          default: 5
+        #
+        weights:
+          description: The weight function used in prediction
+          type: string
+          default: distance
+          choices:
+            #
+            - value: uniform
+              description: All points in each neighborhood are weighted equally
+            #
+            - value: distance
+              description: Weight points by the inverse of their distance

@@ -1,8 +1,45 @@
-# Configuration file with base models
+# Configuration file for base models
 
 - config: base
   description: Base object for all models
   operations:
+    #
     evaluate:
-      description: Evaluate metrics and record fit and score times
-      main: evaluate
+      #
+      flags:
+        # 
+        model:
+          description: The string identifier of the model
+          type: string
+          required: true
+          choices: [label ranker, partial label ranker]
+        #
+        data_id:
+          description: The identifier of the dataset
+          type: int
+          required: true
+        #
+        n_splits:
+          description: The number of folds
+          type: int
+          default: 10
+        #
+        n_repeats:
+          description: The number of times cross-validator needs to be repeated
+          type: int
+          default: 5
+        #
+        random_state:
+          description: Controls the randomness of each repeated cross-validation instance
+          type: int
+          required: true
+        #
+        n_jobs:
+          description: The number of jobs to run in parallel
+          type: int
+          default: 1
+        #
+        verbose:
+          description: The verbosity level
+          type: int
+          default: 0

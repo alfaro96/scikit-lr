@@ -1,0 +1,39 @@
+# Configuration file for decision tree models
+
+- include: ../base.yml
+
+- model: tree
+  description: Decision tree model
+  extends: base
+  operations:
+    #
+    evaluate:
+      description: Evaluate a decision tree model
+      main: evaluate
+      flags:
+        #
+        criterion:
+          description: The function to measure the quality of a split
+          type: string
+          required: true
+          choices:
+            #
+            - value: mallows
+              description: Spread parameter
+            #
+            - value: entropy
+              description: Information gain
+            #
+            - value: gini
+              description: Gini impurity
+            #
+            - value: disagremeents
+              description: Pairwise disagreements
+            #
+            - value: distance
+              description: Matrix distance
+        #
+        min_samples_split:
+          description: The minimum number of samples required to split an internal node
+          type: int
+          required: true
