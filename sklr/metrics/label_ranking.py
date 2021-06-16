@@ -17,8 +17,9 @@ the better.
 import numpy as np
 
 # Local application
-from ..utils.ranking import check_label_ranking_targets
-from ..utils.validation import check_array, check_consistent_length
+#from ..utils.ranking import check_label_ranking_targets
+#from ..utils.validation import check_array, check_consistent_length
+from sklearn.utils import check_array
 from ._label_ranking_fast import kendall_distance_fast, tau_score_fast
 
 
@@ -36,10 +37,10 @@ def _check_targets(Y_true, Y_pred):
     Y_true = check_array(Y_true, dtype=np.int64)
     Y_pred = check_array(Y_pred, dtype=np.int64)
 
-    check_consistent_length(Y_true, Y_pred)
+    #check_consistent_length(Y_true, Y_pred)
 
-    check_label_ranking_targets(Y_true)
-    check_label_ranking_targets(Y_pred)
+    #check_label_ranking_targets(Y_true)
+    #check_label_ranking_targets(Y_pred)
 
     return (Y_true, Y_pred)
 
