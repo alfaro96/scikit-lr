@@ -19,7 +19,3 @@
 # =============================================================================
 # Main
 # =============================================================================
-
-def get_estimator(estimator_type):
-    from sklr.neighbors import KNeighborsLabelRanker
-    return KNeighborsLabelRanker()
