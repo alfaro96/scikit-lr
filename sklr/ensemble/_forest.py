@@ -1,4 +1,4 @@
-"""Forest of tree-based ensemble methods."""
+"""This module includes forest of tree-based ensemble methods."""
 
 
 # =============================================================================
@@ -6,13 +6,13 @@
 # =============================================================================
 
 # Standard
-import numpy as np
 from abc import ABCMeta
 
 # Third party
 from sklearn.ensemble._forest import BaseForest
 
 # Local application
+from ._base import _predict_ensemble
 from ..base import LabelRankerMixin, PartialLabelRankerMixin
 from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 
@@ -22,9 +22,7 @@ from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 # =============================================================================
 
 class ForestLabelRanker(LabelRankerMixin, BaseForest, metaclass=ABCMeta):
-
-    def _set_oob_score(self, X, Y):
-        raise NotImplementedError("")
+    """Base class for forest of trees-based label rankers."""
 
     def __init__(self,
                  base_estimator,
@@ -37,12 +35,11 @@ class ForestLabelRanker(LabelRankerMixin, BaseForest, metaclass=ABCMeta):
                  random_state=None,
                  verbose=0,
                  warm_start=False,
-                 class_weight=None,
                  max_samples=None):
         """Constructor."""
         super(ForestLabelRanker, self).__init__(base_estimator,
                                                 n_estimators,
-                                                estimator_params=estimator_params,
+                                                estimator_params=estimator_params,  # noqa
                                                 bootstrap=bootstrap,
                                                 oob_score=oob_score,
                                                 n_jobs=n_jobs,
@@ -51,33 +48,29 @@ class ForestLabelRanker(LabelRankerMixin, BaseForest, metaclass=ABCMeta):
                                                 warm_start=warm_start,
                                                 class_weight=None,
                                                 max_samples=max_samples)
-        
 
     def predict(self, X):
-        aggregate = self._rank_algorithm.aggregate
-        n_samples = X.shape[0]
-        Y = np.array([estimator.predict(X) for estimator in self.estimators_])
-        #print(Y[:, 0])
-        Y = [aggregate(Y[:, sample]) for sample in range(n_samples)]
-
-        return np.array(Y)
+        """"""
+        return _predict_ensemble(self, X, None)
 
 
 class RandomForestLabelRanker(ForestLabelRanker):
+    """A Random Forest :term:`label ranker`.
 
-    base_estimator = DecisionTreeLabelRanker(random_state=None)
-    estimator_params = (
-                "criterion",
-                "max_depth",
-                "min_samples_split",
-                #"min_samples_leaf",
-                #"min_weight_fraction_leaf",
-                "max_features",
-                #"max_leaf_nodes",
-                #"min_impurity_decrease",
-                "random_state",
-                #"ccp_alpha",
-            )
+    A Random Forest is a meta estimator that fits a number of decision tree
+    label rankers on various sub-samples of the dataset and uses averaging
+    to improve the predictive accuracy and control over-fitting.
+
+    The sub-sample size is controlled with the `max_samples` parameter if
+    `bootstrap=True` (default), otherwise the whole dataset is used to build
+    each tree.
+
+    Read more in the :ref:`User Guide <forest>`.
+
+
+    """
+    
+    
 
     def __init__(self,
                  n_estimators=100,
@@ -99,13 +92,27 @@ class RandomForestLabelRanker(ForestLabelRanker):
                  ccp_alpha=0.0,
                  max_samples=None):
         """Constructor."""
-        super(RandomForestLabelRanker, self).__init__(self.base_estimator,
+        #
+        base_estimator = DecisionTreeLabelRanker(max_depth=None)
+
+        estimator_params = ("criterion",
+                            "max_depth",
+                            "min_samples_split",
+                            "min_samples_leaf",
+                            "min_weight_fraction_leaf",
+                            "max_features",
+                            "max_leaf_nodes",
+                            "min_impurity_decrease",
+                            "ccp_alpha",
+                            "random_state")
+
+        super(RandomForestLabelRanker, self).__init__(base_estimator,
                                                       n_estimators,
-                                                      estimator_params=self.estimator_params,
+                                                      estimator_params=estimator_params,  # noqa
                                                       bootstrap=bootstrap,
                                                       oob_score=oob_score,
                                                       n_jobs=n_jobs,
-                                                      random_state=random_state,
+                                                      random_state=random_state,  # noqa
                                                       verbose=verbose,
                                                       warm_start=warm_start,
                                                       max_samples=max_samples)
@@ -113,9 +120,9 @@ class RandomForestLabelRanker(ForestLabelRanker):
         self.criterion = criterion
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
-        # self.min_samples_leaf = min_samples_leaf
-        # self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
         self.max_features = max_features
-        # self.max_leaf_nodes = max_leaf_nodes
-        # self.min_impurity_decrease = min_impurity_decrease
-        # self.ccp_alpha = ccp_alpha
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
+        self.ccp_alpha = ccp_alpha

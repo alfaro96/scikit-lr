@@ -1,4 +1,4 @@
-"""Bagging meta-estimator."""
+"""TODO: ADD COMMENT HERE."""
 
 
 # =============================================================================
@@ -6,10 +6,10 @@
 # =============================================================================
 
 # Third party
-import numpy as np
 from sklearn.ensemble._bagging import BaseBagging
 
 # Local application
+from ._base import _predict_ensemble
 from ..base import LabelRankerMixin, PartialLabelRankerMixin
 from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 
@@ -19,6 +19,7 @@ from ..tree import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 # =============================================================================
 
 class BaggingLabelRanker(LabelRankerMixin, BaseBagging):
+    """A Bagging :term:`label ranker`."""
 
     def __init__(self,
                  base_estimator=None,
@@ -47,9 +48,9 @@ class BaggingLabelRanker(LabelRankerMixin, BaseBagging):
                                                  verbose=verbose)
 
     def _validate_estimator(self):
-        """Check the estimator and set the `base_estimator_` attribute."""
-        # The random state will be set by the ensemble
-        estimator = DecisionTreeLabelRanker(random_state=None)
+        """Check the estimator and set the corresponding attribute."""
+        #
+        estimator = DecisionTreeLabelRanker(max_depth=None)
 
         super(BaggingLabelRanker, self)._validate_estimator(estimator)
 
@@ -61,10 +62,4 @@ class BaggingLabelRanker(LabelRankerMixin, BaseBagging):
         return Y
 
     def predict(self, X):
-        aggregate = self._rank_algorithm.aggregate
-        n_samples = X.shape[0]
-        Y = np.array([estimator.predict(X) for estimator in self.estimators_])
-        #print(Y[:, 0])
-        Y = [aggregate(Y[:, sample]) for sample in range(n_samples)]
-
-        return np.array(Y)
+        return _predict_ensemble(self, X)
