@@ -129,7 +129,7 @@ class BaseDecisionTree(BaseEstimator, metaclass=ABCMeta):
         # sum of the number of internal and leaf nodes)
         return self.tree_.internal_count + self.tree_.leaf_count
 
-    def fit(self, X, Y, sample_weight=None):
+    def fit(self, X, Y, sample_weight=None, check_input=True):
         """Fit the decision tree on the training data and rankings."""
         # Validate the training data, the training
         # rankings and also the sample weights
@@ -418,7 +418,7 @@ class DecisionTreeLabelRanker(LabelRankerMixin, BaseDecisionTree):
                          max_splits=max_splits,
                          random_state=random_state)
 
-    def fit(self, X, Y, sample_weight=None):
+    def fit(self, X, Y, sample_weight=None, check_input=True):
         """Build a decision tree Label Ranker from the training set (X, Y).
 
         Parameters
@@ -584,7 +584,7 @@ class DecisionTreePartialLabelRanker(PartialLabelRankerMixin,
                          max_splits=max_splits,
                          random_state=random_state)
 
-    def fit(self, X, Y, sample_weight=None):
+    def fit(self, X, Y, sample_weight=None, check_input=True):
         """Build a decision tree Partial Label Ranker
         from the training set (X, Y).
 
