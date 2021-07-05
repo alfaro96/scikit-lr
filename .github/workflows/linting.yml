@@ -1,5 +1,5 @@
 # Workflow to check linting violations
-name: Linting check
+name: Linting checking
 
 on:
   push:
@@ -19,10 +19,7 @@ jobs:
 
     steps:
       - name: Checkout scikit-lr
-        uses: actions/checkout@v2
-        with:
-          # Checkout pull request head commit instead of merge commit
-          ref: ${{ github.event.pull_request.head.sha }}
+        uses: actions/checkout@v1
 
       - name: Setup Python
         uses: actions/setup-python@v2

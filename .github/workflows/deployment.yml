@@ -1,4 +1,4 @@
-# Workflow to build and test the wheels
+# Workflow to build and test the wheels and source distribution
 name: Continuous deployment wheels
 
 on:
@@ -14,13 +14,13 @@ on:
     branches:
       - master
       - "[0-9]+.[0-9]+.X"
-  # Manual run
+  # Manual trigger run
   workflow_dispatch:
 
 jobs:
-  # Build the wheels
+  # Build the wheels for Linux, Windows and macOS for Python 3.7 and newer
   build_wheel:
-    name: Build wheel for platform ${{ matrix.platform_id }} and Python ${{ matrix.python }}
+    # name: Build wheel cp${{ matrix.python }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -76,7 +76,7 @@ jobs:
 
   # Build the source distribution
   build_sdist:
-    name: Source distribution
+    name: Build source distribution
     runs-on: ubuntu-latest
 
     steps:
