@@ -18,6 +18,6 @@ echo "Installing pytest."
 pip install pytest==$PYTEST_MIN_VERSION pytest-xdist
 
 echo "Installing codecov."
-pip install --upgrade codecov pytest-cov
+pip install codecov pytest-cov
 
 pip install --editable .
