@@ -18,6 +18,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      # Ensure that a test finishes even if another fails
+      fail-fast: false
+
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: [3.6, 3.7, 3.8]
@@ -40,7 +43,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install dependencies
-        run: source $GITHUB_WORKSPACE/.github/tools/integration/install.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/integration/install.sh
 
       - name: Test library
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/test_script.sh
