@@ -65,7 +65,7 @@ jobs:
         env:
           CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
-          CIBW_TEST_COMMAND: bash $GITHUB_WORKSPACE/.github/tools/test_wheels.sh
+          CIBW_TEST_COMMAND: bash $GITHUB_WORKSPACE/.github/tools/deployment/test_wheel.sh
           CIBW_TEST_REQUIRES: pytest
           CIBW_BUILD_VERBOSITY: 1
 
@@ -87,10 +87,10 @@ jobs:
         uses: actions/setup-python@v2
 
       - name: Build source distribution
-        run: bash $GITHUB_WORKSPACE/.github/tools/build_source.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/deployment/build_source.sh
 
       - name: Test source distribution
-        run: bash $GITHUB_WORKSPACE/.github/tools/test_source.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/deployment/test_source.sh
 
       - name: Store artifacts
         uses: actions/upload-artifact@v2
