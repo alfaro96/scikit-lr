@@ -2,4 +2,4 @@
 
 set -e
 
-# make test-docs
+make test-docs
