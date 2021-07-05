@@ -16,6 +16,6 @@ echo "Installing pytest."
 pip install pytest pytest-xdist
 
 echo "Installing codecov."
-pip install --upgrade codecov pytest-cov
+pip install codecov pytest-cov
 
 pip install --editable .
