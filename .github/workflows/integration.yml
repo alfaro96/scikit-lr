@@ -1,4 +1,4 @@
-# Workflow to continuous test the library and documentation
+# Workflow to build and test the library
 name: Continuous integration tests
 
 on:
@@ -14,18 +14,18 @@ on:
 
 jobs:
   test:
-    name: Continuous test
+    name: Build and test the library
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Ensure that a test finishes even if another fails
+      # Prevent a failing test job from failing a workflow run
       fail-fast: false
-
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: [3.7, 3.7, 3.8]
 
     env:
+        # Mininum dependencies for the library
         NUMPY_MIN_VERSION: 1.14.6
         SCIPY_MIN_VERSION: 1.1.0
         CYTHON_MIN_VERSION: 0.28.5
@@ -51,7 +51,7 @@ jobs:
       - name: Test documentation
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/test_docs.sh
 
-      - name: Upload code coverage
+      - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
