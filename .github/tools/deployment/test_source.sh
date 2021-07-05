@@ -13,4 +13,4 @@ mkdir tmp_for_test
 cp setup.cfg tmp_for_test
 cd tmp_for_test
 
-pytest --pyargs sklearn
+pytest --pyargs sklr

@@ -2,4 +2,4 @@
 
 set -e
 
-pytest --pyargs sklearn
+pytest --pyargs sklr
