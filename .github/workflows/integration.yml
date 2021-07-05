@@ -14,7 +14,7 @@ on:
 
 jobs:
   test:
-    name: Build and test library on ${{ matrix.os }} for Python ${{ matrix.python }}
+    name: Build and test library for ${{ matrix.os }} and cp-${{ matrix.python }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -36,7 +36,6 @@ jobs:
       - name: Install dependencies
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/install.sh
         env:
-          # Mininum dependencies for the library
           NUMPY_MIN_VERSION: 1.14.6
           SCIPY_MIN_VERSION: 1.1.0
           CYTHON_MIN_VERSION: 0.28.5

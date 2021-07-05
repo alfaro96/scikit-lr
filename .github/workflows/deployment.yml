@@ -19,7 +19,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build the wheel for ${{ matrix.platform_id }} and Python ${{ matrix.python }}
+    name: Build and test wheel for ${{ matrix.platform_id }} and cp-${{ matrix.python }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -73,7 +73,7 @@ jobs:
           path: wheelhouse/*.whl
 
   build_sdist:
-    name: Build the source distribution
+    name: Build source distribution
     runs-on: ubuntu-latest
 
     steps:
@@ -95,7 +95,7 @@ jobs:
           path: dist/*.tar.gz
 
   upload_anaconda:
-    name: Upload the artifacts to Anaconda
+    name: Upload artifacts to Anaconda
     runs-on: ubuntu-latest
     needs: [build_wheels, build_sdist]
     # Do not upload the artifacts on pull requests
