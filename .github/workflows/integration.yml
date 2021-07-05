@@ -21,7 +21,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python: [3.7, 3.7, 3.8]
+        python: [37, 38, 39]
+        include:
+          # Set the version identifier
+          - python: 37
+            python-version: 3.7
+          - python: 38
+            python-version: 3.8
+            python: 39
+            python-version: 3.9
 
     steps:
       - name: Checkout scikit-lr
@@ -30,7 +38,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/install.sh
