@@ -65,7 +65,7 @@ jobs:
         env:
           CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
-          CIBW_TEST_COMMAND: bash $GITHUB_WORKSPACE/.github/tools/deployment/test_wheel.sh
+          CIBW_TEST_COMMAND: bash {project}/.github/tools/deployment/test_wheel.sh
           CIBW_TEST_REQUIRES: pytest
           CIBW_BUILD_VERBOSITY: 1
 
