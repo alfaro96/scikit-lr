@@ -14,7 +14,7 @@ on:
 
 jobs:
   test:
-    name: Build and test the library
+    name: Build and test library on ${{ matrix.os }} for Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -23,15 +23,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: [3.7, 3.7, 3.8]
-
-    env:
-        # Mininum dependencies for the library
-        NUMPY_MIN_VERSION: 1.14.6
-        SCIPY_MIN_VERSION: 1.1.0
-        CYTHON_MIN_VERSION: 0.28.5
-        PYTEST_MIN_VERSION: 5.0.1
-        PYTEST_COV_MIN_VERSION: 2.9.0
-        SCIKIT_LEARN_MIN_VERSION: 0.24.0
 
     steps:
       - name: Checkout scikit-lr
@@ -44,6 +35,14 @@ jobs:
 
       - name: Install dependencies
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/install.sh
+        env:
+          # Mininum dependencies for the library
+          NUMPY_MIN_VERSION: 1.14.6
+          SCIPY_MIN_VERSION: 1.1.0
+          CYTHON_MIN_VERSION: 0.28.5
+          PYTEST_MIN_VERSION: 5.0.1
+          PYTEST_COV_MIN_VERSION: 2.9.0
+          SCIKIT_LEARN_MIN_VERSION: 0.24.0
 
       - name: Test library
         run: bash $GITHUB_WORKSPACE/.github/tools/integration/test_script.sh

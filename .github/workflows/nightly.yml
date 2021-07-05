@@ -19,13 +19,13 @@ jobs:
         uses: actions/setup-python@v2
 
       - name: Install dependencies
-        run: bash $GITHUB_WORKSPACE/.github/tools/cron/install.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/nightly/install.sh
 
       - name: Test library
-        run: bash $GITHUB_WORKSPACE/.github/tools/cron/test_script.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/nightly/test_script.sh
 
       - name: Test documentation
-        run: bash $GITHUB_WORKSPACE/.github/tools/cron/test_docs.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/nightly/test_docs.sh
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
