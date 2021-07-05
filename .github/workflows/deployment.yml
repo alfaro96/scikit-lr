@@ -1,79 +1,123 @@
+# Workflow to build and test the wheels
 name: Continuous deployment wheels
 
 on:
+  schedule:
+    # Everyday at 3:42 UTC
+    - cron: "42 3 */1 * *"
   push:
     branches:
       - master
-    tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
   pull_request:
     branches:
       - master
       - "[0-9]+.[0-9]+.X"
+  # Manual run
+  workflow_dispatch:
 
 jobs:
-  build:
+  # Build the wheels
+  build_wheel:
+    name: Build wheel scikit-lr-cp${{ matrix.python }}-${{ matrix.platform_id }}
     runs-on: ${{ matrix.os }}
 
     strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-        python:
-          - 3.6
-          - 3.7
-          - 3.8
+      # Ensure that a wheel builder finishes even if another fails
+      fail-fast: false
 
-    env:
-      REPO_DIR: scikit-lr
-      BUILD_COMMIT: ${{ github.sha }}
-      PLAT: x86_64
-      MB_PYTHON_VERSION: ${{ matrix.python }}
-      BUILD_DEPENDS: "numpy==1.17.3 cython==0.29.14 scipy==1.3.2 scikit-learn==0.22.0"
-      TEST_DEPENDS: pytest==4.6.4
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: [37, 38, 39]
+        bitness: [32, 64]
+
+      include:
+          # Run 32 and 64 bit version in parallel
+          - os: ubuntu-latest
+            bitness: 32
+            platform_id: manylinux_i686
+          - os: ubuntu-latest
+            bitness: 64
+            platform_id: manylinux_x86_64
+          - os: windows-latest
+            bitness: 32
+            platform_id: win32
+          - os: windows-latest
+            bitness: 64
+            platform_id: win_amd64
+          - os: macos-latest
+            bitness: 64
+            platform_id: macosx_x86_64
+          exclude:
+          - os: macos-latest
+            bitness: 32
 
     steps:
       - name: Checkout scikit-lr
         uses: actions/checkout@v2
-        with:
-          path: scikit-lr
-
-      - name: Checkout multibuild
-        uses: actions/checkout@v2
-        with:
-          repository: matthew-brett/multibuild
-          ref: devel
-          path: multibuild
 
       - name: Setup Python
         uses: actions/setup-python@v2
+
+      - name: Build and test wheel
+        uses: pypa/cibuildwheel@v1.12.0
+        env:
+          CIBW_BUILD: cp${{ matrix.python }}-${{ matrix.platform_id }}
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
+          CIBW_TEST_COMMAND: bash $GITHUB_WORKSPACE/.github/tools/test_wheels.sh
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_BUILD_VERBOSITY: 1
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
         with:
-          python-version: ${{ matrix.python }}
+          path: wheelhouse/*.whl
 
-      - name: Copy files
+  # Build the source distribution
+  build_sdist:
+    name: Source distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Build source distribution
+        run: bash $GITHUB_WORKSPACE/.github/tools/build_source.sh
+
+      - name: Test source distribution
+        run: bash $GITHUB_WORKSPACE/.github/tools/test_source.sh
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.tar.gz
+
+  # Upload the wheels and the source distribution
+  upload_anaconda:
+    name: Upload to Anaconda
+    runs-on: ubuntu-latest
+    needs: [build_wheels, build_sdist]
+    # The artifacts cannot be uploaded on pull requests
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: dist
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Upload artifacts
         env:
-          FILES_PATH: ${{ github.workspace }}/scikit-lr/.github/tools/deployment
-        run: |
-          cp $FILES_PATH/extra_functions.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/before_install.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/config.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/build_wheel.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/test_wheel.sh $GITHUB_WORKSPACE
-          cp $FILES_PATH/upload_wheel.sh $GITHUB_WORKSPACE
-
-      - name: Define variables
-        run: source before_install.sh
-
-      - name: Build wheel
-        run: bash build_wheel.sh
-
-      - name: Test wheel
-        run: bash test_wheel.sh
-
-      - name: Upload wheel
-        env:
-          CONDA_TOKEN: ${{ secrets.CONDA_TOKEN }}
-        # The wheels should not be uploaded on PRs
-        if: ${{ github.event_name != 'pull_request' }}
-        run: bash upload_wheel.sh
+          ANACONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+        run: bash build_tools/github/upload_anaconda.sh

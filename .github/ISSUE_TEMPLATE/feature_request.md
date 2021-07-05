@@ -6,7 +6,7 @@ labels: feature
 ---
 
 <!--
-If you want to propose a new algorithm, be sure that the standards are followed.
+If you want to propose a new algorithm, be sure that the inclusion criteria are met.
 -->
 
 #### Describe the workflow you want to enable

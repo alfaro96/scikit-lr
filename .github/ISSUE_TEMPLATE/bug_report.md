@@ -6,8 +6,8 @@ labels: bug
 ---
 
 <!--
-Before submitting a bug, make sure the issue has not been
-already addressed by searching through the past issues.
+Before submitting a bug, please make sure the issue has not
+been already addressed by searching through the past issues.
 -->
 
 #### Description
@@ -19,9 +19,9 @@ A clear and concise description of what the bug is.
 #### Code to reproduce the problem
 
 <!--
-Add a minimal example that we can reproduce the error by running the code.
-Be as succinct as possible, do not depend on external data. In short, we are
-going to copy-paste your code and we expect to get the same result as you.
+Please add a minimal example that we can reproduce the error by running the
+code. Be as succinct as possible, do not depend on external data. In short,
+we are going to copy-paste your code and we expect to get the same results.
 -->
 
 ```
@@ -31,13 +31,13 @@ Sample code to reproduce the problem
 #### Expected behaviour
 
 <!--
-Paste or describe the expected behaviour.
+Please paste or describe the expected behaviour.
 -->
 
 #### Actual behaviour
 
 <!--
-Paste or specifically describe the actual output or traceback.
+Please paste or describe the actual output or traceback.
 -->
 
 #### Specifications
@@ -53,3 +53,5 @@ import sklearn; print("scikit-learn", sklearn.__version__)
 import imblearn; print("imbalanced-learn", imblearn.__version__)
 import sklr; print("scikit-lr", sklr.__version__)
 -->
+
+<!-- Thanks for contributing! -->

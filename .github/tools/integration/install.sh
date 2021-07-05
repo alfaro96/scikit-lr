@@ -5,13 +5,19 @@ set -e
 echo "Upgrading pip and setuptools."
 pip install --upgrade pip setuptools
 
-echo "Installing numpy, scipy, cython and scikit-learn."
-pip install numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION cython==$CYTHON_VERSION scikit-learn==$SCIKIT_LEARN_VERSION
+echo "Installing numpy and scipy."
+pip install numpy==$NUMPY_MIN_VERSION scipy==$SCIPY_MIN_VERSION
+
+echo "Installing cython."
+pip install cython==$CYTHON_MIN_VERSION
+
+echo "Installing scikit-learn."
+pip install scikit-learn==$SCIKIT_LEARN_MIN_VERSION
 
 echo "Installing pytest."
-pip install pytest==4.6.4 pytest-cov
+pip install pytest==$PYTEST_MIN_VERSION pytest-xdist
 
 echo "Installing codecov."
-pip install --upgrade codecov
+pip install --upgrade codecov pytest-cov
 
-python setup.py develop
+pip install --editable .

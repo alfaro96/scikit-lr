@@ -2,4 +2,4 @@
 
 set -e
 
-# pytest $(find docs -name "*.rst" | sort)
+# make test-docs
