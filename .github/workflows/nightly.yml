@@ -1,7 +1,9 @@
+# Workflow to nightly build and test the library
 name: Nightly tests
 
 on:
   schedule:
+    # Everyday at 3:42 UTC
     - cron: "42 3 */1 * *"
 
 jobs:
@@ -14,17 +16,15 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
 
       - name: Install dependencies
-        run: source $GITHUB_WORKSPACE/.github/tools/cron/install.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/nightly/install.sh
 
-      - name: Execute code tests
-        run: bash $GITHUB_WORKSPACE/.github/tools/cron/test_script.sh
+      - name: Test library
+        run: bash $GITHUB_WORKSPACE/.github/tools/nightly/test_script.sh
 
-      - name: Execute documentation tests
-        run: bash $GITHUB_WORKSPACE/.github/tools/cron/test_docs.sh
+      - name: Test documentation
+        run: bash $GITHUB_WORKSPACE/.github/tools/nightly/test_docs.sh
 
       - name: Upload code coverage
         uses: codecov/codecov-action@v1

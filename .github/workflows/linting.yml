@@ -1,9 +1,11 @@
-name: Linting tests
+# Workflow to check linting violations
+name: Linting check
 
 on:
   push:
     branches:
       - master
+      # Release branches
       - "[0-9]+.[0-9]+.X"
   pull_request:
     branches:
@@ -11,22 +13,18 @@ on:
       - "[0-9]+.[0-9]+.X"
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout using the first version because, in the second
-      # version, the workflow payload contains a wrong revision
       - name: Checkout scikit-lr
         uses: actions/checkout@v1
 
       - name: Setup Python
         uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
 
       - name: Install dependencies
-        run: source $GITHUB_WORKSPACE/.github/tools/linting/install.sh
+        run: bash $GITHUB_WORKSPACE/.github/tools/linting/install.sh
 
-      - name: Test linting
-        run: bash $GITHUB_WORKSPACE/.github/tools/linting/test.sh
+      - name: Check linting
+        run: bash $GITHUB_WORKSPACE/.github/tools/linting/check.sh

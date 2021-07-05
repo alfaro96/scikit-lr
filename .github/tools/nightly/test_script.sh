@@ -4,6 +4,7 @@ set -e
 
 TEST_CMD="pytest --showlocals --durations=20 --pyargs"
 TEST_CMD="$TEST_CMD --cov=sklr --cov-report=xml"
+TEST_CMD="$TEST_CMD -Werror::DeprecationWarning -Werror::FutureWarning"
 TEST_CMD="$TEST_CMD -n2"
 
 # Run the tests on the installed development version
