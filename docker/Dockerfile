@@ -1,8 +1,11 @@
-FROM python:3.6-slim
+FROM python:3.9-slim
 
-# Install system dependencies
+# Install the system dependencies
 RUN apt-get update; \
-    apt-get install -y git gcc g++ make
+    apt-get install -y git \
+                       gcc \
+                       g++ \
+                       make
 
 # Run the container in user mode
 ARG USERNAME=scikit-lr
@@ -10,14 +13,14 @@ ENV HOME /home/$USERNAME
 RUN useradd -ms /bin/bash $USERNAME
 USER $USERNAME
 
-# Move to the workspace
+# Move to the workspace directory
 RUN mkdir -p $HOME/workspace
 WORKDIR $HOME/workspace
 
-# Add the path to the packages
+# Add the path to the local libraries
 ENV PATH="$PATH:$HOME/.local/bin"
 
-# Install Python requirements
+# Install the Python requirements
 COPY requirements.txt /req/
 RUN pip install --upgrade pip; \
     pip install -r /req/requirements.txt
