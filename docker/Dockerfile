@@ -20,12 +20,12 @@ WORKDIR $HOME/workspace
 # Add the path to the local libraries
 ENV PATH="$PATH:$HOME/.local/bin"
 
-# Install the Python requirements
+# Install the library requirements
 COPY requirements.txt /req/
 RUN pip install --upgrade pip; \
     pip install -r /req/requirements.txt
 
-# Install from source
+# Install the library from source
 ARG SOURCE_COMMIT
 RUN echo "Installing commit $SOURCE_COMMIT."
 RUN pip install git+git://github.com/alfaro96/scikit-lr.git@$SOURCE_COMMIT

@@ -8,15 +8,6 @@
 This directory contains a `Dockerfile` to make it easy
 to get up and running with `scikit-lr` via `Docker`.
 
-## Building the image
-
-To build the image from the `Dockerfile`:
-
-```
-docker build --build-arg SOURCE_COMMIT=master \
-			 -t alfaro96/scikit-lr:latest .
-```
-
 ## Pulling the image
 
 To pull the image from [Docker Hub](https://hub.docker.com/r/alfaro96/scikit-lr):
@@ -27,7 +18,7 @@ docker pull alfaro96/scikit-lr:latest
 
 ## Running the container
 
-To start a bash:
+To start a `bash`:
 
 ```
 docker run -it \
@@ -36,7 +27,7 @@ docker run -it \
            /bin/bash
 ```
 
-To start a notebook:
+To start a `notebook`:
 
 ```
 docker run -it \
