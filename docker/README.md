@@ -27,7 +27,7 @@ docker run -it \
            /bin/bash
 ```
 
-To start a `notebook`:
+To start `jupyter lab`:
 
 ```
 docker run -it \
