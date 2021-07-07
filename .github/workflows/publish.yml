@@ -1,0 +1,49 @@
+# Workflow to publish the wheels and the source distribution in PyPI
+name: Publish PyPI
+
+on:
+  # Manual trigger run
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version to upload to PyPI"
+        required: true
+
+      repository:
+        description: "The repository to upload to (PyPI or TestPyPI)"
+        required: true
+        default: "testpypi"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Install dependencies
+        run: bash $GITHUB_WORKSPACE/.github/tools/publish/install.sh
+
+      - name: Download artifacts
+        run: bash $GITHUB_WORKSPACE/.github/tools/publish/download.sh
+        env:
+          SCIKIT_LR_VERSION: ${{ github.event.inputs.version }}
+
+      - name: Publish artifacts in PyPI
+        uses: pypa/gh-action-pypi-publish@v1.4.2
+        if: ${{ github.event.inputs.pypi_repo == "pypi" }}
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Publish artifacts in TestPyPI
+        uses: pypa/gh-action-pypi-publish@v1.4.2
+        if: ${{ github.event.inputs.pypi_repo == "testpypi" }}
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_TOKEN }}
+          repository_url: https://test.pypi.org/legacy
