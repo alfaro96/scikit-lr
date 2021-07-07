@@ -3,47 +3,36 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/alfaro96/scikit-lr.svg)
 ![Docker Image Size](https://img.shields.io/docker/image-size/alfaro96/scikit-lr/latest.svg)
 
-# Using scikit-lr via Docker
+# Using `scikit-lr` via `Docker`
 
-This directory contains a `Dockerfile` to make it easy to get
-up and running with scikit-lr via [Docker](https://docker.com).
-
-## Installing Docker
-
-General installation instructions are
-[on the Docker site](https://docs.docker.com/get-docker/),
-but we give some quick links here:
-
-* [Installing Docker Engine](https://docs.docker.com/engine/install/)
-
-## Building the image
-
-We are using a `Makefile` to simplify Docker commands within `make` commands.
-
-To build the image from the `Dockerfile`:
-
-```
-make build
-```
+This directory contains a `Dockerfile` to make it easy
+to get up and running with `scikit-lr` via `Docker`.
 
 ## Pulling the image
 
 To pull the image from [Docker Hub](https://hub.docker.com/r/alfaro96/scikit-lr):
 
 ```
-make pull
+docker pull alfaro96/scikit-lr:latest
 ```
 
 ## Running the container
 
-To start a bash:
+To start a `bash`:
 
 ```
-make bash
+docker run -it \
+           -v $(PWD)/:/home/scikit-lr/workspace \
+           --rm alfaro96/scikit-lr:latest \
+           /bin/bash
 ```
 
-To start a notebook:
+To start `jupyter lab`:
 
 ```
-make notebook
+docker run -it \
+           -p 8888:8888 \
+           -v $(PWD)/:/home/scikit-lr/workspace \
+           --rm alfaro96/scikit-lr:latest \
+           jupyter lab --ip=0.0.0.0
 ```
