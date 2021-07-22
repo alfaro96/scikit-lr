@@ -1,3 +1,6 @@
+"""."""
+
+
 # =============================================================================
 # Imports
 # =============================================================================
@@ -13,13 +16,15 @@ from sklr._build_utils import cythonize_extensions
 # Constants
 # =============================================================================
 
-# The module name is not package metadata, and
-# cannot be declared in the configuration file
 MOD_NAME = "sklr"
 
 
 # =============================================================================
 # Main
 # =============================================================================
+
 if __name__ == "__main__":
-    setup(ext_modules=cythonize_extensions(MOD_NAME))
+    # Cythonize to generate the extension modules
+    ext_modules = cythonize_extensions(MOD_NAME)
+
+    setup(ext_modules=ext_modules)

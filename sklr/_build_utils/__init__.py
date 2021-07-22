@@ -62,12 +62,18 @@ def cythonize_extensions(module_name):
     # Skip cythonization in the release tarballs since
     # the generated C++ source files are not necessary
     if "sdist" not in sys.argv:
-        extensions_pattern = os.path.join(module_name, "**", "*.pyx")
-        extensions_path = glob.glob(extensions_pattern, recursive=True)
+        # extensions_pattern = os.path.join(module_name, "**", "*.pyx")
+        # extensions_path = glob.glob(extensions_pattern, recursive=True)
 
-        for (extension, extension_path) in enumerate(extensions_path):
-            extensions_path[extension] = create_extension(extension_path)
+        # for (extension, extension_path) in enumerate(extensions_path):
+        # extensions_path[extension] = create_extension(extension_path)
 
-        extensions = cythonize(extensions_path)
-
-        return extensions
+        # extensions = cythonize(extensions_path)
+        include_dirs = [NUMPY_HEADERS_PATH]
+        extra_link_args = ["-std=c++11"]
+        extra_compile_args = ["-O3", "-std=c++11"]
+        return cythonize(sources=os.path.join(module_name, "**", "*.pyx"),
+                         language="c++",
+                         include_dirs=include_dirs,
+                         extra_link_args=extra_link_args,
+                         extra_compile_args=extra_compile_args)
