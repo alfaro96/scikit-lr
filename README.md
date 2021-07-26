@@ -1,16 +1,16 @@
-[![Continuous integration tests](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20integration%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+integration+tests%22)
-[![Continuous deployment wheels](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20deployment%20wheels/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+deployment+wheels%22)
-[![Linting tests](https://github.com/alfaro96/scikit-lr/workflows/Linting%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Linting+tests%22)
-[![Daily tests](https://github.com/alfaro96/scikit-lr/workflows/Daily%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+tests%22)
+[![Continuous integration tests](https://github.com/alfaro96/scikit-lr/actions/workflows/integration.yml/badge.svg)](https://github.com/alfaro96/scikit-lr/actions/workflows/integration.yml)
+[![Nightly tests](https://github.com/alfaro96/scikit-lr/actions/workflows/nightly.yml/badge.svg)](https://github.com/alfaro96/scikit-lr/actions/workflows/nightly.yml)
 [![Code coverage](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/alfaro96/scikit-lr.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/alfaro96/scikit-lr/context:python)
+[![Linting check](https://github.com/alfaro96/scikit-lr/actions/workflows/linting.yml/badge.svg)](https://github.com/alfaro96/scikit-lr/actions/workflows/linting.yml)
+[![Continuous deployment wheels](https://github.com/alfaro96/scikit-lr/actions/workflows/deployment.yml/badge.svg)](https://github.com/alfaro96/scikit-lr/actions/workflows/deployment.yml)
+[![Publish PyPI](https://github.com/alfaro96/scikit-lr/actions/workflows/publish.yml/badge.svg)](https://github.com/alfaro96/scikit-lr/actions/workflows/publish.yml)
 [![PyPi package](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr)
-[![Python version](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/alfaro96/scikit-lr.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/alfaro96/scikit-lr/context:python)
 
-# Scikit-lr
+# `Scikit-lr`
 
-Scikit-lr is a Python package for Label Ranking problems and distributed under
-MIT license.
+`Scikit-lr` is a Python package for Label Ranking problems and distributed
+under MIT license.
 
 The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
 Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
@@ -22,17 +22,17 @@ Website: https://scikit-lr.readthedocs.io
 
 ### Dependencies
 
-Scikit-lr requires:
+`Scikit-lr` requires:
 
-    * Python (>= 3.6)
-    * NumPy (>= 1.17.3)
-    * SciPy (>= 1.3.2)
-    * Scikit-learn (>= 0.23.0)
+    * Python (>= 3.7)
+    * NumPy (>= 1.14.6)
+    * SciPy (>= 1.1.0)
+    * Scikit-learn (>= 0.24.0)
 
 ### User installation
 
 If you already have a working installation, the easiest way to install
-scikit-lr is using ``pip``:
+`scikit-lr` is using `pip`:
 
 ```
 pip install -U scikit-lr
@@ -43,7 +43,7 @@ The documentation includes more detailed [installation instructions](https://sci
 ## Release history
 
 See the [release history](https://scikit-lr.readthedocs.io/en/latest/whats_new/index.html)
-for a history of notable changes to scikit-lr.
+for a history of notable changes to `scikit-lr`.
 
 ## Development
 
@@ -66,8 +66,8 @@ git clone https://github.com/alfaro96/scikit-lr.git
 
 ### Testing
 
-After installation, you can launch the test suite from outside the source
-directory (you will need to have ``pytest (>= 5.0.1)`` installed):
+After installation, you can launch the test suite from outside the
+source directory (you will need to have `pytest (>= 5.0.1)` installed):
 
 ```
 pytest sklr
@@ -91,3 +91,7 @@ Martín.
 
 * Issue tracker: https://github.com/alfaro96/scikit-lr/issues
 * Website: https://scikit-lr.readthedocs.io
+
+### Citation
+
+If you use `scikit-lr` in a scientific publication, we would appreciate citations: https://scikit-lr.readthedocs.io/en/latest/about.html#citing
