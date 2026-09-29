@@ -1,0 +1,35 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Keep in sync with the ruff version in environment.yml
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        args: ["--fix", "--show-fixes"]
+      - id: ruff-format
+
+  - repo: https://github.com/MarcoGorelli/cython-lint
+    rev: v0.21.1
+    hooks:
+      - id: cython-lint
+      - id: double-quote-cython-strings
+
+  - repo: local
+    hooks:
+      # Private scikit-learn modules may change without deprecation, so
+      # they are only imported from a single compatibility module.
+      - id: no-private-sklearn-imports
+        name: private scikit-learn imports only in sklr/utils/_sklearn_compat.py
+        language: pygrep
+        entry: '^\s*(from|import)\s+sklearn(\.\w+)*\._'
+        types: [python]
+        exclude: ^sklr/utils/_sklearn_compat\.py$
