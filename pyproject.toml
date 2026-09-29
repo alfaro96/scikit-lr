@@ -1,0 +1,150 @@
+[project]
+name = "scikit-lr"
+dynamic = ["version"]
+description = "Label Ranking and Partial Label Ranking with scikit-learn compatible estimators"
+authors = [
+    {name = "Juan Carlos Alfaro Jiménez", email = "JuanCarlos.Alfaro@uclm.es"},
+]
+maintainers = [
+    {name = "Juan Carlos Alfaro Jiménez", email = "JuanCarlos.Alfaro@uclm.es"},
+]
+requires-python = ">=3.12"
+# The compiled extensions cimport scikit-learn's Cython internals, whose ABI
+# may change between minor releases, so the runtime requirement must match
+# the version pinned in [build-system].
+dependencies = [
+    "numpy>=2.2",
+    "scipy>=1.15",
+    "scikit-learn~=1.9.0",
+]
+license = "MIT"
+license-files = ["COPYING"]
+keywords = ["label ranking", "partial label ranking", "machine learning", "scikit-learn"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Programming Language :: C",
+    "Programming Language :: Cython",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+homepage = "https://scikit-lr.readthedocs.io"
+source = "https://github.com/alfaro96/scikit-lr"
+download = "https://pypi.org/project/scikit-lr/#files"
+tracker = "https://github.com/alfaro96/scikit-lr/issues"
+
+[build-system]
+build-backend = "mesonpy"
+requires = [
+    "meson-python>=0.17.1",
+    "cython>=3.1.2",
+    # Building against NumPy 2 produces extensions that are also compatible
+    # with the older NumPy versions allowed at runtime.
+    "numpy>=2",
+    # Must match the runtime requirement (see [project].dependencies).
+    "scikit-learn~=1.9.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["sklr"]
+addopts = [
+    "--import-mode=importlib",
+    "--strict-config",
+    "--strict-markers",
+    "--doctest-modules",
+    "-ra",
+]
+doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"
+xfail_strict = true
+# Every warning is an error. Add an exception here only for a specific,
+# documented third-party warning, never to silence our own code.
+filterwarnings = [
+    "error",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["sklr"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+extend-exclude = [
+    "build",
+    "builddir",
+    "doc/_build",
+    "doc/auto_examples",
+    "doc/modules/generated",
+]
+
+[tool.ruff.lint]
+# All rules can be found here: https://docs.astral.sh/ruff/rules/
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "NPY",  # NumPy-specific rules
+    "PGH",  # pygrep-hooks
+    "PT",   # flake8-pytest-style
+    "RUF",  # ruff-specific rules
+    "TID",  # flake8-tidy-imports
+]
+ignore = [
+    # Do not assign a lambda expression, use a def
+    "E731",
+    # Do not use variables named "l", "O" or "I"
+    "E741",
+    # Mutable class attributes are idiomatic in scikit-learn
+    # (e.g. "_parameter_constraints")
+    "RUF012",
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+known-first-party = ["sklr"]
+
+[tool.ruff.lint.per-file-ignores]
+# Imports are not at the top of the file in the gallery examples
+"examples/*" = ["E402"]
+"doc/conf.py" = ["E402"]
+
+[tool.cython-lint]
+max-line-length = 88
+ignore = [
+    # Do not assign a lambda expression, use a def
+    "E731",
+    # Do not use variables named "l", "O" or "I"
+    "E741",
+    # Line break before/after binary operator
+    "W503",
+    "W504",
+]
