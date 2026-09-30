@@ -17,11 +17,11 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/MarcoGorelli/cython-lint
-    rev: v0.21.1
+    rev: v0.21.1  # Configuration in pyproject.toml
     hooks:
       - id: cython-lint
-        args: ["--ban-relative-imports"]
-      - id: double-quote-cython-strings
+        args: ["--ban-relative-imports"]  # Same as ruff for Python files
+      - id: double-quote-cython-strings  # Same quotes as ruff format for Python files
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3  # Configuration in pyproject.toml
@@ -31,7 +31,7 @@ repos:
   - repo: local
     hooks:
       # Private scikit-learn modules may change without deprecation, so
-      # they are only imported from a single compatibility module.
+      # they are only imported from a single compatibility module
       - id: no-private-sklearn-imports
         name: private scikit-learn imports only in sklr/utils/_sklearn_compat.py
         language: pygrep
