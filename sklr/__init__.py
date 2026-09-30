@@ -6,6 +6,9 @@ import importlib as _importlib
 # version of the distribution, so keep it as a single string literal.
 __version__ = "0.3.dev0"
 
+# Fail early with a helpful message if the extension modules are not built
+from sklr import __check_build  # noqa: F401
+
 # Public subpackages, imported lazily on first attribute access
 _submodules: list[str] = []
 
