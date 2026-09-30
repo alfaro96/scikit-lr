@@ -10,8 +10,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Keep in sync with the ruff version in environment.yml
-    rev: v0.16.9
+    rev: v0.16.9  # Keep in sync with the ruff version in environment.yml
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
@@ -21,7 +20,13 @@ repos:
     rev: v0.21.1
     hooks:
       - id: cython-lint
+        args: ["--ban-relative-imports"]
       - id: double-quote-cython-strings
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3  # Configuration in pyproject.toml
+    hooks:
+      - id: codespell
 
   - repo: local
     hooks:
