@@ -1,4 +1,6 @@
 repos:
+  # Generic file checks: large files, merge conflict markers, valid TOML and
+  # YAML, final newline and trailing whitespace
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -9,6 +11,7 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
+  # Lint and format the Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.9  # Keep in sync with the ruff version in environment.yml
     hooks:
@@ -16,6 +19,7 @@ repos:
         args: ["--fix", "--show-fixes"]
       - id: ruff-format
 
+  # Lint the Cython code and normalize its string quotes
   - repo: https://github.com/MarcoGorelli/cython-lint
     rev: v0.21.1  # Configuration in pyproject.toml
     hooks:
@@ -23,11 +27,13 @@ repos:
         args: ["--ban-relative-imports"]  # Same as ruff for Python files
       - id: double-quote-cython-strings  # Same quotes as ruff format for Python files
 
+  # Find common misspellings in code, comments and documentation
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3  # Configuration in pyproject.toml
     hooks:
       - id: codespell
 
+  # Checks specific to this project
   - repo: local
     hooks:
       # Private scikit-learn modules may change without deprecation, so
