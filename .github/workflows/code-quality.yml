@@ -45,7 +45,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"  # Minimum supported version, as in environment.yml
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
 
       - name: Install pre-commit
         run: bash build_tools/github/install_pre_commit.sh

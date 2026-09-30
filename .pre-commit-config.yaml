@@ -50,12 +50,13 @@ repos:
         types: [python]
         exclude: ^sklr/utils/_sklearn_compat\.py$
 
-      # The versions of some packages are declared in several files, which
-      # are checked against each other to keep them from drifting apart
-      - id: check-environment
-        name: environment.yml in sync with pyproject.toml and the hooks
+      # The versions of some packages, and the supported Python versions, are
+      # declared in several files, which are checked against each other to
+      # keep them from drifting apart
+      - id: check-versions
+        name: versions in sync across pyproject.toml, environment.yml, the hooks and the workflows
         language: python
-        entry: python build_tools/check_environment.py
+        entry: python build_tools/check_versions.py
         additional_dependencies: [packaging, pyyaml]
-        files: ^(environment\.yml|pyproject\.toml|\.pre-commit-config\.yaml|build_tools/check_environment\.py)$
+        files: ^(environment\.yml|pyproject\.toml|\.pre-commit-config\.yaml|\.github/workflows/.*\.yml|build_tools/check_versions\.py)$
         pass_filenames: false
