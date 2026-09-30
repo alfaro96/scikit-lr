@@ -1,8 +1,13 @@
 # Run the pre-commit hooks on the whole repository
 name: Code quality checks
 
-# Only the branches that receive commits directly or through pull requests,
-# since the results depend on the code alone and the hooks are pinned
+# The hooks are pinned and only look at the files, so their result can only
+# change when the files of master or a release branch do. The pull requests
+# that target these branches are checked to fix the problems before merging.
+# The merges are checked again, because two pull requests that pass on their
+# own can break a hook once merged, as when one renames a function that the
+# other starts to use and the type checker fails. There is no scheduled run,
+# since nothing but a merge changes the result
 on:
   push:
     branches:
@@ -43,7 +48,7 @@ jobs:
           python-version: "3.13"  # Minimum supported version, as in environment.yml
 
       - name: Install pre-commit
-        run: python -m pip install pre-commit
+        run: bash build_tools/github/install_pre_commit.sh
 
       # pre-commit installs every hook in its own environment, which is slow to build
       - name: Cache the hook environments
@@ -56,4 +61,4 @@ jobs:
           key: pre-commit-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Run the hooks
-        run: pre-commit run --all-files --show-diff-on-failure --color=always
+        run: bash build_tools/github/run_pre_commit.sh
