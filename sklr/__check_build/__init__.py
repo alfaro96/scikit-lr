@@ -6,16 +6,7 @@ import os
 def raise_build_error(error):
     """Raise an :class:`ImportError` explaining that ``sklr`` is not built correctly.
 
-    Parameters
-    ----------
-    error : ImportError
-        Error raised when importing an extension module.
-
-    Raises
-    ------
-    ImportError
-        Always, with `error` as its cause and the contents of this directory,
-        to help debugging.
+    The contents of this directory are listed to help debugging.
     """
     local_dir = os.path.dirname(__file__)
     dir_content = "\n".join(sorted(os.listdir(local_dir)))
