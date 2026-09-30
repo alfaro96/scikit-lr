@@ -120,7 +120,7 @@ def check_cimported(runtime, build):
     for name in CIMPORTED_PACKAGES:
         if runtime.get(name) != build.get(name):
             errors.append(
-                "{name} must have the same range in project.dependencies and in "
+                f"{name} must have the same range in project.dependencies and in "
                 "build-system.requires in pyproject.toml, because its .pxd files "
                 f"are cimported, got {str(runtime.get(name))!r} and "
                 f"{str(build.get(name))!r}"
