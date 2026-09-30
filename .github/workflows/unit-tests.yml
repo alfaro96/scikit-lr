@@ -1,0 +1,76 @@
+# Build scikit-lr and run its tests
+name: Unit tests
+
+# The package is built and tested on every supported platform and Python
+# version, which a contributor rarely has at hand, so the pull requests that
+# target master or a release branch are tested before merging. The wheels of
+# a release are built from these branches, so the merges are tested again:
+# the merged commit was not tested as is if the branch moved after the pull
+# request was, and the latest releases of the dependencies, which most jobs
+# install from PyPI on every run, may have changed since then
+on:
+  push:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, while every push gets its
+  # own, so only the outdated runs of a pull request are cancelled
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }} (${{ matrix.dependencies }} dependencies)
+    runs-on: ${{ matrix.os }}
+    # Skip the runs in forks: their changes are tested here when they open a
+    # pull request, so running the matrix there as well would only spend
+    # the minutes of their account
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    strategy:
+      # Run every job to completion, since a failure in one of them
+      # says nothing about the others
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        # The versions in the classifiers of pyproject.toml
+        python: ["3.13", "3.14", "3.15"]
+        dependencies: [latest]
+        include:
+          # The minimum supported runtime dependencies, with the minimum
+          # supported Python version. The extension modules are still built
+          # against the latest build dependencies, as when installing a wheel
+          - os: ubuntu-latest
+            python: "3.13"
+            dependencies: minimum
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Build and install scikit-lr and pytest
+        env:
+          DEPENDENCIES: ${{ matrix.dependencies }}
+        run: bash build_tools/github/install.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
