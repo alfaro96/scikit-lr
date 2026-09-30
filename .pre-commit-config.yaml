@@ -23,10 +23,10 @@ repos:
         # The hook runs in an isolated environment, so install the
         # imported packages to type check against their annotations
         additional_dependencies:
-          - numpy>=2.2
-          - scipy>=1.15
-          - scikit-learn~=1.9.0
-          - pytest
+          - numpy==2.5.3
+          - scipy==1.18.1
+          - scikit-learn==1.9.1
+          - pytest==9.1.1
 
   - repo: https://github.com/MarcoGorelli/cython-lint
     rev: v0.21.1
@@ -57,6 +57,6 @@ repos:
         name: versions in sync across pyproject.toml, environment.yml, the hooks and the workflows
         language: python
         entry: python build_tools/check_versions.py
-        additional_dependencies: [packaging, pyyaml]
+        additional_dependencies: [packaging==26.3, pyyaml==6.0.3]
         files: ^(environment\.yml|pyproject\.toml|\.pre-commit-config\.yaml|\.github/workflows/.*\.yml|build_tools/check_versions\.py)$
         pass_filenames: false

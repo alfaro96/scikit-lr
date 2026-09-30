@@ -12,9 +12,10 @@ ranges as in ``pyproject.toml``, and its Python version must be the minimum
 supported one.
 
 The tools pinned in ``environment.yml`` that also run as pre-commit hooks must
-have the version of their hook in ``.pre-commit-config.yaml``, and the runtime
-dependencies installed in the environments of the hooks must have the same
-ranges as in ``pyproject.toml``.
+have the version of their hook in ``.pre-commit-config.yaml``. The packages
+installed in the environments of the hooks must be pinned, so the result of
+the hooks only changes with that file, and the pinned versions of the runtime
+dependencies must be within their ranges in ``pyproject.toml``.
 
 The minimum supported Python version is the lower bound of ``requires-python``
 in ``pyproject.toml``, and the classifiers list the supported versions from it.
@@ -276,22 +277,34 @@ def check_hook_versions(environment, repos):
 
 
 def check_hook_dependencies(repos, runtime):
-    """Check the ranges of the runtime dependencies installed in the hooks."""
+    """Check that the packages installed in the hooks are pinned and supported."""
     errors = []
     for repo in repos:
         for hook in repo["hooks"]:
-            specs = {}
+            source = (
+                f"the additional_dependencies of the {hook['id']} hook in "
+                ".pre-commit-config.yaml"
+            )
             for dependency in hook.get("additional_dependencies", []):
                 requirement = Requirement(dependency)
-                specs[canonicalize_name(requirement.name)] = str(requirement.specifier)
-            errors += check_dependencies(
-                f"the additional_dependencies of the {hook['id']} hook in "
-                ".pre-commit-config.yaml",
-                specs,
-                runtime,
-                "project.dependencies",
-                required=False,
-            )
+                pinned = [
+                    specifier.version
+                    for specifier in requirement.specifier
+                    if specifier.operator == "=="
+                ]
+                if len(requirement.specifier) != 1 or len(pinned) != 1:
+                    errors.append(
+                        f"{requirement.name} must be pinned with '==' in {source}, "
+                        f"got {dependency!r}"
+                    )
+                    continue
+                expected = runtime.get(canonicalize_name(requirement.name))
+                if expected is not None and pinned[0] not in expected:
+                    errors.append(
+                        f"{requirement.name} in {source} must be within the range "
+                        f"{str(expected)!r} of project.dependencies in "
+                        f"pyproject.toml, got {pinned[0]!r}"
+                    )
     return errors
 
 
