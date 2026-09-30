@@ -78,15 +78,12 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-preview = true  # Needed by CPY001
-explicit-preview-rules = true  # Only enable the preview rules selected by their full code
 extend-select = [
     "E501",  # Line too long
     "W",  # pycodestyle warnings
     "I",  # isort
     "UP",  # pyupgrade
     "NPY",  # NumPy-specific rules
-    "CPY001",  # Missing copyright notice
     "PGH",  # pygrep-hooks
     "RUF",  # Ruff-specific rules
     "TID252",  # Relative imports
@@ -99,10 +96,6 @@ ignore = [
     "RUF012",  # Mutable class attribute not annotated as shared by all instances, idiomatic in scikit-learn estimators
     "W191",  # Conflicts with the formatter
 ]
-
-[tool.ruff.lint.flake8-copyright]
-notice-rgx = '# Authors: The scikit-lr developers\r?\n# SPDX-License-Identifier: MIT'
-min-file-size = 1  # Empty files do not need the notice
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
