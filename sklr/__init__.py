@@ -6,8 +6,10 @@ import importlib as _importlib
 # version of the distribution, so keep it as a single string literal.
 __version__ = "0.3.dev0"
 
-# Fail early with a helpful message if the extension modules are not built
-from sklr import __check_build  # noqa: F401
+# Fail early with a helpful message if the extension modules are not built,
+# or were compiled against another scikit-learn. __check_build can be loaded
+# before the version check because it only uses scikit-learn typedefs
+from sklr import __check_build, _sklearn_version  # noqa: F401
 
 # Public subpackages, imported lazily on first attribute access
 _submodules: list[str] = []
