@@ -1,0 +1,59 @@
+# Run the pre-commit hooks on the whole repository
+name: Code quality checks
+
+# Only the branches that receive commits directly or through pull requests,
+# since the results depend on the code alone and the hooks are pinned
+on:
+  push:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, while every push gets its
+  # own, so only the outdated runs of a pull request are cancelled
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Pre-commit hooks
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, since their changes reach this repository
+    # through pull requests, which are checked here
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"  # Minimum supported version, as in environment.yml
+
+      - name: Install pre-commit
+        run: python -m pip install pre-commit
+
+      # pre-commit installs every hook in its own environment, which is slow to build
+      - name: Cache the hook environments
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pre-commit
+          # The environments depend on the operating system, the Python
+          # installation and the pre-commit configuration, so the key includes
+          # all of them and the cache is reused until any of them changes
+          key: pre-commit-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run the hooks
+        run: pre-commit run --all-files --show-diff-on-failure --color=always
