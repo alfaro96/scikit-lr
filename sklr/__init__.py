@@ -12,7 +12,7 @@ __version__ = "0.3.dev0"
 from sklr import __check_build, _sklearn_version  # noqa: F401
 
 # Public subpackages, imported lazily on first attribute access
-_submodules: list[str] = []
+_submodules = []
 
 __all__ = list(_submodules)
 
