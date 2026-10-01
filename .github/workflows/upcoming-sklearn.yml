@@ -1,0 +1,73 @@
+# Build scikit-lr against the upcoming scikit-learn and run its tests
+name: Upcoming scikit-learn
+
+# The extension modules cimport the internals of scikit-learn, and the Python
+# code may use its private API, both of which may change between its minor
+# releases without deprecation. Building and testing against the next release
+# every night finds those changes before it is published, and tells when a
+# release line of scikit-lr for it can be opened. The nightly wheels of
+# scikit-learn are built from its main branch, which moves on to the following
+# minor release when the first release candidate of the next one is prepared,
+# so the latest release on PyPI, release candidates included, is tested too.
+# The runs of the pull requests that change the workflow or its scripts check
+# them before they reach master, where the schedule runs
+on:
+  schedule:
+    # After the nightly wheels of scikit-learn are uploaded
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+    paths:
+      - .github/workflows/upcoming-sklearn.yml
+      - build_tools/github/build_requirements.py
+      - build_tools/github/install_upcoming_sklearn.sh
+      - build_tools/github/test_script.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, while every other run gets its
+  # own, so only the outdated runs of a pull request are cancelled
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  upcoming-sklearn:
+    name: scikit-learn ${{ matrix.sklearn }}
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, whose changes are tested here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    strategy:
+      # Run every job to completion, since a failure in one of them
+      # says nothing about the others
+      fail-fast: false
+      matrix:
+        # The nightly wheels, or the latest release on PyPI
+        sklearn: [nightly, latest]
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
+
+      - name: Build and install scikit-lr against the upcoming scikit-learn
+        env:
+          SKLEARN: ${{ matrix.sklearn }}
+        run: bash build_tools/github/install_upcoming_sklearn.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
