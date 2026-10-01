@@ -106,6 +106,20 @@ filterwarnings = [
     "error",  # Every warning is an error; add exceptions only for specific, documented third-party warnings
 ]
 
+[tool.coverage.run]
+# A package instead of a directory, so the paths in the reports are relative
+# to the directory that contains it, the root of the repository, as Codecov
+# needs to match them with the files in git
+source_pkgs = ["sklr"]
+# Measure the Cython modules built with the linetrace option of meson.options
+plugins = ["Cython.Coverage"]
+# The tracer based on sys.monitoring, the default on the newer Python
+# versions, does not support plugins
+core = "ctrace"
+# The build helpers are not installed, Meson runs them as scripts, and the
+# modules that Meson generates in the build directory are not in git
+omit = ["sklr/_build_utils/*", "build/*"]
+
 [tool.ruff]
 line-length = 88
 extend-exclude = [
