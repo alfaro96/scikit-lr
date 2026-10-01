@@ -1,5 +1,23 @@
 # scikit-lr
 
+[![Unit tests][unit-tests-badge]][unit-tests] [![Code quality checks][code-quality-badge]][code-quality] [![Wheels][wheels-badge]][wheels] [![Upcoming scikit-learn][upcoming-sklearn-badge]][upcoming-sklearn] [![Coverage][coverage-badge]][coverage] [![Ruff][ruff-badge]][ruff] [![PyPI][pypi-badge]][pypi] [![Python versions][python-badge]][pypi]
+
+[unit-tests-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/unit-tests.yml/badge.svg?branch=master
+[unit-tests]: https://github.com/alfaro96/scikit-lr/actions/workflows/unit-tests.yml?query=branch%3Amaster
+[code-quality-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/code-quality.yml/badge.svg?branch=master
+[code-quality]: https://github.com/alfaro96/scikit-lr/actions/workflows/code-quality.yml?query=branch%3Amaster
+[wheels-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/wheels.yml/badge.svg?branch=master
+[wheels]: https://github.com/alfaro96/scikit-lr/actions/workflows/wheels.yml?query=branch%3Amaster
+[upcoming-sklearn-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-sklearn.yml/badge.svg?event=schedule
+[upcoming-sklearn]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-sklearn.yml?query=event%3Aschedule
+[coverage-badge]: https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg
+[coverage]: https://codecov.io/gh/alfaro96/scikit-lr
+[ruff-badge]: https://img.shields.io/badge/code%20style-ruff-000000.svg
+[ruff]: https://github.com/astral-sh/ruff
+[pypi-badge]: https://img.shields.io/pypi/v/scikit-lr
+[python-badge]: https://img.shields.io/pypi/pyversions/scikit-lr
+[pypi]: https://pypi.org/project/scikit-lr
+
 scikit-lr is a Python package for label ranking and partial label ranking, built on top of [scikit-learn](https://scikit-learn.org) and distributed under the MIT license.
 
 In label ranking, each sample is associated with a ranking of a fixed set of labels instead of a single class, and the goal is to learn a model that predicts that ranking for new samples. Partial label ranking extends the problem to rankings with ties. scikit-lr provides estimators and metrics for both problems that follow the scikit-learn API, so they can be used with tools such as pipelines, cross-validation and hyperparameter search.
