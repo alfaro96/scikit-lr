@@ -55,6 +55,13 @@ requires = [
     "scikit-learn~=1.9.0",
 ]
 
+[tool.meson-python.args]
+# Install only the files needed at runtime. Otherwise, the wheels for Windows
+# would also carry the import library that MSVC creates for each extension
+# module, which is only used to link other code against it and is never
+# loaded by Python
+install = ["--tags=runtime,python-runtime"]
+
 [tool.cibuildwheel]
 # The Python versions in the classifiers, checked by build_tools/check_versions.py.
 # The free-threaded builds do not match, since they are not supported yet

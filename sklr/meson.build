@@ -29,6 +29,9 @@ configure_file(
   configuration: {'SKLEARN_BUILD_VERSION': sklearn_build_version},
   install: true,
   install_dir: py.get_install_dir() / 'sklr',
+  # Meson does not tag the generated files, which would otherwise
+  # be left out when installing only the runtime files
+  install_tag: 'python-runtime',
 )
 
 py.install_sources(
