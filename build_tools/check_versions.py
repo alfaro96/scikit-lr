@@ -22,6 +22,9 @@ in ``pyproject.toml``, and the classifiers list the supported versions from it.
 The unit tests must run on all the versions in the classifiers, the job with
 the minimum dependencies on the minimum version, and the workflows that set up
 a single Python version, instead of one from a matrix, must use the minimum.
+The wheels must be built for the versions in the classifiers too, because
+cibuildwheel would otherwise build them for every version that it knows of,
+including the ones released after the classifiers were last updated.
 
 Run it from the root of the repository.
 """
@@ -93,7 +96,7 @@ def read_workflows():
 
 
 def lookup(data, keys):
-    """Return the value at the path of `keys` in nested mappings, or None."""
+    """Return the value at the path of `keys` in nested mappings, or ``None``."""
     for key in keys:
         if not isinstance(data, dict) or key not in data:
             return None
@@ -102,7 +105,7 @@ def lookup(data, keys):
 
 
 def minimum_python(requires_python):
-    """Return the minimum supported Python version, or None if not found."""
+    """Return the minimum supported Python version, or ``None`` if not found."""
     minimum = [
         specifier.version
         for specifier in SpecifierSet(requires_python)
@@ -189,8 +192,24 @@ def check_setup_python(workflows, minimum):
     return errors
 
 
-def check_python_versions(environment, project, workflows):
+def check_cibuildwheel(build, versions):
+    """Check that the wheels are built for the supported Python versions."""
+    # The wheels can also be built for free-threaded Python (without the GIL),
+    # whose names have a "t" after the version, so the patterns end the version
+    # with "-" to leave those wheels out
+    expected = sorted(f"cp{version.replace('.', '')}-*" for version in versions)
+    if not isinstance(build, list) or sorted(build) != expected:
+        message = (
+            "build in [tool.cibuildwheel] in pyproject.toml must be "
+            f"{expected!r}, the Python versions in the classifiers, got {build!r}"
+        )
+        return [message]
+    return []
+
+
+def check_python_versions(environment, pyproject, workflows):
     """Check every declaration of the supported Python versions."""
+    project = pyproject["project"]
     requires_python = project["requires-python"]
     minimum = minimum_python(requires_python)
     if minimum is None:
@@ -212,11 +231,13 @@ def check_python_versions(environment, project, workflows):
         )
         return [message]
     matrix = lookup(workflows.get(UNIT_TESTS_WORKFLOW), UNIT_TESTS_MATRIX)
+    build = lookup(pyproject, ["tool", "cibuildwheel", "build"])
     return [
         *check_python(environment, minimum),
         *check_classifiers(versions, minimum),
         *check_unit_tests(matrix, versions, minimum),
         *check_setup_python(workflows, minimum),
+        *check_cibuildwheel(build, versions),
     ]
 
 
@@ -324,7 +345,7 @@ def main():
 
     errors = [
         *check_cimported(runtime, build),
-        *check_python_versions(environment, pyproject["project"], workflows),
+        *check_python_versions(environment, pyproject, workflows),
         *check_dependencies(
             "environment.yml",
             environment,

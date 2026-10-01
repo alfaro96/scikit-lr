@@ -55,6 +55,35 @@ requires = [
     "scikit-learn~=1.9.0",
 ]
 
+[tool.cibuildwheel]
+# The Python versions in the classifiers, checked by build_tools/check_versions.py.
+# The free-threaded builds do not match, since they are not supported yet
+build = ["cp313-*", "cp314-*", "cp315-*"]
+# scikit-learn has no wheels for musl, so it is built from source there and a
+# wheel of scikit-lr would not spare users from compiling
+skip = ["*-musllinux_*"]
+# scikit-learn has no wheels for 32-bit platforms either
+archs = ["auto64"]
+build-verbosity = 1
+test-requires = ["pytest"]
+# The tests run in a directory without the sources, so the installed wheel is
+# tested, and pytest needs pyproject.toml there to read the options of the project
+test-sources = ["pyproject.toml"]
+test-command = "python -m pytest --pyargs sklr"
+
+[tool.cibuildwheel.windows]
+# Use MSVC, the compiler of CPython on Windows, instead of the
+# MinGW compiler that the runner also has in the PATH
+config-settings = {setup-args = "--vsenv"}
+
+[tool.check-sdist]
+# The files left out of the source distribution, which must
+# match the export-ignore patterns in .gitattributes
+git-only = [".*", "build_tools"]
+# Do not ignore the files that check-sdist ignores by default, such as
+# bytecode, so only the patterns above are allowed to differ
+default-ignore = false
+
 [tool.pytest.ini_options]
 testpaths = ["sklr"]
 addopts = [
