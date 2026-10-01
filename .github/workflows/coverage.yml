@@ -1,0 +1,82 @@
+# Measure the code covered by the tests and upload it to Codecov
+name: Coverage
+
+# The coverage of the Python code is measured on the same events as the unit
+# tests, so the status checks of a pull request report how its changes affect
+# the coverage. Tracing the lines of the Cython modules slows them down, so
+# their coverage is only measured every night and when the workflow is run by
+# hand
+on:
+  push:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, while every push gets its
+  # own, so only the outdated runs of a pull request are cancelled
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: Coverage of the ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'Python and Cython' || 'Python' }} code
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, whose changes are measured here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    permissions:
+      contents: read
+      # Authenticate to Codecov with OpenID Connect instead of a token. The
+      # pull requests from forks do not get it and upload without a token
+      id-token: write
+
+    env:
+      LINETRACE: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+
+    defaults:
+      run:
+        # A login shell, to activate the environment
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # The development environment, which has the build dependencies
+      # needed for the editable install and the minimum Python version. It
+      # is not cached, so every run gets the latest releases of its packages
+      - name: Set up the development environment
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: environment.yml
+
+      - name: Build and install scikit-lr in editable mode
+        run: bash build_tools/github/install_editable.sh
+
+      - name: Run the tests measuring their coverage
+        run: bash build_tools/github/test_coverage.sh
+
+      - name: Upload the coverage report to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: coverage.xml
+          disable_search: true
+          # The flags select the files of each report, as configured
+          # in .github/codecov.yml
+          flags: ${{ env.LINETRACE == 'true' && 'cython' || 'python' }}
+          use_oidc: true
