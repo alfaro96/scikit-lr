@@ -36,6 +36,15 @@ pre-commit run --all-files
 
 The `pre-commit` hooks run `ruff` (lint and format), `pyrefly` (type checking), `cython-lint` and `codespell`, among others.
 
+New code should be covered by the tests. To see the lines that they miss:
+
+```
+coverage run -m pytest sklr
+coverage report --show-missing
+```
+
+The coverage of the Cython extensions is measured every night by the continuous integration, which compiles them with the `linetrace` option of `meson.options`.
+
 ## Guidelines
 
 * Follow the [scikit-learn API](https://scikit-learn.org/stable/developers/develop.html): estimators must pass the scikit-learn estimator checks.
