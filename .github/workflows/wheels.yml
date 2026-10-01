@@ -4,8 +4,11 @@ name: Wheels and source distribution
 # What is checked here is what users install, built as it is released, so the
 # pull requests that target master or a release branch are checked before
 # merging, and the merges again, since the merged commit may differ from the
-# one checked and the dependencies from PyPI may have changed. It can also be
-# run by hand, to get the wheels of a branch without opening a pull request
+# one checked and the dependencies from PyPI may have changed. Publishing a
+# GitHub release builds the distributions of its tag and uploads them to PyPI.
+# It can also be run by hand, to get the wheels of a branch without opening a
+# pull request, or to upload the distributions of a tag to TestPyPI and test
+# them from there before a release
 on:
   push:
     branches:
@@ -16,7 +19,18 @@ on:
     branches:
       - master
       - "[0-9]+.[0-9]+.X"
+  release:
+    types:
+      - published
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Repository to upload the distributions to, when run from a tag
+        type: choice
+        options:
+          - none
+          - testpypi
+        default: none
 
 permissions:
   contents: read
@@ -127,3 +141,77 @@ jobs:
         with:
           name: sdist
           path: dist/*.tar.gz
+
+  publish:
+    name: Publish to ${{ github.event_name == 'release' && 'PyPI' || 'TestPyPI' }}
+    needs: [wheels, sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || inputs.publish == 'testpypi'
+    # The trusted publisher of the project on PyPI (and on TestPyPI) only
+    # accepts uploads from this workflow in this environment, whose
+    # protection rules on GitHub can restrict who deploys and from which tags
+    environment:
+      name: ${{ github.event_name == 'release' && 'pypi' || 'testpypi' }}
+      url: ${{ github.event_name == 'release' && 'https://pypi.org' || 'https://test.pypi.org' }}/project/scikit-lr/${{ github.ref_name }}/
+    permissions:
+      contents: read
+      # Trusted publishing authenticates with an OpenID Connect token
+      # of the job instead of an API token stored as a secret
+      id-token: write
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Download the distributions
+        uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Check the distributions
+        env:
+          DIST_DIR: dist
+        run: bash build_tools/github/check_release.sh
+
+      - name: Publish to PyPI
+        if: github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@v1.14.2
+
+      - name: Publish to TestPyPI
+        if: github.event_name != 'release'
+        uses: pypa/gh-action-pypi-publish@v1.14.2
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  test-testpypi:
+    name: Test the release from TestPyPI
+    needs: publish
+    runs-on: ubuntu-latest
+    if: inputs.publish == 'testpypi'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install scikit-lr from TestPyPI and pytest
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: bash build_tools/github/install_testpypi.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
