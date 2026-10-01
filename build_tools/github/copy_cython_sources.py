@@ -4,7 +4,7 @@ The ``Cython.Coverage`` plugin of ``coverage.py`` reads the executable lines of
 a Cython module from the C file generated from it, which it looks for next to
 the source, with the same name. Meson writes that file in the build directory
 instead, inside the private directory of the extension module, under the same
-relative path as the source, so it is copied to the source tree, where git
+relative path as the source, so it is copied to the source tree, where ``git``
 ignores it.
 
 Run it from the root of the repository after an editable install, which builds

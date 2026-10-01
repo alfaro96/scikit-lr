@@ -11,7 +11,7 @@ The runtime and build dependencies in ``environment.yml`` must have the same
 ranges as in ``pyproject.toml``, and its Python version must be the minimum
 supported one.
 
-The tools pinned in ``environment.yml`` that also run as pre-commit hooks must
+The tools pinned in ``environment.yml`` that also run as ``pre-commit`` hooks must
 have the version of their hook in ``.pre-commit-config.yaml``. The packages
 installed in the environments of the hooks must be pinned, so the result of
 the hooks only changes with that file, and the pinned versions of the runtime
@@ -23,7 +23,7 @@ The unit tests must run on all the versions in the classifiers, the job with
 the minimum dependencies on the minimum version, and the workflows that set up
 a single Python version, instead of one from a matrix, must use the minimum.
 The wheels must be built for the versions in the classifiers too, because
-cibuildwheel would otherwise build them for every version that it knows of,
+``cibuildwheel`` would otherwise build them for every version that it knows of,
 including the ones released after the classifiers were last updated.
 
 Run it from the root of the repository.

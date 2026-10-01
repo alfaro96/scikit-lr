@@ -1,7 +1,7 @@
 """Check that the wheels contain exactly the files of the package.
 
 The files of a wheel are compared with the ones expected from the files of
-``sklr`` tracked by git, so a wheel can neither miss a module that the
+``sklr`` tracked by ``git``, so a wheel can neither miss a module that the
 ``meson.build`` files forgot to install nor carry files that do not run. A
 wheel must have the Python files, except the build helpers in
 ``sklr/_build_utils``, an extension module for each Cython source, and the
@@ -30,7 +30,7 @@ EXTENSION_SUFFIXES = (".so", ".pyd")
 
 
 def tracked_files():
-    """Return the files of the package tracked by git."""
+    """Return the files of the package tracked by ``git``."""
     output = subprocess.run(
         ["git", "ls-files", "-z", PACKAGE],
         capture_output=True,

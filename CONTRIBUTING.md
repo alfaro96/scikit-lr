@@ -10,7 +10,7 @@ Note that communications on all channels should respect our [code of conduct](CO
 
 ## Development environment
 
-scikit-lr contains Cython extensions, so it must be compiled to be used from the source tree. The development environment is declared in `environment.yml` and uses packages from [conda-forge](https://conda-forge.org). With [micromamba](https://mamba.readthedocs.io) (or conda):
+scikit-lr contains Cython extensions, so it must be compiled to be used from the source tree. The development environment is declared in `environment.yml` and uses packages from [conda-forge](https://conda-forge.org). With [`micromamba`](https://mamba.readthedocs.io) (or `conda`):
 
 ```
 git clone https://github.com/alfaro96/scikit-lr.git

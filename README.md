@@ -59,4 +59,4 @@ The project was started in 2019 as the Ph.D. thesis of Juan Carlos Alfaro Jimén
 
 ## License
 
-scikit-lr is distributed under the MIT license. See [COPYING](COPYING).
+scikit-lr is distributed under the MIT license. See [`COPYING`](COPYING).
