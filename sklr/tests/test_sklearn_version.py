@@ -3,6 +3,7 @@ import sys
 
 import pytest
 
+from sklr._build_info import SKLEARN_BUILD_VERSION
 from sklr._sklearn_version import check_sklearn_version
 
 
@@ -39,10 +40,12 @@ def test_check_sklearn_version_different_minor(build_version, runtime_version):
 
 
 def test_import_with_other_sklearn_version():
+    # A release that differs in major from the one sklr was built against
+    other_version = f"{int(SKLEARN_BUILD_VERSION.split('.')[0]) + 1}.0.0"
     # Run it in a fresh interpreter, where sklr has not been imported yet
     code = (
         "import sklearn\n"
-        "sklearn.__version__ = '1.10.0'\n"
+        f"sklearn.__version__ = {other_version!r}\n"
         "try:\n"
         "    import sklr\n"
         "except ImportError as error:\n"
@@ -53,4 +56,4 @@ def test_import_with_other_sklearn_version():
     result = subprocess.run(
         [sys.executable, "-c", code], capture_output=True, text=True, check=True
     )
-    assert "scikit-learn 1.10.0 is installed" in result.stdout
+    assert f"scikit-learn {other_version} is installed" in result.stdout
