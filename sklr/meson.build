@@ -17,6 +17,21 @@ print(Path(spec.submodule_search_locations[0]).parent)
 
 cython_args = ['--include-dir', sklearn_include_dir]
 
+if get_option('linetrace')
+  # Cython only emits the calls that report each executed line when the
+  # directive is set, and the C code only compiles them in with the macro,
+  # which also covers the code that runs without the GIL. The plugin that
+  # coverage.py needs for Cython only works with its tracer based on
+  # sys.settrace, which does not receive the sys.monitoring events that
+  # Cython reports by default on the newer Python versions
+  cython_args += ['-X', 'linetrace=True']
+  add_project_arguments(
+    '-DCYTHON_TRACE_NOGIL=1',
+    '-DCYTHON_USE_SYS_MONITORING=0',
+    language: 'c',
+  )
+endif
+
 # Checked against the scikit-learn found at runtime when importing sklr
 sklearn_build_version = run_command(py,
   ['-c', 'import importlib.metadata; print(importlib.metadata.version("scikit-learn"))'],
