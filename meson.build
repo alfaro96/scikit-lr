@@ -11,8 +11,7 @@ project(
 
 py = import('python').find_installation(pure: false)
 
-# Install the sklr directory as is, so new Python files are picked up
-# without listing each of them (as py.install_sources() would require)
-install_subdir('sklr', install_dir: py.get_install_dir())
-
+# Each meson.build installs the Python files of its directory, listed one by
+# one, so the wheels only get the files that run (not the Cython sources, the
+# build helpers or the bytecode left in the source tree)
 subdir('sklr')

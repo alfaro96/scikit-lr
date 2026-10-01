@@ -31,4 +31,13 @@ configure_file(
   install_dir: py.get_install_dir() / 'sklr',
 )
 
+py.install_sources(
+  [
+    '__init__.py',
+    '_sklearn_version.py',
+  ],
+  subdir: 'sklr',
+)
+
+subdir('tests')
 subdir('__check_build')

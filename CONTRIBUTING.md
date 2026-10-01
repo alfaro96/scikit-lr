@@ -23,6 +23,8 @@ pre-commit install
 
 The editable install recompiles the extensions when `sklr` is imported, so there is no need to reinstall after changing a Cython file.
 
+The `meson.build` file of each directory lists the files that are installed, so a new Python module or Cython extension must be added to it. Otherwise it cannot be imported, and the continuous integration reports that it is missing from the wheels.
+
 ## Checks
 
 Before submitting a pull request, make sure that the tests and the linters pass:

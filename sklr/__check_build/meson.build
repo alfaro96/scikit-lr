@@ -1,3 +1,8 @@
+py.install_sources(
+  ['__init__.py'],
+  subdir: 'sklr/__check_build',
+)
+
 py.extension_module(
   '_check_build',
   '_check_build.pyx',
@@ -5,3 +10,5 @@ py.extension_module(
   install: true,
   subdir: 'sklr/__check_build',
 )
+
+subdir('tests')
