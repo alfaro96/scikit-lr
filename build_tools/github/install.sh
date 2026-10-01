@@ -2,8 +2,7 @@
 
 set -e
 
-# pytest also installs packaging, used to read the minimum versions
-python -m pip install pytest
+python -m pip install pytest packaging
 
 options=()
 
