@@ -10,7 +10,9 @@ name: Upcoming scikit-learn
 # minor release when the first release candidate of the next one is prepared,
 # so the latest release on PyPI, release candidates included, is tested too.
 # The runs of the pull requests that change the workflow or its scripts check
-# them before they reach master, where the schedule runs
+# them before they reach master, where the schedule runs. A failure of the
+# scheduled or manual runs opens an issue, since nobody may look at them, and
+# the issue is closed once they pass again
 on:
   schedule:
     # After the nightly wheels of scikit-learn are uploaded
@@ -71,3 +73,36 @@ jobs:
 
       - name: Run the tests
         run: bash build_tools/github/test_script.sh
+
+  update-tracking-issue:
+    name: Update the tracking issue
+    needs: upcoming-sklearn
+    runs-on: ubuntu-latest
+    # Only the scheduled and manual runs, which test master or the branch
+    # chosen by hand, report to the issue; the runs of the pull requests are
+    # reported on them. It also runs when a job of the matrix fails, so that
+    # failure opens the issue
+    if: >-
+      always() && github.repository == 'alfaro96/scikit-lr' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+
+    permissions:
+      # Open, edit and close the issue with the token of the job
+      issues: write
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Open, update or close the issue
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          LABEL: continuous integration
+          # The result of the whole matrix, a failure if any of its jobs failed
+          RESULT: ${{ needs.upcoming-sklearn.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: bash build_tools/github/update_tracking_issue.sh
