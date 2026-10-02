@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a bug so that it can be reproduced and fixed.
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Before reporting a bug, please search the [past issues](https://github.com/alfaro96/scikit-lr/issues?q=)
+        to make sure that it has not been reported already.
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: >
+        A clear and concise description of what the bug is, and how it affects your use of scikit-lr.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: |
+        A [minimal example](https://scikit-learn.org/stable/developers/minimal_reproducer.html) that reproduces the bug when it is run as it is. It should only use the public API of scikit-lr and synthetic data, generated with `numpy.random` or a few lines of code, instead of your own data files.
+      placeholder: |
+        ```python
+        Code that reproduces the bug
+        ```
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected results
+      description: The results that you expected.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual results
+      description: The results that you got instead. If an exception is raised, paste the full traceback.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Versions
+      description: |
+        Paste the output of the following command. If `sklr` cannot be imported, paste the output of `python -c "import sklearn; sklearn.show_versions()"` instead.
+        ```
+        python -c "import sklr; sklr.show_versions()"
+        ```
+      render: shell
+    validations:
+      required: true
