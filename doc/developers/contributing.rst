@@ -192,8 +192,9 @@ Before submitting a pull request, make sure that the tests and the linters pass:
    $ pre-commit run --all-files
 
 The ``pre-commit`` hooks run ``ruff`` (lint and format), ``pyrefly`` (type checking),
-``cython-lint`` and ``codespell``, among others. They only look at the files tracked
-by ``git``, so add the new files before running them.
+``cython-lint``, ``sphinx-lint`` (reStructuredText) and ``codespell``, among others.
+They only look at the files tracked by ``git``, so add the new files before running
+them.
 
 .. _testing:
 
