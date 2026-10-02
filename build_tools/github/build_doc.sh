@@ -2,6 +2,6 @@
 
 set -e
 
-python -c "import sklearn; sklearn.show_versions()"
+python -c "import sklr; sklr.show_versions()"
 
 make -C doc html

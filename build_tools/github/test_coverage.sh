@@ -2,7 +2,7 @@
 
 set -e
 
-python -c "import sklearn; sklearn.show_versions()"
+python -c "import sklr; sklr.show_versions()"
 
 if [[ "$LINETRACE" == "true" ]]; then
     python build_tools/github/copy_cython_sources.py

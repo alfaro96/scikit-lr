@@ -2,8 +2,6 @@
 
 set -e
 
-python -c "import sklearn; sklearn.show_versions()"
-
 # Run the tests of the installed package from outside the repository,
 # so the sources of the checkout are not imported by mistake
 test_dir="$RUNNER_TEMP/tests"
@@ -15,5 +13,7 @@ mkdir -p "$test_dir"
 # copied as well, to run their examples against the installed package
 cp -r pyproject.toml doc "$test_dir"
 cd "$test_dir"
+
+python -c "import sklr; sklr.show_versions()"
 
 python -m pytest --pyargs sklr doc
