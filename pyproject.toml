@@ -174,6 +174,14 @@ ignore = [
 [tool.codespell]
 skip = ["./.git", "./build", "./doc/_build", "./doc/auto_examples", "./doc/modules/generated"]
 
+# The check of the changelog entries in the pull requests, which looks for
+# the fragments in the directories and with the types of [tool.towncrier]
+[tool.changelog-bot.towncrier_changelog]
+enabled = true
+# The fragment of a pull request is named after its number
+verify_pr_number = true
+changelog_noop_label = "no changelog needed"
+
 [tool.towncrier]
 package = "sklr"
 # The file of the upcoming minor release, changed when the next one starts

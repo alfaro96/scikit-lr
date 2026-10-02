@@ -173,6 +173,10 @@ The pull requests are checked by these workflows of GitHub Actions:
 
 * "CodeQL" looks for security problems in the Python code and the workflows.
 
+* "Check changelog" checks that a pull request that changes the tests adds a
+  :ref:`changelog entry <changelog>` named after its number, unless a maintainer
+  labels it "no changelog needed" because it does not affect users.
+
 The workflow "Upcoming scikit-learn" runs every night instead, and builds and tests
 scikit-lr against the next release of scikit-learn (see
 :ref:`sklearn_version_coupling`). When it fails, it opens an issue, which it closes
