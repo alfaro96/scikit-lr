@@ -51,8 +51,8 @@ comments, beyond fixing the grammar or translating your own words.
 
 This policy does not cover the automated tools that the maintainers set up for the
 project, such as the bot that updates the pinned versions of the tools and the
-actions. Their pull requests are reviewed by a maintainer before merging, like any
-other.
+actions, or the workflows that open an issue when they fail. Their pull requests are
+reviewed by a maintainer before merging, like any other.
 
 .. _submitting_bug_feature:
 
@@ -176,7 +176,8 @@ The pull requests are checked by these workflows of GitHub Actions:
 
 The workflow "Upcoming scikit-learn" runs every night instead, and builds and tests
 scikit-lr against the next release of scikit-learn (see
-:ref:`sklearn_version_coupling`).
+:ref:`sklearn_version_coupling`). When it fails, it opens an issue, which it closes
+once it passes again.
 
 .. _checks:
 
