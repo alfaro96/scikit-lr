@@ -36,9 +36,11 @@ permissions:
   contents: read
 
 concurrency:
-  # The runs of a pull request share a group, while every push gets its
-  # own, so only the outdated runs of a pull request are cancelled
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # while every other run gets its own, so only the outdated runs of a pull
+  # request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
