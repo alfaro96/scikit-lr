@@ -82,7 +82,7 @@ To learn more about making a contribution to scikit-lr, see our [contributing gu
 After installation, you can launch the test suite with `pytest`:
 
 ```
-pytest sklr
+pytest --pyargs sklr
 ```
 
 See [testing and improving test coverage](https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html#testing-and-improving-test-coverage) for more information.
