@@ -60,3 +60,4 @@ py.install_sources(
 
 subdir('tests')
 subdir('__check_build')
+subdir('utils')
