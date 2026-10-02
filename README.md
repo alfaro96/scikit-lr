@@ -35,8 +35,6 @@ scikit-lr requires:
 * SciPy (>= 1.15)
 * scikit-learn (1.9.x)
 
-scikit-lr is compiled against a specific minor release of scikit-learn, so each release of scikit-lr supports only one minor release of scikit-learn.
-
 ### User installation
 
 The easiest way to install scikit-lr is using `pip`:
@@ -45,9 +43,21 @@ The easiest way to install scikit-lr is using `pip`:
 pip install -U scikit-lr
 ```
 
+The documentation includes more detailed [installation instructions](https://alfaro96.github.io/scikit-lr/dev/install.html).
+
+## Documentation
+
+* [User guide](https://alfaro96.github.io/scikit-lr/dev/user_guide.html)
+* [API reference](https://alfaro96.github.io/scikit-lr/dev/api/index.html)
+* [Examples](https://alfaro96.github.io/scikit-lr/dev/auto_examples/index.html)
+
+## Changelog
+
+See the [release history](https://alfaro96.github.io/scikit-lr/dev/whats_new.html) for a history of notable changes to scikit-lr.
+
 ## Development
 
-Contributions are welcome. See the [contributing guide](CONTRIBUTING.md) to set up a development environment, and note that all communications should respect our [code of conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome. The [developer's guide](https://alfaro96.github.io/scikit-lr/dev/developers/index.html) has detailed information about contributing code, documentation and tests, and about the Cython extensions. All communications should respect our [code of conduct](CODE_OF_CONDUCT.md).
 
 ### Important links
 
@@ -63,6 +73,10 @@ You can check the latest sources with the command:
 git clone https://github.com/alfaro96/scikit-lr.git
 ```
 
+### Contributing
+
+To learn more about making a contribution to scikit-lr, see our [contributing guide](https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html).
+
 ### Testing
 
 After installation, you can launch the test suite with `pytest`:
@@ -70,6 +84,8 @@ After installation, you can launch the test suite with `pytest`:
 ```
 pytest sklr
 ```
+
+See [testing and improving test coverage](https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html#testing-and-improving-test-coverage) for more information.
 
 ## Project history
 
