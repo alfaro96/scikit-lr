@@ -44,12 +44,13 @@ repos:
 
   - repo: local
     hooks:
-      # Private scikit-learn modules may change without deprecation, so
-      # they are only imported from a single compatibility module
+      # The private API of scikit-learn, its modules and names, may change
+      # without deprecation, so it is only imported from a single
+      # compatibility module
       - id: no-private-sklearn-imports
         name: private scikit-learn imports only in sklr/utils/_sklearn_compat.py
-        language: pygrep
-        entry: '^\s*(from|import)\s+sklearn(\.\w+)*\._'
+        language: python
+        entry: python build_tools/check_private_sklearn_imports.py
         types: [python]
         exclude: ^sklr/utils/_sklearn_compat\.py$
 
