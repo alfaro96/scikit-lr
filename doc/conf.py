@@ -24,6 +24,11 @@ root_doc = "index"
 templates_path = ["templates"]
 exclude_patterns = ["_build", "templates", "sg_execution_times.rst"]
 
+# Render the text between single backticks without a role, which marks the
+# parameters and attributes of the documented object, as code, as scikit-learn
+# does, instead of in italics
+default_role = "literal"
+
 # Document the methods of a class on its own page, as the autosummary template
 # does, instead of in a table of numpydoc with a separate page for each one
 numpydoc_show_class_members = False
