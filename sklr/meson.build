@@ -54,6 +54,9 @@ py.install_sources(
     '__init__.py',
     '_sklearn_version.py',
     'conftest.py',
+    # Tells type checkers that the package ships the type hints of its public
+    # API (PEP 561)
+    'py.typed',
   ],
   subdir: 'sklr',
 )
