@@ -173,3 +173,63 @@ ignore = [
 
 [tool.codespell]
 skip = ["./.git", "./build", "./doc/_build", "./doc/auto_examples", "./doc/modules/generated"]
+
+[tool.towncrier]
+package = "sklr"
+# The file of the upcoming minor release, changed when the next one starts
+filename = "doc/whats_new/v0.3.rst"
+single_file = true
+directory = "doc/whats_new/upcoming_changes"
+issue_format = ":pr:`{issue}`"
+template = "doc/whats_new/upcoming_changes/towncrier_template.rst.jinja2"
+# Each fragment is already a bullet point
+all_bullets = false
+
+# The types of change, in the order in which they are listed in each
+# section, with the badges defined in doc/whats_new/changelog_legend.inc
+[[tool.towncrier.type]]
+directory = "major-feature"
+name = "|MajorFeature|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "|Feature|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "efficiency"
+name = "|Efficiency|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "enhancement"
+name = "|Enhancement|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fix"
+name = "|Fix|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "api"
+name = "|API|"
+showcontent = true
+
+# Without a badge
+[[tool.towncrier.type]]
+directory = "other"
+name = ""
+showcontent = true
+
+# The sections of the release notes, one per directory of fragments: the
+# changes without a module, listed first and without a title, and then a
+# section per public module
+[[tool.towncrier.section]]
+name = "custom-top-level"
+path = "custom-top-level"
+
+[[tool.towncrier.section]]
+name = ":mod:`sklr`"
+path = "sklr"

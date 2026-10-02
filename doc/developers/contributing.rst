@@ -141,8 +141,7 @@ Before asking for a review, make sure that:
 * The public API is documented, and new features are described in the user guide
   and shown in an example (see :ref:`documentation`).
 
-* A change that affects users has an entry in the release history, in the file of
-  the upcoming version in ``doc/whats_new``.
+* A change that affects users has a :ref:`changelog entry <changelog>`.
 
 * The :ref:`checks <checks>` pass locally, and the continuous integration passes
   once the pull request is opened.
@@ -259,7 +258,8 @@ The documentation has four parts, written in reStructuredText:
 * The examples, in ``examples``, which Sphinx-Gallery runs and renders when the
   documentation is built.
 
-* The release history, with a file per version in ``doc/whats_new``.
+* The release history, with a file per minor release in ``doc/whats_new``, which is
+  generated from the :ref:`changelog entries <changelog>` of the pull requests.
 
 Docstrings follow the `numpydoc style guide
 <https://numpydoc.readthedocs.io/en/latest/format.html>`_ and, for what it leaves
@@ -271,6 +271,53 @@ public API pass the `validation checks of numpydoc
 except the ones that scikit-learn ignores, as ``sklr/tests/test_docstrings.py``
 tests. The examples of the docstrings and of the pages run as tests without the
 names of the module where they are, so they must import everything they use.
+
+.. _changelog:
+
+Changelog entries
+~~~~~~~~~~~~~~~~~
+
+A pull request that affects users describes its changes in a changelog fragment, a
+short reStructuredText file in ``doc/whats_new/upcoming_changes`` that `towncrier
+<https://towncrier.readthedocs.io>`_ adds to the release history of the upcoming
+version when it is released. The release history is not edited by hand, so that the
+pull requests do not conflict with each other.
+
+The fragment goes in the directory of the public module that the pull request
+changes, such as ``sklr``, or in ``custom-top-level`` if it changes none in
+particular. Each directory is a section of ``[tool.towncrier]`` in ``pyproject.toml``,
+so a pull request that adds a public module also adds its section there. The
+fragment is named ``<pull request>.<type>.rst``, with the number of the pull
+request and one of these types, whose meaning the legend of the release history
+explains:
+
+* ``major-feature``
+* ``feature``
+* ``efficiency``
+* ``enhancement``
+* ``fix``
+* ``api``
+* ``other``, without a badge, mostly for ``custom-top-level``.
+
+A pull request with more than one change of the same type and directory adds a
+counter to the name of the other fragments, as in ``<pull request>.<type>.1.rst``.
+Each fragment is a single bullet point, which ends by crediting its authors with the
+``:user:`` role and their GitHub username, and the link to the pull request is added
+when the release history is generated. For example, the pull request that added
+:func:`~sklr.show_versions` added ``99.feature.rst`` to the ``sklr`` directory:
+
+.. code-block:: rst
+
+   * :func:`show_versions` prints the versions of scikit-lr, of the scikit-learn that
+     it was built against and of the dependencies, to include them in bug reports.
+     By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`.
+
+The documentation of the development version renders the fragments into the release
+history of the upcoming version. To preview it locally, run:
+
+.. code-block:: console
+
+   $ towncrier build --draft
 
 .. _building_documentation:
 

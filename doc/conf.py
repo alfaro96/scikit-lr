@@ -16,13 +16,20 @@ extensions = [
     "numpydoc",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx_gallery.gen_gallery",
 ]
 
 root_doc = "index"
 templates_path = ["templates"]
-exclude_patterns = ["_build", "templates", "sg_execution_times.rst"]
+# The changelog fragments are only rendered through the release history
+exclude_patterns = [
+    "_build",
+    "templates",
+    "sg_execution_times.rst",
+    "whats_new/upcoming_changes",
+]
 
 # Render the text between single backticks without a role, which marks the
 # parameters and attributes of the documented object, as code, as scikit-learn
@@ -44,6 +51,13 @@ intersphinx_mapping = {
         "https://scikit-learn.org/{}.{}".format(*sklearn.__version__.split(".")),
         None,
     ),
+}
+
+# The roles of the changelog entries, which link the pull request
+# and the GitHub profile of its author
+extlinks = {
+    "pr": ("https://github.com/alfaro96/scikit-lr/pull/%s", "#%s"),
+    "user": ("https://github.com/%s", "%s"),
 }
 
 sphinx_gallery_conf = {

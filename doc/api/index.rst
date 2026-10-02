@@ -10,7 +10,7 @@ more details on how to use them.
 :mod:`sklr`: Utilities
 ----------------------
 
-.. currentmodule:: sklr
+.. module:: sklr
 
 .. autosummary::
    :toctree: ../modules/generated/
