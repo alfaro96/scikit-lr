@@ -92,12 +92,13 @@ git-only = [".*", "build_tools"]
 default-ignore = false
 
 [tool.pytest.ini_options]
-testpaths = ["sklr"]
+testpaths = ["sklr", "doc"]
 addopts = [
     "--import-mode=importlib",  # Do not prepend test directories to sys.path, so the installed sklr is tested
     "--strict-config",  # Fail on unknown keys in this section
     "--strict-markers",  # Fail on markers that are not registered
     "--doctest-modules",  # Also run the examples in the docstrings
+    "--doctest-glob=*.rst",  # And in the pages of the documentation
     "-ra",  # Report the reason of every test that does not pass (skipped, xfailed, xpassed, failed, error)
 ]
 doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"  # Ignore whitespace differences and let "..." match any output

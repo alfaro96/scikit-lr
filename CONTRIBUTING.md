@@ -30,7 +30,7 @@ The `meson.build` file of each directory lists the files that are installed, so 
 Before submitting a pull request, make sure that the tests and the linters pass:
 
 ```
-pytest sklr
+pytest
 pre-commit run --all-files
 ```
 
@@ -39,7 +39,7 @@ The `pre-commit` hooks run `ruff` (lint and format), `pyrefly` (type checking), 
 New code should be covered by the tests. To see the lines that they miss:
 
 ```
-coverage run -m pytest sklr
+coverage run -m pytest
 coverage report --show-missing
 ```
 
