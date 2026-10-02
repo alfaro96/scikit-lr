@@ -1,4 +1,4 @@
-"""Check that ``sklr`` runs with the ``scikit-learn`` it was built against."""
+"""Check that :mod:`sklr` runs with the scikit-learn it was built against."""
 
 import sklearn
 

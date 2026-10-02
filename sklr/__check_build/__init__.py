@@ -1,10 +1,10 @@
-"""Give a helpful message when the extension modules of ``sklr`` are not built."""
+"""Give a helpful message when the extension modules of :mod:`sklr` are not built."""
 
 import os
 
 
 def raise_build_error(error):
-    """Raise an :class:`ImportError` explaining that ``sklr`` is not built correctly.
+    """Raise an :class:`ImportError` explaining that :mod:`sklr` is not built correctly.
 
     The contents of this directory are listed to help debugging.
     """

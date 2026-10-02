@@ -1,4 +1,4 @@
-"""Label ranking and partial label ranking estimators for ``scikit-learn``."""
+"""Label ranking and partial label ranking estimators for scikit-learn."""
 
 import importlib as _importlib
 

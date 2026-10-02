@@ -1,6 +1,6 @@
-"""Print the build requirements of the package, except ``scikit-learn``.
+"""Print the build requirements of the package, except scikit-learn.
 
-The package is then built without isolation against a ``scikit-learn`` installed
+The package is then built without isolation against a scikit-learn installed
 apart, which may be a release that its build requirements do not allow yet.
 
 Run it from the root of the repository.
