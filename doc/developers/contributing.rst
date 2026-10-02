@@ -215,7 +215,7 @@ it passes.
 
 The tests of scikit-lr follow these rules:
 
-* Tests import what they test from its public module, as users do.
+* Tests import the public API from its public module, as users do.
 
 * Every estimator passes the scikit-learn estimator checks with
   :func:`~sklearn.utils.estimator_checks.parametrize_with_checks`. A check that
