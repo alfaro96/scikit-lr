@@ -20,6 +20,9 @@ repos:
     rev: 1.3.2
     hooks:
       - id: pyrefly-check
+        # Already the language of the hook, but Renovate only updates the
+        # additional_dependencies of the hooks that declare it here
+        language: python
         # The hook runs in an isolated environment, so install the
         # imported packages to type check against their annotations
         additional_dependencies:
@@ -54,9 +57,9 @@ repos:
       # declared in several files, which are checked against each other to
       # keep them from drifting apart
       - id: check-versions
-        name: versions in sync across pyproject.toml, environment.yml, the hooks and the workflows
+        name: versions in sync across pyproject.toml, environment.yml, the hooks, the workflows and Renovate
         language: python
         entry: python build_tools/check_versions.py
         additional_dependencies: [packaging==26.3, pyyaml==6.0.3]
-        files: ^(environment\.yml|pyproject\.toml|\.pre-commit-config\.yaml|\.github/workflows/.*\.yml|build_tools/check_versions\.py)$
+        files: ^(environment\.yml|pyproject\.toml|\.pre-commit-config\.yaml|\.github/workflows/.*\.yml|\.github/renovate\.json|build_tools/check_versions\.py)$
         pass_filenames: false

@@ -15,7 +15,10 @@ The tools pinned in ``environment.yml`` that also run as ``pre-commit`` hooks mu
 have the version of their hook in ``.pre-commit-config.yaml``. The packages
 installed in the environments of the hooks must be pinned, so the result of
 the hooks only changes with that file, and the pinned versions of the runtime
-dependencies must be within their ranges in ``pyproject.toml``.
+dependencies must be within their ranges in ``pyproject.toml``. Renovate updates
+those pins, so its configuration must restrict these dependencies to the same
+ranges, and every hook with packages installed in its environment must declare
+its language, since Renovate leaves out the packages of the hooks that do not.
 
 The minimum supported Python version is the lower bound of ``requires-python``
 in ``pyproject.toml``, and the classifiers list the supported versions from it.
@@ -29,6 +32,7 @@ including the ones released after the classifiers were last updated.
 Run it from the root of the repository.
 """
 
+import json
 import re
 import sys
 import tomllib
@@ -51,6 +55,8 @@ HOOK_PACKAGES = {
 CIMPORTED_PACKAGES = ["scikit-learn"]
 
 WORKFLOWS_DIR = Path(".github/workflows")
+
+RENOVATE_CONFIG = Path(".github/renovate.json")
 
 # Workflow whose matrix runs the tests on every supported Python version,
 # and the path to that matrix in the workflow
@@ -329,6 +335,50 @@ def check_hook_dependencies(repos, runtime):
     return errors
 
 
+def check_hook_languages(repos):
+    """Check that the hooks with packages installed in them declare their language."""
+    errors = []
+    for repo in repos:
+        for hook in repo["hooks"]:
+            if hook.get("additional_dependencies") and "language" not in hook:
+                errors.append(
+                    f"the {hook['id']} hook in .pre-commit-config.yaml must declare "
+                    "its language, because Renovate only updates the "
+                    "additional_dependencies of the hooks that declare it"
+                )
+    return errors
+
+
+def check_renovate(renovate, repos, runtime):
+    """Check that Renovate keeps the runtime dependencies of the hooks in range."""
+    allowed = {
+        canonicalize_name(name): rule["allowedVersions"]
+        for rule in renovate.get("packageRules", [])
+        if "allowedVersions" in rule
+        for name in rule.get("matchPackageNames", [])
+    }
+    names = {
+        canonicalize_name(Requirement(dependency).name)
+        for repo in repos
+        for hook in repo["hooks"]
+        for dependency in hook.get("additional_dependencies", [])
+    }
+    errors = []
+    for name in sorted(names & runtime.keys()):
+        expected = runtime[name]
+        try:
+            spec = SpecifierSet(allowed[name])
+        except (KeyError, InvalidSpecifier):
+            spec = None
+        if spec != expected:
+            errors.append(
+                f"{name} must have the allowedVersions {str(expected)!r} in "
+                f"{RENOVATE_CONFIG}, its range in project.dependencies in "
+                f"pyproject.toml, got {allowed.get(name)!r}"
+            )
+    return errors
+
+
 def main():
     pyproject = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
     environment = read_environment(Path("environment.yml"))
@@ -336,6 +386,7 @@ def main():
         Path(".pre-commit-config.yaml").read_text(encoding="utf-8")
     )
     workflows = read_workflows()
+    renovate = json.loads(RENOVATE_CONFIG.read_text(encoding="utf-8"))
 
     runtime = read_requirements(pyproject["project"]["dependencies"])
     build = read_requirements(pyproject["build-system"]["requires"])
@@ -362,6 +413,8 @@ def main():
         ),
         *check_hook_versions(environment, pre_commit["repos"]),
         *check_hook_dependencies(pre_commit["repos"], runtime),
+        *check_hook_languages(pre_commit["repos"]),
+        *check_renovate(renovate, pre_commit["repos"], runtime),
     ]
     for error in errors:
         print(error, file=sys.stderr)
