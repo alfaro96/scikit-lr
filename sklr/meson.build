@@ -53,6 +53,7 @@ py.install_sources(
   [
     '__init__.py',
     '_sklearn_version.py',
+    'conftest.py',
   ],
   subdir: 'sklr',
 )
