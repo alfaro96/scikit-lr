@@ -15,7 +15,7 @@ from sklr import __check_build, _sklearn_version  # noqa: F401
 from sklr.utils._show_versions import show_versions
 
 # Public subpackages, imported lazily on first attribute access
-_submodules = []
+_submodules = ["utils"]
 
 __all__ = ["show_versions"]
 __all__.extend(_submodules)

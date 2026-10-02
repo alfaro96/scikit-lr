@@ -1,1 +1,1 @@
-"""Utilities for the development and the debugging of scikit-lr."""
+"""Various utilities to help with development."""
