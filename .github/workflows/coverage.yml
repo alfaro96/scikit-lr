@@ -1,9 +1,10 @@
 # Measure the code covered by the tests and upload it to Codecov
 name: Coverage
 
-# The coverage of the Python code is measured on the same events as the unit
-# tests, so the status checks of a pull request report how its changes affect
-# the coverage. Tracing the lines of the Cython modules slows them down, so
+# The coverage of the Python code is measured for the pull requests that target
+# master or a release branch, so their status checks report how their changes
+# affect it, and for the merges, whose reports are the ones that the pull
+# requests are compared with. Tracing the lines of the Cython modules slows them down, so
 # their coverage is only measured every night and when the workflow is run by
 # hand
 on:
