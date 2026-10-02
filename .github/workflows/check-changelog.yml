@@ -1,0 +1,67 @@
+# Check that the pull requests that change the tests add a changelog entry
+name: Check changelog
+
+# The changes that affect users usually come with changes to the tests, so the
+# pull requests that target master or a release branch and change a test file
+# must add a changelog fragment named after their number, unless a maintainer
+# labels them "no changelog needed". The check runs again when the pull request
+# is updated and when its labels change, so adding the label makes it pass
+on:
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: read
+  # The action lists the files and the labels of the pull request
+  pull-requests: read
+
+concurrency:
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # so only the outdated runs of a pull request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Changelog entry
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, since their pull requests are checked
+    # when they target this repository
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The whole history, to compare the pull request with its base branch
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check if the tests have changed
+        id: tests_changed
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: bash build_tools/github/check_tests_changed.sh
+
+      # The configuration of the check is in [tool.changelog-bot] of pyproject.toml
+      - name: Check the changelog entry
+        id: changelog
+        if: steps.tests_changed.outputs.check_changelog == 'true'
+        uses: scientific-python/action-towncrier-changelog@f9c7df9a9f8b55cb0c12d94d14b281e9bcd101c0 # v2.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BOT_USERNAME: changelog-bot
+
+      # Only when the entry is missing or wrong, not when an earlier step failed
+      - name: Show how to add a changelog entry
+        if: failure() && steps.changelog.outcome == 'failure'
+        run: bash build_tools/github/changelog_instructions.sh

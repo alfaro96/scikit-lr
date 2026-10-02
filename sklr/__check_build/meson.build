@@ -1,0 +1,14 @@
+py.install_sources(
+  ['__init__.py'],
+  subdir: 'sklr/__check_build',
+)
+
+py.extension_module(
+  '_check_build',
+  '_check_build.pyx',
+  cython_args: cython_args,
+  install: true,
+  subdir: 'sklr/__check_build',
+)
+
+subdir('tests')

@@ -1,8 +1,247 @@
-# Minimum build system requirements
+[project]
+name = "scikit-lr"
+dynamic = ["version"]
+description = "Label ranking and partial label ranking with scikit-learn compatible estimators"
+readme = "README.md"
+authors = [
+    {name = "Juan Carlos Alfaro Jiménez", email = "JuanCarlos.Alfaro@uclm.es"},
+]
+maintainers = [
+    {name = "Juan Carlos Alfaro Jiménez", email = "JuanCarlos.Alfaro@uclm.es"},
+]
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.2",
+    "scipy>=1.15",
+    "scikit-learn~=1.9.0",  # The cimported modules may change between minor releases
+]
+license = "MIT"
+license-files = ["COPYING"]
+keywords = ["label ranking", "partial label ranking", "machine learning", "scikit-learn"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Programming Language :: C",
+    "Programming Language :: Cython",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+homepage = "https://alfaro96.github.io/scikit-lr"
+source = "https://github.com/alfaro96/scikit-lr"
+download = "https://pypi.org/project/scikit-lr/#files"
+tracker = "https://github.com/alfaro96/scikit-lr/issues"
+
 [build-system]
-requires = ["setuptools",
-            "wheel",
-            "numpy>=1.17.3",
-            "scipy>=1.3.2",
-            "cython>=0.29.14",
-            "scikit-learn>=0.23.0"]
+build-backend = "mesonpy"
+requires = [
+    "meson-python>=0.17.1",
+    "cython>=3.1.2",
+    "numpy>=2",  # Extensions built against this version also work with the older runtime versions
+    "scikit-learn~=1.9.0",
+]
+
+[tool.meson-python.args]
+# Install only the files needed at runtime. Otherwise, the wheels for Windows
+# would also carry the import library that MSVC creates for each extension
+# module, which is only used to link other code against it and is never
+# loaded by Python
+install = ["--tags=runtime,python-runtime"]
+
+[tool.cibuildwheel]
+# The Python versions in the classifiers, checked by build_tools/check_versions.py.
+# The free-threaded builds do not match, since they are not supported yet
+build = ["cp313-*", "cp314-*", "cp315-*"]
+# scikit-learn has no wheels for musl, so it is built from source there and a
+# wheel of scikit-lr would not spare users from compiling
+skip = ["*-musllinux_*"]
+# scikit-learn has no wheels for 32-bit platforms either
+archs = ["auto64"]
+build-verbosity = 1
+test-requires = ["pytest"]
+# The tests run in a directory without the sources, so the installed wheel is
+# tested, and pytest needs pyproject.toml there to read the options of the project
+test-sources = ["pyproject.toml"]
+test-command = "python -m pytest --pyargs sklr"
+
+[tool.cibuildwheel.windows]
+# Use MSVC, the compiler of CPython on Windows, instead of the
+# MinGW compiler that the runner also has in the PATH
+config-settings = {setup-args = "--vsenv"}
+
+[tool.check-sdist]
+# The files left out of the source distribution, which must
+# match the export-ignore patterns in .gitattributes
+git-only = [".*", "build_tools"]
+# Do not ignore the files that check-sdist ignores by default, such as
+# bytecode, so only the patterns above are allowed to differ
+default-ignore = false
+
+[tool.pytest.ini_options]
+testpaths = ["sklr", "doc"]
+addopts = [
+    "--import-mode=importlib",  # Do not prepend test directories to sys.path, so the installed sklr is tested
+    "--strict-config",  # Fail on unknown keys in this section
+    "--strict-markers",  # Fail on markers that are not registered
+    "--doctest-modules",  # Also run the examples in the docstrings
+    "--doctest-glob=*.rst",  # And in the pages of the documentation
+    "-ra",  # Report the reason of every test that does not pass (skipped, xfailed, xpassed, failed, error)
+]
+doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"  # Ignore whitespace differences and let "..." match any output
+xfail_strict = true  # An expected failure that passes is an error
+filterwarnings = [
+    "error",  # Every warning is an error; add exceptions only for specific, documented third-party warnings
+]
+
+[tool.coverage.run]
+# A package instead of a directory, so the paths in the reports are relative
+# to the directory that contains it, the root of the repository, as Codecov
+# needs to match them with the files in git
+source_pkgs = ["sklr"]
+# Measure the Cython modules built with the linetrace option of meson.options
+plugins = ["Cython.Coverage"]
+# The tracer based on sys.monitoring, the default on the newer Python
+# versions, does not support plugins
+core = "ctrace"
+# The build helpers are not installed, Meson runs them as scripts, and the
+# modules that Meson generates in the build directory are not in git
+omit = ["sklr/_build_utils/*", "build/*"]
+
+[tool.ruff]
+line-length = 88
+extend-exclude = [
+    "build",
+    "doc/auto_examples",
+    "doc/modules/generated",
+]
+
+[tool.ruff.lint]
+extend-select = [
+    "E501",  # Line too long
+    "W",  # pycodestyle warnings
+    "I",  # isort
+    "UP",  # pyupgrade
+    "NPY",  # NumPy-specific rules
+    "PGH",  # pygrep-hooks
+    "RUF",  # Ruff-specific rules
+    "TID252",  # Relative imports
+]
+ignore = [
+    "E731",  # Lambda expression assigned to a variable
+    "E741",  # Ambiguous variable name
+    "RUF002",  # Ambiguous Unicode character in a docstring, where math symbols are needed
+    "RUF003",  # Ambiguous Unicode character in a comment, where math symbols are needed
+    "RUF012",  # Mutable class attribute not annotated as shared by all instances, idiomatic in scikit-learn estimators
+    "W191",  # Conflicts with the formatter
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.per-file-ignores]
+"examples/*" = ["E402"]  # Gallery examples have code before the imports
+
+[tool.pyrefly]
+project-includes = ["sklr"]
+
+[tool.cython-lint]
+ban-relative-imports = true
+# Same codes as ruff, plus E501 because keeping Cython lines
+# under 88 characters often makes the code less readable
+ignore = [
+    "E24",  # Multiple spaces or tab after comma
+    "E501",
+    "E731",
+    "E741",
+    "W503",  # Line break before binary operator
+    "W504",  # Line break after binary operator
+]
+
+[tool.codespell]
+skip = ["./.git", "./build", "./doc/_build", "./doc/auto_examples", "./doc/modules/generated"]
+
+# The check of the changelog entries in the pull requests, which looks for
+# the fragments in the directories and with the types of [tool.towncrier]
+[tool.changelog-bot.towncrier_changelog]
+enabled = true
+# The fragment of a pull request is named after its number
+verify_pr_number = true
+changelog_noop_label = "no changelog needed"
+
+[tool.towncrier]
+package = "sklr"
+# The file of the upcoming minor release, changed when the next one starts
+filename = "doc/whats_new/v0.3.rst"
+single_file = true
+directory = "doc/whats_new/upcoming_changes"
+issue_format = ":pr:`{issue}`"
+template = "doc/whats_new/upcoming_changes/towncrier_template.rst.jinja2"
+# Each fragment is already a bullet point
+all_bullets = false
+
+# The types of change, in the order in which they are listed in each
+# section, with the badges defined in doc/whats_new/changelog_legend.inc
+[[tool.towncrier.type]]
+directory = "major-feature"
+name = "|MajorFeature|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "|Feature|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "efficiency"
+name = "|Efficiency|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "enhancement"
+name = "|Enhancement|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fix"
+name = "|Fix|"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "api"
+name = "|API|"
+showcontent = true
+
+# Without a badge
+[[tool.towncrier.type]]
+directory = "other"
+name = ""
+showcontent = true
+
+# The sections of the release notes, one per directory of fragments: the
+# changes without a module, listed first and without a title, and then a
+# section per public module
+[[tool.towncrier.section]]
+name = "custom-top-level"
+path = "custom-top-level"
+
+[[tool.towncrier.section]]
+name = ":mod:`sklr`"
+path = "sklr"
+
+[[tool.towncrier.section]]
+name = ":mod:`sklr.utils`"
+path = "sklr.utils"

@@ -1,58 +1,67 @@
-[![Continuous integration tests](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20integration%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+integration+tests%22)
-[![Continuous deployment wheels](https://github.com/alfaro96/scikit-lr/workflows/Continuous%20deployment%20wheels/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Continuous+deployment+wheels%22)
-[![Linting tests](https://github.com/alfaro96/scikit-lr/workflows/Linting%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Linting+tests%22)
-[![Daily tests](https://github.com/alfaro96/scikit-lr/workflows/Daily%20tests/badge.svg)](https://github.com/alfaro96/scikit-lr/actions?query=workflow%3A%22Daily+tests%22)
-[![Code coverage](https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg)](https://codecov.io/gh/alfaro96/scikit-lr)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/alfaro96/scikit-lr.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/alfaro96/scikit-lr/context:python)
-[![PyPi package](https://badge.fury.io/py/scikit-lr.svg)](https://pypi.org/project/scikit-lr)
-[![Python version](https://img.shields.io/pypi/pyversions/scikit-lr.svg)](https://pypi.org/project/scikit-lr)
+# scikit-lr
 
-# Scikit-lr
+[![Unit tests][unit-tests-badge]][unit-tests] [![Code quality checks][code-quality-badge]][code-quality] [![Wheels][wheels-badge]][wheels] [![Upcoming scikit-learn][upcoming-sklearn-badge]][upcoming-sklearn] [![Coverage][coverage-badge]][coverage] [![Ruff][ruff-badge]][ruff] [![PyPI][pypi-badge]][pypi] [![Python versions][python-badge]][pypi]
 
-Scikit-lr is a Python package for Label Ranking problems and distributed under
-MIT license.
+[unit-tests-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/unit-tests.yml/badge.svg?branch=master
+[unit-tests]: https://github.com/alfaro96/scikit-lr/actions/workflows/unit-tests.yml?query=branch%3Amaster
+[code-quality-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/code-quality.yml/badge.svg?branch=master
+[code-quality]: https://github.com/alfaro96/scikit-lr/actions/workflows/code-quality.yml?query=branch%3Amaster
+[wheels-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/wheels.yml/badge.svg?branch=master
+[wheels]: https://github.com/alfaro96/scikit-lr/actions/workflows/wheels.yml?query=branch%3Amaster
+[upcoming-sklearn-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-sklearn.yml/badge.svg?event=schedule
+[upcoming-sklearn]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-sklearn.yml?query=event%3Aschedule
+[coverage-badge]: https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg
+[coverage]: https://codecov.io/gh/alfaro96/scikit-lr
+[ruff-badge]: https://img.shields.io/badge/code%20style-ruff-000000.svg
+[ruff]: https://github.com/astral-sh/ruff
+[pypi-badge]: https://img.shields.io/pypi/v/scikit-lr
+[python-badge]: https://img.shields.io/pypi/pyversions/scikit-lr
+[pypi]: https://pypi.org/project/scikit-lr
 
-The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
-Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
-Martín.
+scikit-lr is a Python package for label ranking and partial label ranking, built on top of [scikit-learn](https://scikit-learn.org) and distributed under the MIT license.
 
-Website: https://scikit-lr.readthedocs.io
+In label ranking, each sample is associated with a ranking of a fixed set of labels instead of a single class, and the goal is to learn a model that predicts that ranking for new samples. Partial label ranking extends the problem to rankings with ties. scikit-lr provides estimators and metrics for both problems that follow the scikit-learn API, so they can be used with tools such as pipelines, cross-validation and hyperparameter search.
+
+Website: https://alfaro96.github.io/scikit-lr
 
 ## Installation
 
 ### Dependencies
 
-Scikit-lr requires:
+scikit-lr requires:
 
-    * Python (>= 3.6)
-    * NumPy (>= 1.17.3)
-    * SciPy (>= 1.3.2)
-    * Scikit-learn (>= 0.23.0)
+* Python (>= 3.13)
+* NumPy (>= 2.2)
+* SciPy (>= 1.15)
+* scikit-learn (1.9.x)
 
 ### User installation
 
-If you already have a working installation, the easiest way to install
-scikit-lr is using ``pip``:
+The easiest way to install scikit-lr is using `pip`:
 
 ```
 pip install -U scikit-lr
 ```
 
-The documentation includes more detailed [installation instructions](https://scikit-lr.readthedocs.io/en/latest/getting_started/install.html).
+The documentation includes more detailed [installation instructions](https://alfaro96.github.io/scikit-lr/dev/install.html).
 
-## Release history
+## Documentation
 
-See the [release history](https://scikit-lr.readthedocs.io/en/latest/whats_new/index.html)
-for a history of notable changes to scikit-lr.
+* [User guide](https://alfaro96.github.io/scikit-lr/dev/user_guide.html)
+* [API reference](https://alfaro96.github.io/scikit-lr/dev/api/index.html)
+* [Examples](https://alfaro96.github.io/scikit-lr/dev/auto_examples/index.html)
+
+## Changelog
+
+See the [release history](https://alfaro96.github.io/scikit-lr/dev/whats_new.html) for a history of notable changes to scikit-lr.
 
 ## Development
 
-Feel free to contribute to the package, but be sure that the standards
-are followed.
+Contributions are welcome. The [developer's guide](https://alfaro96.github.io/scikit-lr/dev/developers/index.html) has detailed information about contributing code, documentation and tests, and about the Cython extensions. All communications should respect our [code of conduct](CODE_OF_CONDUCT.md).
 
 ### Important links
 
-* Official source code repository: https://github.com/alfaro96/scikit-lr
+* Source code repository: https://github.com/alfaro96/scikit-lr
 * Download releases: https://pypi.org/project/scikit-lr
 * Issue tracker: https://github.com/alfaro96/scikit-lr/issues
 
@@ -64,30 +73,24 @@ You can check the latest sources with the command:
 git clone https://github.com/alfaro96/scikit-lr.git
 ```
 
+### Contributing
+
+To learn more about making a contribution to scikit-lr, see our [contributing guide](https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html).
+
 ### Testing
 
-After installation, you can launch the test suite from outside the source
-directory (you will need to have ``pytest (>= 5.0.1)`` installed):
+After installation, you can launch the test suite with `pytest`:
 
 ```
-pytest sklr
+pytest --pyargs sklr
 ```
+
+See [testing and improving test coverage](https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html#testing-and-improving-test-coverage) for more information.
 
 ## Project history
 
-The project was started in 2019 as the Ph.D. Thesis of Juan Carlos Alfaro
-Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez
-Martín.
+The project was started in 2019 as the Ph.D. thesis of Juan Carlos Alfaro Jiménez, whose advisors are Juan Ángel Aledo Sánchez and José Antonio Gámez Martín.
 
-## Help and support
+## License
 
-### Documentation
-
-* HTML documentation (stable release): https://scikit-lr.readthedocs.io/en/stable/index.html
-* HTML documentation (development version): https://scikit-lr.readthedocs.io/en/latest/index.html
-* FAQ: https://scikit-lr.readthedocs.io/en/stable/getting_started/faq.html
-
-### Communication
-
-* Issue tracker: https://github.com/alfaro96/scikit-lr/issues
-* Website: https://scikit-lr.readthedocs.io
+scikit-lr is distributed under the MIT license. See [`COPYING`](COPYING).

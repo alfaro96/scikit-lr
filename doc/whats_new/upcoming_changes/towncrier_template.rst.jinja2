@@ -1,0 +1,43 @@
+{#- The development versions, such as the one of the documentation of the
+    development branch, are titled with the release they lead to -#}
+{% set in_development = ".dev" in versiondata.version %}
+{% set version = versiondata.version.split(".dev")[0] %}
+{% if version.count(".") == 1 %}
+{% set version = version + ".0" %}
+{% endif %}
+.. _changes_{{ version.replace(".", "_") }}:
+
+{% set title = "Version " + version %}
+{{ title }}
+{{ top_underline * title|length }}
+
+{% if in_development %}
+**In development**
+{% else %}
+{% set months = ["January", "February", "March", "April", "May", "June", "July",
+                 "August", "September", "October", "November", "December"] %}
+{% set year, month, _ = versiondata.date.split("-") %}
+**{{ months[month|int - 1] }} {{ year }}**
+{% endif %}
+
+{% for section, entries in sections.items() if entries %}
+{#- The changes without a module go first, below the title of the version -#}
+{% if section != "custom-top-level" %}
+{{ section }}
+{{ underlines[0] * section|length }}
+
+{% endif %}
+{#- definitions keeps the order of the types in pyproject.toml -#}
+{% for category in definitions if category in entries %}
+{% set badge = definitions[category]["name"] %}
+{% for text, links in entries[category].items() %}
+{#- Each fragment is a single bullet point, so the badge goes after its marker -#}
+{% if badge %}
+{{ text[0] }} {{ badge }}{{ text[1:] }} {{ links|join(", ") }}
+{% else %}
+{{ text }} {{ links|join(", ") }}
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+{% endfor %}
