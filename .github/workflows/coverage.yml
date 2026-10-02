@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Checkout scikit-lr
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -61,7 +61,7 @@ jobs:
       # needed for the editable install and the minimum Python version. It
       # is not cached, so every run gets the latest releases of its packages
       - name: Set up the development environment
-        uses: mamba-org/setup-micromamba@v3
+        uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v3.2.1
         with:
           environment-file: environment.yml
 
@@ -72,7 +72,7 @@ jobs:
         run: bash build_tools/github/test_coverage.sh
 
       - name: Upload the coverage report to Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: coverage.xml
           disable_search: true

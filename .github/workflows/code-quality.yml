@@ -39,12 +39,12 @@ jobs:
 
     steps:
       - name: Checkout scikit-lr
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           # Minimum supported version, checked by build_tools/check_versions.py
           python-version: "3.13"
@@ -54,7 +54,7 @@ jobs:
 
       # pre-commit installs every hook in its own environment, which is slow to build
       - name: Cache the hook environments
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: ~/.cache/pre-commit
           # The environments depend on the operating system, the Python
