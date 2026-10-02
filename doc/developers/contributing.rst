@@ -264,9 +264,12 @@ Docstrings follow the `numpydoc style guide
 <https://numpydoc.readthedocs.io/en/latest/format.html>`_ and, for what it leaves
 open, the guidelines for docstrings, the user guide and the references of
 :ref:`scikit-learn <sklearn:contribute_documentation>`. Lines are at most 88
-characters long, in docstrings and in the ``.rst`` pages. The examples of the
-docstrings and of the pages run as tests without the names of the module where they
-are, so they must import everything they use.
+characters long, in docstrings and in the ``.rst`` pages. The docstrings of the
+public API pass the `validation checks of numpydoc
+<https://numpydoc.readthedocs.io/en/latest/validation.html#validation-checks>`_,
+except the ones that scikit-learn ignores, as ``sklr/tests/test_docstrings.py``
+tests. The examples of the docstrings and of the pages run as tests without the
+names of the module where they are, so they must import everything they use.
 
 .. _building_documentation:
 
