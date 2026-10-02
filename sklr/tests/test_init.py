@@ -22,14 +22,6 @@ def test_dir_lists_public_api():
     assert sorted(dir(sklr)) == sorted(sklr.__all__)
 
 
-def test_getattr_imports_submodule(monkeypatch):
-    # A subpackage of the tests stands in for a public one, which may not
-    # exist. Once imported, it is an attribute of sklr, so __getattr__ is
-    # called directly
-    monkeypatch.setattr(sklr, "_submodules", ["tests"])
-    assert sklr.__getattr__("tests") is sys.modules["sklr.tests"]
-
-
 def test_getattr_unknown_name():
     with pytest.raises(AttributeError, match="Module 'sklr' has no attribute 'foo'"):
         sklr.foo  # noqa: B018

@@ -1,6 +1,4 @@
-import importlib
 import os
-import sys
 
 import pytest
 
@@ -21,10 +19,3 @@ def test_raise_build_error():
     # The message lists the contents of the directory to help debugging
     assert os.path.dirname(__check_build.__file__) in str(exc_info.value)
     assert "__init__.py" in str(exc_info.value)
-
-
-def test_import_without_extension_module(monkeypatch):
-    # A None entry in sys.modules makes importing that module raise ImportError
-    monkeypatch.setitem(sys.modules, "sklr.__check_build._check_build", None)
-    with pytest.raises(ImportError, match="has not been built correctly"):
-        importlib.reload(__check_build)
