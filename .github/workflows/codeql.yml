@@ -1,0 +1,62 @@
+# Analyze the Python code and the workflows with CodeQL
+name: CodeQL
+
+# CodeQL does not analyze Cython, so the extension modules are left out. Its
+# queries are updated with each release of the action, and may find problems
+# in code that did not change, so the analysis also runs every week
+on:
+  push:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, while every other run gets its
+  # own, so only the outdated runs of a pull request are cancelled
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze ${{ matrix.language }}
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, whose changes are analyzed here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+    permissions:
+      contents: read
+      # Upload the results to the code scanning alerts of the repository
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, python]
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: ${{ matrix.language }}
+          # Neither language is compiled, so the code is analyzed without building it
+          build-mode: none
+
+      - name: Analyze the code
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: /language:${{ matrix.language }}
