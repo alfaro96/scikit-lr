@@ -40,3 +40,10 @@ Python version.
 The project uploads to PyPI and TestPyPI with trusted publishing, so no token
 is stored in the repository: each index only accepts the uploads of this
 workflow from the environment of the same name.
+
+Publishing the GitHub release also makes the "Documentation" workflow build the
+documentation of the tag and publish it on GitHub Pages, in the directory of its
+minor release. A final release, not a pre-release, also becomes the stable
+version, where the root of the site redirects to, unless a newer minor release
+already is. The pushes to the development branch publish the development
+version.

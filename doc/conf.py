@@ -53,6 +53,17 @@ sphinx_gallery_conf = {
 
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
+    # The development version is published in its own directory of the site,
+    # and every release in the one of its minor release
+    "switcher": {
+        "json_url": "https://alfaro96.github.io/scikit-lr/versions.json",
+        "version_match": "dev" if ".dev" in release else version,
+    },
+    # The list of versions is written when the documentation is deployed,
+    # after building it, so it does not exist for the first deployment and
+    # checking it would make that build fail
+    "check_switcher": False,
+    "navbar_end": ["theme-switcher", "navbar-icon-links", "version-switcher"],
     "icon_links": [
         {
             "name": "GitHub",
