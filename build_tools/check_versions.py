@@ -29,6 +29,10 @@ The wheels must be built for the versions in the classifiers too, because
 ``cibuildwheel`` would otherwise build them for every version that it knows of,
 including the ones released after the classifiers were last updated.
 
+The dependencies listed in ``README.md`` must be Python and the runtime
+dependencies, with their minimum supported versions, or the minor release for
+the ones restricted to a single one.
+
 Run it from the root of the repository.
 """
 
@@ -57,6 +61,17 @@ CIMPORTED_PACKAGES = ["scikit-learn"]
 WORKFLOWS_DIR = Path(".github/workflows")
 
 RENOVATE_CONFIG = Path(".github/renovate.json")
+
+README = Path("README.md")
+
+# The section of README.md that lists the dependencies, up to the next heading,
+# and each of its items: the name of the package and its supported versions
+README_DEPENDENCIES = re.compile(
+    r"^### Dependencies\n(?P<section>.*?)^#", re.MULTILINE | re.DOTALL
+)
+README_DEPENDENCY = re.compile(
+    r"^\* (?P<name>\S+) \((?P<versions>[^)]*)\)$", re.MULTILINE
+)
 
 # Workflow whose matrix runs the tests on every supported Python version,
 # and the path to that matrix in the workflow
@@ -247,6 +262,55 @@ def check_python_versions(environment, pyproject, workflows):
     ]
 
 
+def supported_versions(specifier):
+    """Return how ``README.md`` writes the versions of `specifier`, or ``None``."""
+    specifiers = list(specifier)
+    if len(specifiers) != 1:
+        return None
+    operator, version = specifiers[0].operator, specifiers[0].version
+    if operator == ">=":
+        return f">= {version}"
+    # A compatible release with three parts allows a single minor release
+    if operator == "~=" and version.count(".") == 2:
+        return version.rpartition(".")[0] + ".x"
+    return None
+
+
+def check_readme(readme, pyproject, runtime):
+    """Check the dependencies listed in ``README.md``."""
+    minimum = minimum_python(pyproject["project"]["requires-python"])
+    if minimum is None:
+        # Already reported by check_python_versions
+        return []
+    expected = {"python": f">= {minimum}"}
+    errors = []
+    unsupported = set()
+    for name, specifier in runtime.items():
+        versions = supported_versions(specifier)
+        if versions is not None:
+            expected[name] = versions
+        else:
+            unsupported.add(name)
+            errors.append(
+                f"{name} in project.dependencies in pyproject.toml must have a "
+                "single '>=' bound, or a '~=' bound with three parts, to list it "
+                f"in {README}, got {str(specifier)!r}"
+            )
+    section = README_DEPENDENCIES.search(readme)
+    found = {
+        canonicalize_name(match["name"]): match["versions"]
+        for match in README_DEPENDENCY.finditer(section["section"] if section else "")
+        if canonicalize_name(match["name"]) not in unsupported
+    }
+    if found != expected:
+        errors.append(
+            f"the dependencies in the Dependencies section of {README} must be "
+            f"{expected!r}, Python and project.dependencies in pyproject.toml, "
+            f"got {found!r}"
+        )
+    return errors
+
+
 def check_dependencies(source, specs, dependencies, table, required):
     """Check that the packages in `specs` have the ranges in `dependencies`.
 
@@ -387,6 +451,7 @@ def main():
     )
     workflows = read_workflows()
     renovate = json.loads(RENOVATE_CONFIG.read_text(encoding="utf-8"))
+    readme = README.read_text(encoding="utf-8")
 
     runtime = read_requirements(pyproject["project"]["dependencies"])
     build = read_requirements(pyproject["build-system"]["requires"])
@@ -415,6 +480,7 @@ def main():
         *check_hook_dependencies(pre_commit["repos"], runtime),
         *check_hook_languages(pre_commit["repos"]),
         *check_renovate(renovate, pre_commit["repos"], runtime),
+        *check_readme(readme, pyproject, runtime),
     ]
     for error in errors:
         print(error, file=sys.stderr)
