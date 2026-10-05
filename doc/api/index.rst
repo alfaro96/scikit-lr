@@ -7,8 +7,8 @@ This is the class and function reference of scikit-lr. Each entry links to a
 page with its full description, and the :ref:`user guide <user_guide>` gives
 more details on how to use them.
 
-:mod:`sklr`: Utilities
-----------------------
+:mod:`sklr`: Settings and information tools
+-------------------------------------------
 
 .. module:: sklr
 
@@ -17,3 +17,14 @@ more details on how to use them.
    :template: base.rst
 
    show_versions
+
+:mod:`sklr.utils`: Utilities
+----------------------------
+
+.. module:: sklr.utils
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   type_of_ranking
