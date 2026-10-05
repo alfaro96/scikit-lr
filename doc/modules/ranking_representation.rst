@@ -63,3 +63,26 @@ rankings at all:
 'label_ranking'
 >>> type_of_ranking([[1, 1, 3], [3, 1, 2]])
 'unknown'
+
+Validation of the rankings
+==========================
+
+:func:`check_ranking` validates ``y`` and returns it as a ``float64`` array, the
+representation used by the estimators. It raises an error that shows the first
+invalid ranking if ``y`` does not encode rankings, and by default it also rejects
+rankings with ties and incomplete rankings, which are accepted with
+``allow_ties=True`` and ``allow_incomplete=True``:
+
+>>> from sklr.utils import check_ranking
+>>> check_ranking([[1, 1, 2], [3, 1, 2]], allow_ties=True)
+array([[1., 1., 2.],
+       [3., 1., 2.]])
+>>> check_ranking([[1, 1, 2], [3, 1, 2]])
+Traceback (most recent call last):
+    ...
+ValueError: Expected rankings without ties in y, got y[0] = [1 1 2].
+>>> check_ranking([[2, np.nan, 1], [3, 1, 2]])
+Traceback (most recent call last):
+    ...
+ValueError: Expected complete rankings in y, without unranked labels (NaN), got
+y[0] = [ 2. nan  1.].

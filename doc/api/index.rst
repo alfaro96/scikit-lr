@@ -27,4 +27,5 @@ more details on how to use them.
    :toctree: ../modules/generated/
    :template: base.rst
 
+   check_ranking
    type_of_ranking

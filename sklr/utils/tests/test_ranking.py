@@ -1,9 +1,11 @@
+import re
+
 import numpy as np
 import pytest
-from scipy.sparse import csr_array
+from scipy.sparse import csr_array, csr_matrix
 from scipy.stats import rankdata
 
-from sklr.utils import type_of_ranking
+from sklr.utils import check_ranking, type_of_ranking
 
 nan = np.nan
 inf = np.inf
@@ -144,3 +146,220 @@ def test_type_of_ranking_naive_oracle(n_labels, seed):
     valid = [type_ != "unknown" for type_ in types]
     assert type_of_ranking(y[valid]) == _naive_type_of_ranking(y[valid])
     assert type_of_ranking(y) == "unknown"
+
+
+@pytest.mark.parametrize(
+    "y, allow_ties, allow_incomplete",
+    [
+        ([[1, 2, 3], [3, 1, 2]], False, False),
+        ([[1, 2], [2, 1]], False, False),
+        ([[1.0, 2.0, 3.0], [2.0, 1.0, 3.0]], False, False),
+        ([[2, 3, 1]], False, False),
+        ([[1, 1, 2], [1, 2, 3]], True, False),
+        ([[1, 1, 1], [2, 1, 3]], True, False),
+        ([[2, nan, 1], [1, 2, 3]], False, True),
+        ([[nan, 1, 1], [1, 2, 3]], True, True),
+        # A row with zero or one ranked label is a valid incomplete ranking
+        ([[1, nan, nan], [1, 2, 3]], False, True),
+        ([[nan, nan, nan], [1, 2, 3]], False, True),
+        ([[nan, nan], [nan, nan]], False, True),
+    ],
+)
+def test_check_ranking(y, allow_ties, allow_incomplete):
+    y_converted = check_ranking(
+        y, allow_ties=allow_ties, allow_incomplete=allow_incomplete
+    )
+    assert isinstance(y_converted, np.ndarray)
+    assert y_converted.dtype == np.float64
+    np.testing.assert_array_equal(y_converted, np.asarray(y, dtype=np.float64))
+
+
+@pytest.mark.parametrize(
+    "y, err_msg",
+    [
+        # Not dense or not starting at one
+        ([[1, 2, 3], [1, 1, 3]], "dense from 1, got y[1] = [1 1 3]."),
+        ([[1, 2, 4], [1, 2, 3]], "dense from 1, got y[0] = [1 2 4]."),
+        ([[2, 3, 4], [1, 2, 3]], "dense from 1, got y[0] = [2 3 4]."),
+        ([[0, 1, 2], [1, 2, 3]], "dense from 1, got y[0] = [0 1 2]."),
+        ([[-1, 1, 2], [1, 2, 3]], "dense from 1, got y[0] = [-1  1  2]."),
+        # Not integers
+        ([[1.0, 1.5, 2.0], [1, 2, 3]], "dense from 1, got y[0] = [1.  1.5 2. ]."),
+        # The ranked labels of incomplete rankings are not dense from one
+        ([[2, nan, 3], [1, 2, 3]], "dense from 1, got y[0] = [ 2. nan  3.]."),
+        ([[nan, 2, nan], [1, 2, 3]], "dense from 1, got y[0] = [nan  2. nan]."),
+    ],
+)
+@pytest.mark.parametrize("allow_ties", [False, True])
+def test_check_ranking_not_dense(y, err_msg, allow_ties):
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        check_ranking(y, allow_ties=allow_ties, allow_incomplete=True)
+
+
+@pytest.mark.parametrize("allow_incomplete", [False, True])
+def test_check_ranking_ties(allow_incomplete):
+    y = [[1, 2, 3], [3, 1, 2], [1, 1, 2], [1, 1, 1]]
+    err_msg = "Expected rankings without ties in y, got y[2] = [1 1 2]."
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        check_ranking(y, allow_incomplete=allow_incomplete)
+    np.testing.assert_array_equal(
+        check_ranking(y, allow_ties=True, allow_incomplete=allow_incomplete), y
+    )
+
+
+@pytest.mark.parametrize("allow_ties", [False, True])
+def test_check_ranking_incomplete(allow_ties):
+    y = [[1, 2, 3], [nan, 1, 2], [nan, nan, nan]]
+    err_msg = (
+        "Expected complete rankings in y, without unranked labels (NaN), got "
+        "y[1] = [nan  1.  2.]."
+    )
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        check_ranking(y, allow_ties=allow_ties)
+    np.testing.assert_array_equal(
+        check_ranking(y, allow_ties=allow_ties, allow_incomplete=True), y
+    )
+
+
+@pytest.mark.parametrize("value", [inf, -inf])
+@pytest.mark.parametrize("allow_incomplete", [False, True])
+def test_check_ranking_infinite(value, allow_incomplete):
+    # NaN is the only marker of an unranked label
+    with pytest.raises(ValueError, match="Input y contains infinity"):
+        check_ranking([[1, 2, value]], allow_incomplete=allow_incomplete)
+
+
+@pytest.mark.parametrize(
+    "y, err_msg",
+    [
+        (1, "for y, got a 0D array instead."),
+        ([1, 2, 3], "for y, got a 1D array instead."),
+        ([[[1, 2], [2, 1]]], "for y, got a 3D array instead."),
+        (
+            np.empty((0, 3)),
+            "Found y with 0 sample(s) (shape=(0, 3)) while a minimum of 1 is required.",
+        ),
+        (
+            [[1], [1]],
+            "Found y with 1 label(s) (shape=(2, 1)) while a minimum of 2 is required.",
+        ),
+        (
+            np.empty((2, 0)),
+            "Found y with 0 label(s) (shape=(2, 0)) while a minimum of 2 is required.",
+        ),
+        (
+            [[True, False], [False, True]],
+            "got dtype bool instead.",
+        ),
+        ([["a", "b"], ["b", "a"]], "dtype='numeric' is not compatible"),
+        ([[1 + 0j, 2 + 0j], [2 + 0j, 1 + 0j]], "Complex data not supported"),
+        ([[1, 2], [1, 2, 3]], "inhomogeneous shape"),
+    ],
+)
+def test_check_ranking_invalid_input(y, err_msg):
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        check_ranking(y, allow_ties=True, allow_incomplete=True)
+
+
+@pytest.mark.parametrize("csr_container", [csr_array, csr_matrix])
+def test_check_ranking_sparse(csr_container):
+    with pytest.raises(TypeError, match="Sparse data was passed for y"):
+        check_ranking(csr_container([[1, 2], [2, 1]]))
+
+
+@pytest.mark.parametrize(
+    "y, kwargs, err_msg",
+    [
+        ([[1, 1, 3]], {}, "in y_true to be dense from 1, got y_true[0] = [1 1 3]."),
+        ([[1, 1, 2]], {}, "without ties in y_true, got y_true[0] = [1 1 2]."),
+        ([[1, nan, 2]], {}, "in y_true, without unranked labels (NaN), got y_true[0]"),
+        ([[1, inf]], {}, "Input y_true contains infinity"),
+        ([1, 2], {}, "for y_true, got a 1D array instead."),
+        ([[1], [1]], {}, "Found y_true with 1 label(s)"),
+        ([[True, False]], {}, "labels in y_true to be integer"),
+    ],
+)
+def test_check_ranking_input_name(y, kwargs, err_msg):
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        check_ranking(y, input_name="y_true", **kwargs)
+
+
+@pytest.mark.parametrize(
+    "dtype",
+    [np.int8, np.int32, np.int64, np.uint8, np.uint64, np.float32, np.float64],
+)
+def test_check_ranking_dtype(dtype):
+    y = np.array([[1, 2, 3], [3, 1, 2]], dtype=dtype)
+    y_converted = check_ranking(y)
+    assert y_converted.dtype == np.float64
+    np.testing.assert_array_equal(y_converted, y)
+
+
+def test_check_ranking_object_dtype():
+    y = np.array([[1, 2, 3], [3, 1, 2]], dtype=object)
+    y_converted = check_ranking(y)
+    assert y_converted.dtype == np.float64
+    np.testing.assert_array_equal(y_converted, y.astype(np.float64))
+
+
+def test_check_ranking_does_not_modify_input():
+    y = np.array([[2.0, nan, 1.0], [1.0, 1.0, 2.0]])
+    y_copy = y.copy()
+    check_ranking(y, allow_ties=True, allow_incomplete=True)
+    np.testing.assert_array_equal(y, y_copy)
+
+
+@pytest.mark.parametrize("n_labels", [2, 3, 5, 8])
+@pytest.mark.parametrize("seed", range(5))
+def test_check_ranking_naive_oracle(n_labels, seed):
+    rng = np.random.default_rng(seed)
+    n_samples = 100
+    # The same generation as in test_type_of_ranking_naive_oracle
+    scores = rng.integers(0, n_labels, size=(n_samples, n_labels)).astype(float)
+    scores[rng.random(scores.shape) < 0.2] = nan
+    y = rankdata(scores, method="dense", axis=1, nan_policy="omit")
+    rows = np.flatnonzero(rng.random(n_samples) < 0.5)
+    y[rows, rng.integers(0, n_labels, size=rows.size)] += 1
+
+    for row in y[:, np.newaxis]:
+        expected = _naive_type_of_ranking(row)
+        # A ranking is accepted if and only if it is valid, and rejected
+        # because of its ties if and only if it has them
+        if expected == "unknown":
+            with pytest.raises(ValueError, match="dense from 1"):
+                check_ranking(row, allow_ties=True, allow_incomplete=True)
+        else:
+            check_ranking(row, allow_ties=True, allow_incomplete=True)
+            if expected == "partial_label_ranking":
+                with pytest.raises(ValueError, match="without ties"):
+                    check_ranking(row, allow_incomplete=True)
+            else:
+                check_ranking(row, allow_incomplete=True)
+
+
+@pytest.mark.parametrize(
+    "y",
+    [
+        [[1, 2, 3], [3, 1, 2]],
+        [[1, 1, 2], [3, 1, 2]],
+        [[2, nan, 1], [3, 1, 2]],
+        [[1, 1, 3], [3, 1, 2]],
+        [[1, 2, inf], [1, 2, 3]],
+        [[1], [1]],
+        [1, 2, 3],
+        [[True, True], [True, True]],
+    ],
+)
+def test_check_ranking_consistent_with_type_of_ranking(y):
+    # The rankings accepted with ties and incomplete rankings are the ones
+    # whose type is known, and without ties, the label rankings
+    type_ = type_of_ranking(y)
+    for allow_ties, accepted_types in [
+        (True, {"label_ranking", "partial_label_ranking"}),
+        (False, {"label_ranking"}),
+    ]:
+        if type_ in accepted_types:
+            check_ranking(y, allow_ties=allow_ties, allow_incomplete=True)
+        else:
+            with pytest.raises(ValueError):
+                check_ranking(y, allow_ties=allow_ties, allow_incomplete=True)
