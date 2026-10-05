@@ -143,8 +143,8 @@ Before asking for a review, make sure that:
 
 * A change that affects users has a :ref:`changelog entry <changelog>`.
 
-* The :ref:`checks <checks>` pass locally, and the continuous integration passes
-  once the pull request is opened.
+* The :ref:`checks <checks>` pass locally, and the CI passes once the pull request
+  is opened.
 
 An incomplete contribution can be opened as a draft pull request, and marked as ready
 for review when it is finished.

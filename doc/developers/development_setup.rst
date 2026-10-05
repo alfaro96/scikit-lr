@@ -69,7 +69,7 @@ Building with Meson
 scikit-lr is built with `meson-python <https://mesonbuild.com/meson-python>`_. The
 ``meson.build`` file of each directory lists the files that are installed, so a new
 Python module or Cython extension must be added to it. Otherwise it cannot be
-imported, and the continuous integration reports that it is missing from the wheels.
+imported, and the CI reports that it is missing from the wheels.
 The scikit-learn guide explains :ref:`how Meson works <sklearn:meson_build_backend>`.
 
 .. _development_setup_troubleshooting:
