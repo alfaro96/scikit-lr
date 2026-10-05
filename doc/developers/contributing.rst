@@ -222,9 +222,12 @@ The tests of scikit-lr follow these rules:
 
 * Tests import the public API from its public module, as users do.
 
-* Every estimator passes the scikit-learn estimator checks with
-  :func:`~sklearn.utils.estimator_checks.parametrize_with_checks`. A check that
-  cannot pass is listed in ``expected_failed_checks`` with the reason.
+* Every estimator passes the scikit-learn estimator checks with the
+  ``parametrize_with_checks`` of ``sklr/utils/_estimator_checks.py``. It runs the
+  checks of :func:`~sklearn.utils.estimator_checks.parametrize_with_checks`, whose
+  targets are meant for classifiers and regressors, with the targets of the rankers
+  turned into rankings. A check that cannot pass is listed in
+  ``expected_failed_checks`` with the reason.
 
 * Numerical results are checked against independent oracles: a naive implementation,
   a known property, or an equivalent function of NumPy, SciPy or scikit-learn, never
