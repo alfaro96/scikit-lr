@@ -5,7 +5,8 @@ from typing import Literal
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.sparse import issparse
-from sklearn.utils import check_array
+from sklearn.utils import check_array, check_consistent_length
+from sklearn.utils.validation import validate_data
 
 
 def _check_positions(ranks):
@@ -248,3 +249,26 @@ def check_ranking(
             f"{input_name}[{sample}] = {ranks[sample]}."
         )
     return ranks_converted
+
+
+def _validate_data(
+    estimator, X, y, *, allow_ties=False, allow_incomplete=True, **check_params
+):
+    """Validate the samples and the rankings that a ranker receives in ``fit``.
+
+    The samples are validated with :func:`sklearn.utils.validation.validate_data`,
+    which receives the keyword arguments `check_params` and sets ``n_features_in_`` and
+    ``feature_names_in_``, and the rankings with :func:`check_ranking`, which
+    receives `allow_ties` and `allow_incomplete`. Unlike :func:`check_ranking`,
+    incomplete rankings are accepted by default, because the rankers learn from
+    them unless their documentation says otherwise.
+    """
+    # validate_data cannot validate rankings, but it raises the error that
+    # scikit-learn expects from the estimators that require y when they do
+    # not receive it, which it only checks if it is given y
+    if y is None:
+        validate_data(estimator, X, y)
+    X = validate_data(estimator, X, **check_params)
+    y = check_ranking(y, allow_ties=allow_ties, allow_incomplete=allow_incomplete)
+    check_consistent_length(X, y)
+    return X, y

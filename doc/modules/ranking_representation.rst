@@ -45,7 +45,9 @@ position is ``np.nan``, the only value that marks a label without position, and
 the positions of the other labels are dense from ``1``. For instance,
 ``[2, np.nan, 1]`` ranks the third label before the first one and says nothing
 about the second one, and a row in which one label or none is ranked is a valid
-incomplete ranking too, although it gives no preference between labels.
+incomplete ranking too, although it gives no preference between labels. The
+estimators of scikit-lr learn from incomplete rankings, unless their documentation
+says otherwise.
 
 Type of the rankings
 ====================

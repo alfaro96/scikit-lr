@@ -4,8 +4,11 @@ import numpy as np
 import pytest
 from scipy.sparse import csr_array, csr_matrix
 from scipy.stats import rankdata
+from sklearn.base import BaseEstimator
 
+from sklr.base import LabelRankerMixin
 from sklr.utils import check_ranking, type_of_ranking
+from sklr.utils._ranking import _validate_data
 
 nan = np.nan
 inf = np.inf
@@ -363,3 +366,51 @@ def test_check_ranking_consistent_with_type_of_ranking(y):
         else:
             with pytest.raises(ValueError):
                 check_ranking(y, allow_ties=allow_ties, allow_incomplete=True)
+
+
+class LabelRanker(LabelRankerMixin, BaseEstimator):
+    pass
+
+
+def test_validate_data():
+    X = [[0, 1], [2, 3], [4, 5]]
+    y = [[1, 2, 3], [3, 1, 2], [2, 3, 1]]
+    estimator = LabelRanker()
+    X_validated, y_validated = _validate_data(estimator, X, y)
+    np.testing.assert_array_equal(X_validated, X)
+    np.testing.assert_array_equal(y_validated, y)
+    assert y_validated.dtype == np.float64
+    assert estimator.n_features_in_ == 2
+
+
+def test_validate_data_y_none():
+    err_msg = "requires y to be passed, but the target y is None"
+    with pytest.raises(ValueError, match=err_msg):
+        _validate_data(LabelRanker(), [[0, 1], [2, 3]], None)
+
+
+def test_validate_data_inconsistent_length():
+    err_msg = "Found input variables with inconsistent numbers of samples: [2, 1]"
+    with pytest.raises(ValueError, match=re.escape(err_msg)):
+        _validate_data(LabelRanker(), [[0, 1], [2, 3]], [[1, 2, 3]])
+
+
+def test_validate_data_rankings():
+    X = [[0, 1], [2, 3]]
+    y = [[1, 1, 2], [np.nan, 1, 2]]
+    # Incomplete rankings are accepted by default, but not ties
+    with pytest.raises(ValueError, match="Expected rankings without ties in y"):
+        _validate_data(LabelRanker(), X, y)
+    with pytest.raises(ValueError, match="Expected complete rankings in y"):
+        _validate_data(LabelRanker(), X, y, allow_ties=True, allow_incomplete=False)
+    _, y_validated = _validate_data(LabelRanker(), X, y, allow_ties=True)
+    np.testing.assert_array_equal(y_validated, y)
+
+
+def test_validate_data_check_params():
+    X = [[0, np.nan], [2, 3]]
+    y = [[1, 2], [2, 1]]
+    with pytest.raises(ValueError, match="Input X contains NaN"):
+        _validate_data(LabelRanker(), X, y)
+    X_validated, _ = _validate_data(LabelRanker(), X, y, ensure_all_finite="allow-nan")
+    np.testing.assert_array_equal(X_validated, X)
