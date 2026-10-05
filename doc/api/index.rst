@@ -18,6 +18,20 @@ more details on how to use them.
 
    show_versions
 
+:mod:`sklr.base`: Base classes and utility functions
+----------------------------------------------------
+
+.. module:: sklr.base
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   LabelRankerMixin
+   PartialLabelRankerMixin
+   is_label_ranker
+   is_partial_label_ranker
+
 :mod:`sklr.utils`: Utilities
 ----------------------------
 
