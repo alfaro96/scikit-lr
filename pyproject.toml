@@ -157,6 +157,10 @@ ban-relative-imports = "all"
 
 [tool.pyrefly]
 project-includes = ["sklr"]
+# scikit-learn ships no type information, so pyrefly would check against the
+# stubs that it bundles, which describe an older API than the one we build
+# against and reject valid calls. Treat it as untyped instead
+replace-untyped-imports-with-any = ["sklearn.*"]
 
 [tool.cython-lint]
 ban-relative-imports = true
