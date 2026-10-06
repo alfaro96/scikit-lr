@@ -12,3 +12,4 @@ with the details that the :ref:`API reference <api_ref>` leaves out.
    :maxdepth: 2
 
    modules/ranking_representation
+   modules/model_evaluation

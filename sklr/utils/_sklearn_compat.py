@@ -12,6 +12,11 @@ from contextlib import contextmanager
 from functools import partial
 from unittest import mock
 
+from sklearn.utils._param_validation import validate_params
+from sklearn.utils.validation import _check_sample_weight
+
+__all__ = ["_check_sample_weight", "_patch_enforce_estimator_tags_y", "validate_params"]
+
 
 @contextmanager
 def _patch_enforce_estimator_tags_y(enforce_estimator_tags_y):

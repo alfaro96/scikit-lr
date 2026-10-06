@@ -32,6 +32,42 @@ more details on how to use them.
    is_label_ranker
    is_partial_label_ranker
 
+:mod:`sklr.metrics`: Metrics
+----------------------------
+
+.. module:: sklr.metrics
+
+See the :ref:`model_evaluation` section of the user guide for further details.
+
+Scoring interface
+~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   get_scorer
+   get_scorer_names
+
+Label ranking metrics
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   kendall_distance
+   kendall_tau_score
+
+Partial label ranking metrics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   kendall_tau_x_score
+
 :mod:`sklr.utils`: Utilities
 ----------------------------
 

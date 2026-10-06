@@ -1,6 +1,9 @@
 """Base classes for all estimators and various utility functions."""
 
+from numpy.typing import ArrayLike
 from sklearn.utils import get_tags
+
+from sklr.metrics import kendall_tau_score, kendall_tau_x_score
 
 
 class LabelRankerMixin:
@@ -10,7 +13,8 @@ class LabelRankerMixin:
     and learns from (possibly incomplete) rankings without ties. This mixin sets the
     ``estimator_type`` tag to ``"label_ranker"`` and states through the target tags
     that ``fit`` requires a target ``y`` with several outputs, one per label, as
-    described in :ref:`ranking_representation`.
+    described in :ref:`ranking_representation`. Its :meth:`score` method computes
+    Kendall's :math:`\\tau` between the predicted and the true rankings.
 
     See Also
     --------
@@ -50,6 +54,32 @@ class LabelRankerMixin:
         tags.target_tags.single_output = False
         return tags
 
+    def score(
+        self, X: ArrayLike, y: ArrayLike, sample_weight: ArrayLike | None = None
+    ) -> float:
+        """Return the mean Kendall's :math:`\\tau` on the given data.
+
+        It is computed with :func:`~sklr.metrics.kendall_tau_score`.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+
+        y : array-like of shape (n_samples, n_labels)
+            True rankings for `X`, complete and without ties.
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights.
+
+        Returns
+        -------
+        score : float
+            Mean Kendall's :math:`\\tau` of ``self.predict(X)`` with respect to `y`.
+        """
+        y_pred = self.predict(X)  # pyrefly: ignore[missing-attribute]
+        return kendall_tau_score(y, y_pred, sample_weight=sample_weight)
+
 
 class PartialLabelRankerMixin:
     """Mixin class for all partial label rankers in scikit-lr.
@@ -59,6 +89,8 @@ class PartialLabelRankerMixin:
     have ties. This mixin sets the ``estimator_type`` tag to ``"partial_label_ranker"``
     and states through the target tags that ``fit`` requires a target ``y`` with
     several outputs, one per label, as described in :ref:`ranking_representation`.
+    Its :meth:`score` method computes the :math:`\\tau_x` coefficient between the
+    predicted and the true rankings.
 
     See Also
     --------
@@ -95,6 +127,32 @@ class PartialLabelRankerMixin:
         tags.target_tags.multi_output = True
         tags.target_tags.single_output = False
         return tags
+
+    def score(
+        self, X: ArrayLike, y: ArrayLike, sample_weight: ArrayLike | None = None
+    ) -> float:
+        """Return the mean :math:`\\tau_x` coefficient on the given data.
+
+        It is computed with :func:`~sklr.metrics.kendall_tau_x_score`.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+
+        y : array-like of shape (n_samples, n_labels)
+            True rankings for `X`, complete and possibly with ties.
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights.
+
+        Returns
+        -------
+        score : float
+            Mean :math:`\\tau_x` of ``self.predict(X)`` with respect to `y`.
+        """
+        y_pred = self.predict(X)  # pyrefly: ignore[missing-attribute]
+        return kendall_tau_x_score(y, y_pred, sample_weight=sample_weight)
 
 
 def is_label_ranker(estimator: object) -> bool:
