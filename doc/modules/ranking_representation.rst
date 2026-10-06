@@ -1,6 +1,5 @@
 .. _ranking_representation:
 
-======================
 Ranking representation
 ======================
 
@@ -13,7 +12,7 @@ array ``y`` of shape ``(n_samples, n_labels)``, with at least two labels, which
 plays the role of the target ``y`` of the scikit-learn estimators.
 
 Positions
-=========
+---------
 
 Each row of ``y`` is a ranking and each column a label: ``y[i, j]`` is the position
 of label ``j`` in ranking ``i``, from ``1`` for the most preferred label. A row
@@ -29,7 +28,7 @@ The positions are integers, which may be stored with an integer or a floating
 point dtype.
 
 Ties
-====
+----
 
 In partial label ranking, the rankings may have ties, which means that there is
 no preference between some labels. Tied labels share their position, and the
@@ -38,7 +37,7 @@ position, without gaps. For instance, ``[1, 1, 2]`` ranks the first two labels
 first, tied, and the third label last, while ``[1, 1, 3]`` is not a valid ranking.
 
 Incomplete rankings
-===================
+-------------------
 
 A ranking is incomplete when the position of some labels is not known. Their
 position is ``np.nan``, the only value that marks a label without position, and
@@ -47,10 +46,11 @@ the positions of the other labels are dense from ``1``. For instance,
 about the second one, and a row in which one label or none is ranked is a valid
 incomplete ranking too, although it gives no preference between labels. The
 estimators of scikit-lr learn from incomplete rankings, unless their documentation
-says otherwise.
+says otherwise, while the :ref:`metrics <model_evaluation>` only compare complete
+rankings.
 
 Type of the rankings
-====================
+--------------------
 
 :func:`type_of_ranking` determines whether ``y`` holds label rankings, without
 ties, partial label rankings, with ties in some ranking, or does not encode
@@ -67,7 +67,7 @@ rankings at all:
 'unknown'
 
 Validation of the rankings
-==========================
+--------------------------
 
 :func:`check_ranking` validates ``y`` and returns it as a ``float64`` array, the
 representation used by the estimators. It raises an error that shows the first
