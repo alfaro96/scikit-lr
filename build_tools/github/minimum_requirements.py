@@ -16,7 +16,6 @@ with open("pyproject.toml", "rb") as file:
     dependencies = tomllib.load(file)["project"]["dependencies"]
 
 for requirement in map(Requirement, dependencies):
-    # The lower bound of the range
     minimum = [
         specifier.version
         for specifier in requirement.specifier

@@ -10,11 +10,8 @@ __version__ = "0.3.dev0"
 # or were compiled against another scikit-learn. __check_build can be loaded
 # before the version check because it only uses scikit-learn typedefs
 from sklr import __check_build, _sklearn_version  # noqa: F401
-
-# Public functions, defined in private modules of the subpackages
 from sklr.utils._show_versions import show_versions
 
-# Public submodules and subpackages, imported lazily on first attribute access
 _submodules = ["base", "metrics", "utils"]
 
 __all__ = ["show_versions"]

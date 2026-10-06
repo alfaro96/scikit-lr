@@ -95,7 +95,6 @@ def test_enforce_estimator_tags_y_real(estimator, shape):
     y = rng.normal(loc=1, scale=5, size=shape)
     y_enforced = _enforce_estimator_tags_y(None, estimator, y)
     assert y_enforced.shape == (shape[0], N_LABELS)
-    # Valid rankings, with ties only for the partial label ranker
     check_ranking(y_enforced, allow_ties=is_partial_label_ranker(estimator))
     # A target with several outputs is reduced to its first one
     y_first = y if y.ndim == 1 else y[:, 0]

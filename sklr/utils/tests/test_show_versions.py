@@ -9,6 +9,5 @@ def test_show_versions(capsys):
     out = capsys.readouterr().out
     assert f"sklr: {__version__}" in out
     assert f"built with: scikit-learn {SKLEARN_BUILD_VERSION}" in out
-    # Followed by the information of scikit-learn
     assert f"sklearn: {sklearn.__version__}" in out
     assert "Python dependencies:" in out

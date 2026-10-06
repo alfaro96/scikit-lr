@@ -51,7 +51,6 @@ def test_ranker_tags(estimator, estimator_type):
     assert tags.target_tags.required
     assert tags.target_tags.multi_output
     assert not tags.target_tags.single_output
-    # The rankers are neither classifiers nor regressors
     assert tags.classifier_tags is None
     assert tags.regressor_tags is None
 
