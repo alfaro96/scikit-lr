@@ -4,11 +4,11 @@ import numpy as np
 import pytest
 from scipy.stats import kendalltau
 
-from sklr.metrics import kendall_distance, kendall_tau_score, kendall_tau_x_score
+from sklr.metrics import kendall_distance, kendall_tau_score, tau_x_score
 
 METRICS = {
     "kendall_tau_score": kendall_tau_score,
-    "kendall_tau_x_score": kendall_tau_x_score,
+    "tau_x_score": tau_x_score,
     "kendall_distance": kendall_distance,
     "unnormalized_kendall_distance": lambda *args, **kwargs: kendall_distance(
         *args, normalize=False, **kwargs
@@ -89,7 +89,7 @@ def _naive_kendall_tau(y_true, y_pred):
     return 2 * score / (n_labels * (n_labels - 1))
 
 
-def _naive_kendall_tau_x(y_true, y_pred):
+def _naive_tau_x(y_true, y_pred):
     """Emond and Mason's tau_x of two rankings, from their score matrices.
 
     Emond and Mason (2002), equation (3).
@@ -126,10 +126,10 @@ def test_kendall_tau_score_all_linear_orderings(n_labels):
 
 
 @pytest.mark.parametrize("n_labels", [2, 3, 4])
-def test_kendall_tau_x_score_all_weak_orderings(n_labels):
+def test_tau_x_score_all_weak_orderings(n_labels):
     for y_true, y_pred in itertools.product(_weak_orderings(n_labels), repeat=2):
-        expected = _naive_kendall_tau_x(y_true, y_pred)
-        assert kendall_tau_x_score([y_true], [y_pred]) == pytest.approx(expected)
+        expected = _naive_tau_x(y_true, y_pred)
+        assert tau_x_score([y_true], [y_pred]) == pytest.approx(expected)
         # Emond and Mason (2002), equation (A3): tau_x and the Kemeny-Snell
         # distance are equivalent
         distance = _kemeny_snell_distance(y_true, y_pred)
@@ -179,15 +179,15 @@ def test_kendall_tau_score_kendall_example():
         ([1, 1, 2], [2, 2, 1], -1 / 3),
     ],
 )
-def test_kendall_tau_x_score_ties(y_true, y_pred, expected):
-    assert kendall_tau_x_score([y_true], [y_pred]) == pytest.approx(expected)
+def test_tau_x_score_ties(y_true, y_pred, expected):
+    assert tau_x_score([y_true], [y_pred]) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize("n_labels", [2, 5, 10])
-def test_kendall_tau_x_score_equals_kendall_tau_score_without_ties(n_labels):
+def test_tau_x_score_equals_kendall_tau_score_without_ties(n_labels):
     y_true = _random_rankings(50, n_labels, ties=False, random_state=0)
     y_pred = _random_rankings(50, n_labels, ties=False, random_state=1)
-    assert kendall_tau_x_score(y_true, y_pred) == pytest.approx(
+    assert tau_x_score(y_true, y_pred) == pytest.approx(
         kendall_tau_score(y_true, y_pred)
     )
 
@@ -219,7 +219,7 @@ def test_bounds(name):
     reverse = y_true.max(axis=1, keepdims=True) + 1 - y_true
     best, worst = {
         "kendall_tau_score": (1, -1),
-        "kendall_tau_x_score": (1, -1),
+        "tau_x_score": (1, -1),
         "kendall_distance": (0, 1),
         "unnormalized_kendall_distance": (0, 6),
     }[name]
@@ -315,7 +315,7 @@ def test_single_sample_two_labels(name):
     metric = METRICS[name]
     expected = {
         "kendall_tau_score": (1, -1),
-        "kendall_tau_x_score": (1, -1),
+        "tau_x_score": (1, -1),
         "kendall_distance": (0, 1),
         "unnormalized_kendall_distance": (0, 1),
     }[name]
@@ -388,9 +388,7 @@ def test_invalid_sample_weight(name, sample_weight, msg):
         metric([[1, 2], [2, 1]], [[1, 2], [1, 2]], sample_weight=sample_weight)
 
 
-@pytest.mark.parametrize(
-    "metric", [kendall_tau_score, kendall_tau_x_score, kendall_distance]
-)
+@pytest.mark.parametrize("metric", [kendall_tau_score, tau_x_score, kendall_distance])
 def test_invalid_params(metric):
     with pytest.raises(ValueError, match="The 'y_true' parameter"):
         metric("rankings", [[1, 2]])

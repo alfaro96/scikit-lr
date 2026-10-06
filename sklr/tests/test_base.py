@@ -9,7 +9,7 @@ from sklr.base import (
     is_label_ranker,
     is_partial_label_ranker,
 )
-from sklr.metrics import kendall_tau_score, kendall_tau_x_score
+from sklr.metrics import kendall_tau_score, tau_x_score
 
 
 class _FixedRanker(BaseEstimator):
@@ -74,7 +74,7 @@ def test_is_ranker(estimator, expected_label_ranker, expected_partial_label_rank
     "estimator, metric",
     [
         (LabelRanker(ranking=[1, 2, 3]), kendall_tau_score),
-        (PartialLabelRanker(ranking=[1, 1, 2]), kendall_tau_x_score),
+        (PartialLabelRanker(ranking=[1, 1, 2]), tau_x_score),
     ],
 )
 def test_ranker_score(estimator, metric):

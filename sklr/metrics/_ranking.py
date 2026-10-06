@@ -94,8 +94,8 @@ def kendall_tau_score(
 
     See Also
     --------
-    kendall_tau_x_score : Compute the :math:`\\tau_x` coefficient between partial
-        label rankings.
+    tau_x_score : Compute the :math:`\\tau_x` coefficient between partial label
+        rankings.
     kendall_distance : Compute the Kendall distance between label rankings.
     scipy.stats.kendalltau : Kendall's :math:`\\tau` between two variables.
 
@@ -112,9 +112,9 @@ def kendall_tau_score(
 
     Without ties, it is equal to Kendall's :math:`\\tau_a` and :math:`\\tau_b`, to
     the coefficient computed by :func:`scipy.stats.kendalltau` and to the
-    coefficient computed by :func:`kendall_tau_x_score`. Rankings with ties are
-    rejected, because the variants of Kendall's :math:`\\tau` handle ties in
-    different ways; use :func:`kendall_tau_x_score` for them.
+    coefficient computed by :func:`tau_x_score`. Rankings with ties are rejected,
+    because the variants of Kendall's :math:`\\tau` handle ties in different ways;
+    use :func:`tau_x_score` for them.
 
     References
     ----------
@@ -148,7 +148,7 @@ def kendall_tau_score(
     },
     prefer_skip_nested_validation=True,
 )
-def kendall_tau_x_score(
+def tau_x_score(
     y_true: ArrayLike, y_pred: ArrayLike, *, sample_weight: ArrayLike | None = None
 ) -> float:
     """Compute the :math:`\\tau_x` coefficient between partial label rankings.
@@ -165,7 +165,7 @@ def kendall_tau_x_score(
     disagree in both orders. The score of the rankings is the average of the
     coefficients of their samples.
 
-    Read more in the :ref:`User Guide <kendall_tau_x>`.
+    Read more in the :ref:`User Guide <tau_x>`.
 
     Parameters
     ----------
@@ -215,10 +215,10 @@ def kendall_tau_x_score(
 
     Examples
     --------
-    >>> from sklr.metrics import kendall_tau_x_score
+    >>> from sklr.metrics import tau_x_score
     >>> y_true = [[1, 1, 2], [1, 2, 3]]
     >>> y_pred = [[1, 1, 2], [1, 1, 1]]
-    >>> kendall_tau_x_score(y_true, y_pred)
+    >>> tau_x_score(y_true, y_pred)
     0.5
     """
     y_true, y_pred, sample_weight = _check_targets(

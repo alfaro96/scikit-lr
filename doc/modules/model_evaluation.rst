@@ -37,7 +37,7 @@ from their names:
 Name                           Function
 =============================  ===============================
 ``"kendall_tau"``              :func:`kendall_tau_score`
-``"kendall_tau_x"``            :func:`kendall_tau_x_score`
+``"tau_x"``                    :func:`tau_x_score`
 ``"neg_kendall_distance"``     :func:`kendall_distance`
 =============================  ===============================
 
@@ -46,7 +46,7 @@ distance returns it negated. :func:`get_scorer_names` lists the names:
 
 >>> from sklr.metrics import get_scorer, get_scorer_names
 >>> get_scorer_names()
-['kendall_tau', 'kendall_tau_x', 'neg_kendall_distance']
+['kendall_tau', 'neg_kendall_distance', 'tau_x']
 >>> get_scorer("neg_kendall_distance")
 make_scorer(kendall_distance, greater_is_better=False, response_method='predict')
 
@@ -119,16 +119,16 @@ Partial label ranking metrics
 
 The metrics of partial label ranking compare rankings that may have ties.
 
-.. _kendall_tau_x:
+.. _tau_x:
 
 :math:`\tau_x`
 ~~~~~~~~~~~~~~
 
-:func:`kendall_tau_x_score` computes the :math:`\tau_x` rank correlation
-coefficient [emond_new_2002]_, which extends Kendall's :math:`\tau` to rankings
-with ties. Let :math:`a'_{ij}` be ``1`` if :math:`y_i \leq y_j`, that is, if
-label :math:`i` is ahead of or tied with label :math:`j`, and ``-1`` if
-:math:`y_i > y_j`, for :math:`i \neq j`. Then
+:func:`tau_x_score` computes the :math:`\tau_x` rank correlation coefficient
+[emond_new_2002]_, which extends Kendall's :math:`\tau` to rankings with ties.
+Let :math:`a'_{ij}` be ``1`` if :math:`y_i \leq y_j`, that is, if label :math:`i`
+is ahead of or tied with label :math:`j`, and ``-1`` if :math:`y_i > y_j`, for
+:math:`i \neq j`. Then
 
 .. math::
 
@@ -139,12 +139,12 @@ a ranking with all its labels tied has a coefficient of ``1`` with itself and of
 ``0`` with any ranking without ties. For rankings without ties, it is equal to
 Kendall's :math:`\tau`:
 
->>> from sklr.metrics import kendall_tau_x_score
->>> kendall_tau_x_score([[1, 1, 1]], [[1, 1, 1]])
+>>> from sklr.metrics import tau_x_score
+>>> tau_x_score([[1, 1, 1]], [[1, 1, 1]])
 1.0
->>> kendall_tau_x_score([[1, 1, 1]], [[1, 2, 3]])
+>>> tau_x_score([[1, 1, 1]], [[1, 2, 3]])
 0.0
->>> kendall_tau_x_score(y_true, y_pred)
+>>> tau_x_score(y_true, y_pred)
 0.333...
 
 The :math:`\tau_x` coefficient is also equivalent to the Kemeny-Snell distance

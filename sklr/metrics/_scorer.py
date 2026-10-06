@@ -14,13 +14,13 @@ from sklearn.metrics import make_scorer
 from sklr.metrics._ranking import (
     kendall_distance,
     kendall_tau_score,
-    kendall_tau_x_score,
+    tau_x_score,
 )
 from sklr.utils._sklearn_compat import validate_params
 
 _SCORERS = {
     "kendall_tau": make_scorer(kendall_tau_score),
-    "kendall_tau_x": make_scorer(kendall_tau_x_score),
+    "tau_x": make_scorer(tau_x_score),
     "neg_kendall_distance": make_scorer(kendall_distance, greater_is_better=False),
 }
 
@@ -115,6 +115,6 @@ def get_scorer_names() -> list[str]:
     --------
     >>> from sklr.metrics import get_scorer_names
     >>> get_scorer_names()
-    ['kendall_tau', 'kendall_tau_x', 'neg_kendall_distance']
+    ['kendall_tau', 'neg_kendall_distance', 'tau_x']
     """
     return sorted(_SCORERS)

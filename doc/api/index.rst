@@ -66,7 +66,7 @@ Partial label ranking metrics
    :toctree: ../modules/generated/
    :template: base.rst
 
-   kendall_tau_x_score
+   tau_x_score
 
 :mod:`sklr.utils`: Utilities
 ----------------------------

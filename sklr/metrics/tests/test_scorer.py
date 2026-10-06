@@ -11,7 +11,7 @@ from sklr.metrics import (
     get_scorer_names,
     kendall_distance,
     kendall_tau_score,
-    kendall_tau_x_score,
+    tau_x_score,
 )
 from sklr.utils.tests.test_estimator_checks import (
     ConsensusLabelRanker,
@@ -21,7 +21,7 @@ from sklr.utils.tests.test_estimator_checks import (
 # The metric of each scorer and the sign that the scorer gives to it
 SCORERS = {
     "kendall_tau": (kendall_tau_score, 1),
-    "kendall_tau_x": (kendall_tau_x_score, 1),
+    "tau_x": (tau_x_score, 1),
     "neg_kendall_distance": (kendall_distance, -1),
 }
 
@@ -82,7 +82,7 @@ def test_get_scorer_invalid_name():
 @pytest.mark.parametrize(
     "ranker, name",
     [(ConsensusLabelRanker(), name) for name in SCORERS]
-    + [(ConsensusPartialLabelRanker(), "kendall_tau_x")],
+    + [(ConsensusPartialLabelRanker(), "tau_x")],
 )
 def test_cross_val_score(ranker, name):
     metric, sign = SCORERS[name]
@@ -123,7 +123,7 @@ def test_grid_search():
     "ranker, name",
     [
         (ConsensusLabelRanker(), "kendall_tau"),
-        (ConsensusPartialLabelRanker(), "kendall_tau_x"),
+        (ConsensusPartialLabelRanker(), "tau_x"),
     ],
 )
 def test_cross_val_score_default_scorer(ranker, name):

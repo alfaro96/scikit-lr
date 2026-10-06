@@ -3,7 +3,7 @@
 from numpy.typing import ArrayLike
 from sklearn.utils import get_tags
 
-from sklr.metrics import kendall_tau_score, kendall_tau_x_score
+from sklr.metrics import kendall_tau_score, tau_x_score
 
 
 class LabelRankerMixin:
@@ -133,7 +133,7 @@ class PartialLabelRankerMixin:
     ) -> float:
         """Return the mean :math:`\\tau_x` coefficient on the given data.
 
-        It is computed with :func:`~sklr.metrics.kendall_tau_x_score`.
+        It is computed with :func:`~sklr.metrics.tau_x_score`.
 
         Parameters
         ----------
@@ -152,7 +152,7 @@ class PartialLabelRankerMixin:
             Mean :math:`\\tau_x` of ``self.predict(X)`` with respect to `y`.
         """
         y_pred = self.predict(X)  # pyrefly: ignore[missing-attribute]
-        return kendall_tau_x_score(y, y_pred, sample_weight=sample_weight)
+        return tau_x_score(y, y_pred, sample_weight=sample_weight)
 
 
 def is_label_ranker(estimator: object) -> bool:
