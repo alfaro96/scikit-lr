@@ -11,3 +11,12 @@ cdef bint estimate_center(
     float64_t[::1] scores,
     intp_t[:, ::1] work,
 ) noexcept nogil
+
+
+cdef float64_t estimate_spread(
+    const float64_t[:, ::1] y,
+    const float64_t[::1] sample_weight,
+    const intp_t[::1] center,
+    float64_t[::1] completed,
+    intp_t[:, ::1] work,
+) noexcept nogil

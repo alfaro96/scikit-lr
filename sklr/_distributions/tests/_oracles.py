@@ -2,13 +2,15 @@
 
 They follow Propositions 1 and 2 and Algorithm 1 of [cheng_decision_2009] literally, in
 exact arithmetic with :class:`fractions.Fraction`, so that ties are not decided by
-rounding.
+rounding. The spread is found in floating point instead, from the probabilities of all
+the rankings rather than a formula for their expected distance.
 """
 
 import itertools
 from fractions import Fraction
 
 import numpy as np
+from scipy.optimize import brentq
 from sklearn.utils import check_random_state
 
 
@@ -106,3 +108,40 @@ def estimate_center(y, sample_weight):
         center = rank_by_scores(borda_scores(completed, sample_weight))
         if np.array_equal(center, previous):
             return center, n_iter
+
+
+def expected_distance(theta, n_labels):
+    """Compute the expected Kendall distance to the center over all the rankings."""
+    identity = np.arange(n_labels)
+    distances = np.array(
+        [
+            kendall_distance(permutation, identity)
+            for permutation in itertools.permutations(range(n_labels))
+        ]
+    )
+    probabilities = np.exp(-theta * distances)
+    return probabilities @ distances / probabilities.sum()
+
+
+def estimate_spread(y, center, sample_weight):
+    """Estimate the spread by completing the rankings and solving for the mean."""
+    distances = [kendall_distance(complete_ranking(row, center), center) for row in y]
+    weights = [Fraction(weight) for weight in sample_weight]
+    mean_distance = float(
+        sum(w * d for w, d in zip(weights, distances, strict=True)) / sum(weights)
+    )
+    n_labels = y.shape[1]
+    if mean_distance == 0:
+        return np.inf
+    if mean_distance >= n_labels * (n_labels - 1) / 4:
+        return 0.0
+    upper = 1.0
+    while expected_distance(upper, n_labels) >= mean_distance:
+        upper *= 2
+    return brentq(
+        lambda theta: expected_distance(theta, n_labels) - mean_distance,
+        0,
+        upper,
+        xtol=1e-300,
+        rtol=1e-15,
+    )

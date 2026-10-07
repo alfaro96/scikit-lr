@@ -1,10 +1,12 @@
-"""Center ranking of the Mallows model of label rankings, possibly incomplete."""
+"""Center ranking and spread of the Mallows model of possibly incomplete rankings."""
 
 import numpy as np
 
 cimport cython
 from cython.parallel cimport prange, threadid
-from libc.math cimport isnan
+from libc.float cimport DBL_EPSILON
+from libc.math cimport INFINITY, exp, isnan
+from scipy.optimize.cython_optimize cimport brentq
 
 from sklearn.utils._typedefs cimport float64_t, intp_t, uint8_t
 
@@ -106,6 +108,112 @@ cdef bint estimate_center(
     return False
 
 
+cdef struct _SpreadEquation:
+    intp_t n_labels
+    float64_t mean_distance
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef intp_t _kendall_distance(
+    const float64_t[::1] y, const intp_t[::1] center
+) noexcept nogil:
+    """Count the pairs of labels that a complete ranking and the center disagree on."""
+    cdef intp_t n_labels = y.shape[0]
+    cdef intp_t label, other, distance = 0
+    for label in range(n_labels):
+        for other in range(label + 1, n_labels):
+            if (y[label] < y[other]) != (center[label] < center[other]):
+                distance += 1
+    return distance
+
+
+# The total of the probabilities, a divisor, starts at one and only grows
+@cython.cdivision(True)
+cdef float64_t _expected_distance(float64_t theta, intp_t n_labels) noexcept nogil:
+    """Compute the expected Kendall distance to the center for a spread `theta`.
+
+    The expected distance of [cheng_decision_2009] is the sum, over :math:`j` from
+    :math:`2` to :math:`n`, of the mean of a variable from :math:`0` to
+    :math:`j - 1` with probabilities proportional to :math:`q^r`, where :math:`q`
+    is the exponential of minus `theta`. Its closed form subtracts terms that grow
+    as the inverse of `theta` and cancel out near zero, while these means only add
+    up positive terms.
+    """
+    cdef float64_t q = exp(-theta)
+    cdef float64_t power = 1, total = 1, weighted = 0, distance = 0
+    cdef intp_t j
+    for j in range(1, n_labels):
+        power *= q
+        total += power
+        weighted += j * power
+        distance += weighted / total
+    return distance
+
+
+cdef float64_t _spread_equation(float64_t theta, void* args) noexcept nogil:
+    """Compute the expected distance for `theta` minus the mean observed distance."""
+    cdef _SpreadEquation* equation = <_SpreadEquation*> args
+    return _expected_distance(theta, equation.n_labels) - equation.mean_distance
+
+
+# A mean distance of zero has no finite spread, and from n_labels(n_labels - 1)/4,
+# the expected distance of the uniform distribution, the spread would be negative
+cdef float64_t _solve_spread(float64_t mean_distance, intp_t n_labels) noexcept nogil:
+    """Find the spread whose expected distance is the mean observed distance."""
+    cdef _SpreadEquation equation
+    cdef float64_t lower = 0, upper = 1
+    if mean_distance <= 0:
+        return INFINITY
+    if mean_distance >= n_labels * (n_labels - 1) / 4.0:
+        return 0
+    # The expected distance decreases to zero, so doubling the upper bound
+    # brackets the root between its last two values
+    while _expected_distance(upper, n_labels) >= mean_distance:
+        lower = upper
+        upper *= 2
+    equation.n_labels = n_labels
+    equation.mean_distance = mean_distance
+    # The root is positive, so the relative tolerance alone, the smallest that
+    # scipy.optimize.brentq accepts, gives it to nearly full precision. The C
+    # routine, unlike that function, accepts a zero absolute tolerance. Mean
+    # distances far below one, from very uneven weights, take close to a hundred
+    # iterations, so the cap leaves room for them
+    return brentq(
+        _spread_equation, lower, upper, &equation, 0, 4 * DBL_EPSILON, 200, NULL
+    )
+
+
+# The callers do not let the weights add up to zero, the divisor of the mean
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+cdef float64_t estimate_spread(
+    const float64_t[:, ::1] y,
+    const float64_t[::1] sample_weight,
+    const intp_t[::1] center,
+    float64_t[::1] completed,
+    intp_t[:, ::1] work,
+) noexcept nogil:
+    """Estimate the spread of the Mallows model given its center.
+
+    The rankings `y` must not have ties and the weights must not all be zero. As in
+    Algorithm 1 of [cheng_decision_2009], the rankings are completed with their
+    closest extensions to the center, and the spread is the maximum likelihood
+    estimate, whose expected distance to the center is the weighted mean of their
+    Kendall distances to it: ``0`` if it is not below that of the uniform
+    distribution, and infinite if it is zero. `completed` has ``n_labels``
+    elements and `work` has shape ``(2, n_labels)``.
+    """
+    cdef intp_t sample
+    cdef float64_t distance = 0, total_weight = 0
+    for sample in range(y.shape[0]):
+        complete_ranking(y[sample], center, completed, work[0], work[1])
+        distance += sample_weight[sample] * _kendall_distance(completed, center)
+        total_weight += sample_weight[sample]
+    return _solve_spread(distance / total_weight, y.shape[1])
+
+
 # The shapes of the inputs and the number of threads are checked first, and the
 # other arrays are created with them
 @cython.boundscheck(False)
@@ -160,3 +268,49 @@ def estimate_center_batch(
             work[thread],
         )
     return center, n_iter, converged.astype(bool)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def estimate_spread_batch(
+    const float64_t[:, :, ::1] y,
+    const float64_t[:, ::1] sample_weight,
+    const intp_t[:, ::1] center,
+    int n_threads,
+):
+    """Estimate the spread of the Mallows model of each group given its center.
+
+    The rankings `y` must not have ties and the weights of a group must not all be
+    zero.
+    """
+    cdef intp_t n_groups = y.shape[0], n_samples = y.shape[1], n_labels = y.shape[2]
+    cdef intp_t group
+    cdef int thread
+    if sample_weight.shape[0] != n_groups or sample_weight.shape[1] != n_samples:
+        raise ValueError(
+            f"Expected sample weights of shape ({n_groups}, {n_samples}), got "
+            f"({sample_weight.shape[0]}, {sample_weight.shape[1]}) instead."
+        )
+    if center.shape[0] != n_groups or center.shape[1] != n_labels:
+        raise ValueError(
+            f"Expected centers of shape ({n_groups}, {n_labels}), got "
+            f"({center.shape[0]}, {center.shape[1]}) instead."
+        )
+    if n_threads < 1:
+        raise ValueError(f"Expected at least 1 thread, got n_threads={n_threads}.")
+
+    spread = np.empty(n_groups, dtype=np.float64)
+    cdef float64_t[::1] spread_view = spread
+    cdef float64_t[:, ::1] completed = np.empty((n_threads, n_labels), dtype=np.float64)
+    cdef intp_t[:, :, ::1] work = np.empty((n_threads, 2, n_labels), dtype=np.intp)
+
+    for group in prange(n_groups, nogil=True, schedule="static", num_threads=n_threads):
+        thread = threadid()
+        spread_view[group] = estimate_spread(
+            y[group],
+            sample_weight[group],
+            center[group],
+            completed[thread],
+            work[thread],
+        )
+    return spread
