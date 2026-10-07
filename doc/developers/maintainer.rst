@@ -62,3 +62,15 @@ minor release. A final release, not a pre-release, also becomes the stable
 version, where the root of the site redirects to, unless a newer minor release
 already is. The pushes to the development branch publish the development
 version.
+
+Bundled libraries
+-----------------
+
+The tools that repair the wheels bundle with them the OpenMP runtime of their
+platform: ``libgomp`` on Linux, ``libomp`` on macOS and ``vcomp140.dll`` on Windows.
+Its license is appended to the license of scikit-lr in the wheels, from the files in
+``build_tools/wheels``, and the workflow checks that each wheel has the runtime of
+its platform and its license. On macOS, the runtime of LLVM is installed from
+conda-forge before building, in its oldest version for each architecture, so that it
+supports the oldest macOS version of the wheels. If the wheels bundle another
+library, add its license to those files.

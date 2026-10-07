@@ -78,7 +78,20 @@ test-requires = ["pytest"]
 test-sources = ["pyproject.toml"]
 test-command = "python -m pytest --pyargs sklr"
 
+# The repair of the wheels bundles the OpenMP runtime with them, so the license
+# of the runtime of each platform is distributed with the license of scikit-lr
+[tool.cibuildwheel.linux]
+before-build = "bash {project}/build_tools/wheels/add_bundled_licenses.sh {project} build_tools/wheels/LICENSE_linux.txt"
+
+[tool.cibuildwheel.macos]
+before-all = "bash build_tools/wheels/install_openmp_macos.sh $HOME/llvm-openmp"
+before-build = "bash {project}/build_tools/wheels/add_bundled_licenses.sh {project} build_tools/wheels/LICENSE_macos.txt"
+# Meson only looks for the OpenMP runtime of the compiler of macOS where Homebrew
+# installs it, so the flags that enable OpenMP are passed to every compilation
+environment = {CPPFLAGS = "-Xpreprocessor -fopenmp", CFLAGS = "-I$HOME/llvm-openmp/include", LDFLAGS = "-Wl,-rpath,$HOME/llvm-openmp/lib -L$HOME/llvm-openmp/lib -lomp"}
+
 [tool.cibuildwheel.windows]
+before-build = "bash {project}/build_tools/wheels/add_bundled_licenses.sh {project} build_tools/wheels/LICENSE_windows.txt"
 # Use MSVC, the compiler of CPython on Windows, instead of the
 # MinGW compiler that the runner also has in the PATH
 config-settings = {setup-args = "--vsenv"}
