@@ -67,5 +67,6 @@ py.install_sources(
 
 subdir('tests')
 subdir('__check_build')
+subdir('_distributions')
 subdir('metrics')
 subdir('utils')
