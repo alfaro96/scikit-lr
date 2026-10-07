@@ -4,9 +4,10 @@ The versions of some packages, and the supported Python versions, are declared
 in more than one file, so they are checked against each other to keep them from
 drifting apart.
 
-In ``pyproject.toml``, the packages whose ``.pxd`` files are cimported must
-have the same range in the runtime and in the build dependencies, because the
-extension modules only work with the minor release they were built against.
+In ``pyproject.toml``, the packages whose ``.pxd`` files are cimported without
+a stable ABI must have the same range in the runtime and in the build
+dependencies, because the extension modules only work with the minor release
+they were built against.
 The runtime and build dependencies in ``environment.yml`` must have the same
 ranges as in ``pyproject.toml``, and its Python version must be the minimum
 supported one.
@@ -54,8 +55,9 @@ HOOK_PACKAGES = {
     "https://github.com/facebook/pyrefly-pre-commit": "pyrefly",
 }
 
-# Packages whose .pxd files are cimported by the extension modules, which
-# must run with the same minor release they were built against
+# Packages whose .pxd files are cimported by the extension modules without a
+# stable ABI, so they must run with the same minor release they were built
+# against. SciPy is left out, since it keeps the ABI of its public Cython API
 CIMPORTED_PACKAGES = ["scikit-learn"]
 
 WORKFLOWS_DIR = Path(".github/workflows")

@@ -1,21 +1,25 @@
-# scikit-learn has no get_include(), so pass the directory that contains
-# its installed package to find the .pxd files it ships. find_spec does
-# not import scikit-learn, it only locates the package
-sklearn_include_dir = run_command(py,
+# scikit-learn and SciPy have no get_include(), so pass the directories that
+# contain their installed packages to find the .pxd files they ship. find_spec
+# does not import the packages, it only locates them
+cython_include_dirs = run_command(py,
   [
     '-c',
     '''
 import importlib.util
 from pathlib import Path
 
-spec = importlib.util.find_spec("sklearn")
-print(Path(spec.submodule_search_locations[0]).parent)
+for name in ["sklearn", "scipy"]:
+    spec = importlib.util.find_spec(name)
+    print(Path(spec.submodule_search_locations[0]).parent)
 '''
   ],
   check: true
-).stdout().strip()
+).stdout().strip().split('\n')
 
-cython_args = ['--include-dir', sklearn_include_dir]
+cython_args = []
+foreach include_dir : cython_include_dirs
+  cython_args += ['--include-dir', include_dir]
+endforeach
 
 # Without OpenMP, the prange loops still build and run on a single thread
 openmp_dep = dependency('OpenMP', language: 'c', required: false)

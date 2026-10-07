@@ -32,6 +32,15 @@ if not numpy_version.version_compare('>=' + numpy_min_version)
   error('scikit-lr requires NumPy>=' + numpy_min_version + ', got ' + numpy_version + ' instead')
 endif
 
+scipy_version = run_command(py,
+  ['-c', 'import importlib.metadata; print(importlib.metadata.version("scipy"))'],
+  check: true
+).stdout().strip()
+scipy_min_version = run_command(py, [min_version_script, 'scipy'], check: true).stdout().strip()
+if not scipy_version.version_compare('>=' + scipy_min_version)
+  error('scikit-lr requires SciPy>=' + scipy_min_version + ', got ' + scipy_version + ' instead')
+endif
+
 # meson-python is not needed when running Meson directly,
 # so it is only checked when it is installed
 meson_python_version_result = run_command(py,
