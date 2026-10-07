@@ -17,6 +17,9 @@ print(Path(spec.submodule_search_locations[0]).parent)
 
 cython_args = ['--include-dir', sklearn_include_dir]
 
+# Without OpenMP, the prange loops still build and run on a single thread
+openmp_dep = dependency('OpenMP', language: 'c', required: false)
+
 if get_option('linetrace')
   # Cython only emits the calls that report each executed line when the
   # directive is set, and the C code only compiles them in with the macro,
