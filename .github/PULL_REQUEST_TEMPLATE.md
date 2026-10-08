@@ -1,24 +1,34 @@
-<!--- Thanks for contributing a pull request! -->
+<!--
+Thanks for contributing a pull request! Please make sure that it meets the
+pull request checklist of the contributing guide:
+https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html#pull-request-checklist
+-->
 
 #### Reference issues and pull requests
 
 <!--
-Please use keywords to create a link to the issues or pull requests
-you resolved, so that they will automatically be closed when your
-pull request is merged. For more information about closing issues,
-see: https://github.com/blog/1506-closing-issues-via-pull-requests
+Link the issues and pull requests that this one resolves with a keyword, such as
+"Fixes #1234", so that they are closed when it is merged. Link the related ones
+without a keyword, such as "See also #3456".
 -->
 
-#### What does this implement?
 
-#### Any other comments?
+#### What does this implement or fix?
+
+
+#### AI usage disclosure
 
 <!--
-Please be aware that we are a loose team of volunteers so patience
-is necessary, and assistance handling other issues is very welcome.
-We value all user contributions, no matter how minor they are. If we
-are slow to review, either the pull request needs some benchmarking,
-tinkering, convincing, etc. or more likely the reviewers are simply
-busy. In either case, we ask for your understanding during the review
-process.
+Keep the items that apply and delete the rest, or write "None". See the
+automated contributions policy of the contributing guide:
+https://alfaro96.github.io/scikit-lr/dev/developers/contributing.html#automated-contributions-policy
 -->
+
+I used AI tools for:
+
+* Code
+* Tests
+* Documentation
+* Research and understanding
+
+#### Any other comments?

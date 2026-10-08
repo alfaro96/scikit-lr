@@ -1,50 +1,31 @@
-"""
-Machine Learning package for Label Ranking problems in Python
-=============================================================
+"""Label ranking and partial label ranking estimators for scikit-learn."""
 
-Scikit-lr is a Python package integrating Machine Learning algorithms
-for Label Ranking problems in the tightly-knit world of Scientific Python
-packages.
+import importlib as _importlib
 
-It aims to provide simple and efficient solutions to Label Ranking
-problems that are accessible to everybody and reusable in all contexts.
-
-See: https://scikit-lr.readthedocs.io for complete documentation.
-"""
-
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-# PEP0440 compatible formatted version, see:
-# https://www.python.org/dev/peps/pep-0440
-#
-# Generic release markers:
-#   * X.Y
-#   * X.Y.Z   # Bug-fix release
-#
-# Admissible pre-release markers:
-#   * X.YaN   # Alpha release
-#   * X.YbN   # Beta release
-#   * X.YrcN  # Release candidate
-#   * X.Y     # Final release
-#
-# Dev branch marker is: "X.Y.dev" or "X.Y.devN", where N is an integer.
-# "X.Y.dev0" is the canonical version of "X.Y.dev".
-
-# Scikit-lr package version
+# This line is also parsed by sklr/_build_utils/version.py to set the
+# version of the distribution, so keep it as a single string literal.
 __version__ = "0.3.dev0"
 
+# Fail early with a helpful message if the extension modules are not built,
+# or were compiled against another scikit-learn. __check_build can be loaded
+# before the version check because it only uses scikit-learn typedefs
+from sklr import __check_build, _sklearn_version  # noqa: F401
+from sklr.utils._show_versions import show_versions
 
-# =============================================================================
-# Module public objects
-# =============================================================================
-__all__ = [
-    "consensus",
-    "dummy",
-    "metrics",
-    "neighbors",
-    "tree",
-    "utils"
-]
+_submodules = ["base", "metrics", "utils"]
+
+__all__ = ["show_versions"]
+__all__.extend(_submodules)
+
+
+def __dir__():
+    return __all__
+
+
+def __getattr__(name):
+    if name in _submodules:
+        return _importlib.import_module(f"sklr.{name}")
+    try:
+        return globals()[name]
+    except KeyError:
+        raise AttributeError(f"Module 'sklr' has no attribute {name!r}") from None

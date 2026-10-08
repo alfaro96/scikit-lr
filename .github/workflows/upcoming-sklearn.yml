@@ -1,0 +1,110 @@
+# Build scikit-lr against the upcoming scikit-learn and run its tests
+name: Upcoming scikit-learn
+
+# The extension modules cimport the internals of scikit-learn, and the Python
+# code may use its private API, both of which may change between its minor
+# releases without deprecation. Building and testing against the next release
+# every night finds those changes before it is published, and tells when a
+# release line of scikit-lr for it can be opened. The nightly wheels of
+# scikit-learn are built from its main branch, which moves on to the following
+# minor release when the first release candidate of the next one is prepared,
+# so the latest release on PyPI, release candidates included, is tested too.
+# The runs of the pull requests that change the workflow or its scripts check
+# them before they reach master, where the schedule runs. A failure of the
+# scheduled or manual runs opens an issue, since nobody may look at them, and
+# the issue is closed once they pass again
+on:
+  schedule:
+    # After the nightly wheels of scikit-learn are uploaded
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+    paths:
+      - .github/workflows/upcoming-sklearn.yml
+      - build_tools/github/build_requirements.py
+      - build_tools/github/install_upcoming_sklearn.sh
+      - build_tools/github/test_script.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # while every other run gets its own, so only the outdated runs of a pull
+  # request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  upcoming-sklearn:
+    name: scikit-learn ${{ matrix.sklearn }}
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, whose changes are tested here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    strategy:
+      # Run every job to completion, since a failure in one of them
+      # says nothing about the others
+      fail-fast: false
+      matrix:
+        # The nightly wheels, or the latest release on PyPI
+        sklearn: [nightly, latest]
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
+
+      - name: Build and install scikit-lr against the upcoming scikit-learn
+        env:
+          SKLEARN: ${{ matrix.sklearn }}
+        run: bash build_tools/github/install_upcoming_sklearn.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
+
+  update-tracking-issue:
+    name: Update the tracking issue
+    needs: upcoming-sklearn
+    runs-on: ubuntu-latest
+    # Only the scheduled and manual runs, which test master or the branch
+    # chosen by hand, report to the issue; the runs of the pull requests are
+    # reported on them. It also runs when a job of the matrix fails, so that
+    # failure opens the issue
+    if: >-
+      always() && github.repository == 'alfaro96/scikit-lr' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+
+    permissions:
+      # Open, edit and close the issue with the token of the job
+      issues: write
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Open, update or close the issue
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          LABEL: continuous integration
+          # The result of the whole matrix, a failure if any of its jobs failed
+          RESULT: ${{ needs.upcoming-sklearn.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: bash build_tools/github/update_tracking_issue.sh

@@ -1,0 +1,125 @@
+# Build the documentation and publish it on GitHub Pages
+name: Documentation
+
+# The documentation is built for the pull requests that target master or a
+# release branch, so one that breaks it fails before merging, and for the
+# merges, since two pull requests that build on their own can break it once
+# merged. The pushes to the development branches publish it as the development
+# version, and publishing a GitHub release publishes the documentation of its
+# tag as the version of its minor release
+on:
+  push:
+    branches:
+      - master
+      # Development branch until it replaces master
+      - modernize
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # while every other run gets its own, so only the outdated runs of a pull
+  # request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build the documentation
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, whose changes are built here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    defaults:
+      run:
+        # A login shell, to activate the environment
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The development environment, which has the dependencies of the
+      # documentation. It is not cached, so every run gets the latest
+      # releases of its packages
+      - name: Set up the development environment
+        uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v3.2.1
+        with:
+          environment-file: environment.yml
+
+      - name: Build and install scikit-lr in editable mode
+        run: bash build_tools/github/install_editable.sh
+
+      - name: Build the documentation
+        run: bash build_tools/github/build_doc.sh
+
+      # Also kept for the pull requests, to look at the pages before merging
+      - name: Store the documentation
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: documentation
+          path: doc/_build/html
+
+  deploy:
+    name: Deploy the documentation
+    needs: build
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'release' ||
+      (github.event_name == 'push' &&
+       (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernize'))
+
+    permissions:
+      # Push the site to the gh-pages branch, which GitHub Pages serves
+      contents: write
+
+    # Every deployment rewrites the gh-pages branch from its previous state.
+    # The deployments of the development version run one after another, and
+    # one that is waiting is replaced by a newer one, which publishes a later
+    # commit. Each release gets its own group, so it is never replaced, and if
+    # it runs at the same time as another deployment, the push of the last one
+    # fails because the branch changed since it was read, instead of dropping
+    # the pages of the other one
+    concurrency:
+      group: ${{ github.workflow }}-deploy-${{ github.event_name == 'release' && github.ref || 'dev' }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
+
+      - name: Download the documentation
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: documentation
+          path: html
+
+      - name: Publish the documentation on the gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          HTML_DIR: html
+          SITE_DIR: site
+          SITE_URL: https://alfaro96.github.io/scikit-lr
+        run: bash build_tools/github/deploy_doc.sh
