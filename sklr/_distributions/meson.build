@@ -1,6 +1,7 @@
 py.install_sources(
   [
     '__init__.py',
+    '_convergence.py',
     'mallows.py',
   ],
   subdir: 'sklr/_distributions',

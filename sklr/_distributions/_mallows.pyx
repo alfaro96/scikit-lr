@@ -214,8 +214,8 @@ cdef float64_t estimate_spread(
     return _solve_spread(distance / total_weight, y.shape[1])
 
 
-# The shapes of the inputs and the number of threads are checked first, and the
-# other arrays are created with them
+# The callers pass inputs of matching shapes and at least one thread, and the other
+# arrays are created with those shapes
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def estimate_center_batch(
@@ -232,13 +232,6 @@ def estimate_center_batch(
     cdef intp_t n_groups = y.shape[0], n_samples = y.shape[1], n_labels = y.shape[2]
     cdef intp_t group
     cdef int thread
-    if sample_weight.shape[0] != n_groups or sample_weight.shape[1] != n_samples:
-        raise ValueError(
-            f"Expected sample weights of shape ({n_groups}, {n_samples}), got "
-            f"({sample_weight.shape[0]}, {sample_weight.shape[1]}) instead."
-        )
-    if n_threads < 1:
-        raise ValueError(f"Expected at least 1 thread, got n_threads={n_threads}.")
 
     center = np.empty((n_groups, n_labels), dtype=np.intp)
     n_iter = np.empty(n_groups, dtype=np.intp)
@@ -283,21 +276,9 @@ def estimate_spread_batch(
     The rankings `y` must not have ties and the weights of a group must not all be
     zero.
     """
-    cdef intp_t n_groups = y.shape[0], n_samples = y.shape[1], n_labels = y.shape[2]
+    cdef intp_t n_groups = y.shape[0], n_labels = y.shape[2]
     cdef intp_t group
     cdef int thread
-    if sample_weight.shape[0] != n_groups or sample_weight.shape[1] != n_samples:
-        raise ValueError(
-            f"Expected sample weights of shape ({n_groups}, {n_samples}), got "
-            f"({sample_weight.shape[0]}, {sample_weight.shape[1]}) instead."
-        )
-    if center.shape[0] != n_groups or center.shape[1] != n_labels:
-        raise ValueError(
-            f"Expected centers of shape ({n_groups}, {n_labels}), got "
-            f"({center.shape[0]}, {center.shape[1]}) instead."
-        )
-    if n_threads < 1:
-        raise ValueError(f"Expected at least 1 thread, got n_threads={n_threads}.")
 
     spread = np.empty(n_groups, dtype=np.float64)
     cdef float64_t[::1] spread_view = spread

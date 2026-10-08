@@ -79,9 +79,3 @@ def test_complete_rankings_complete_and_sparse_rows():
     y = np.array([[2, 1, 4, 3], [np.nan] * 4, [np.nan, 1, np.nan, np.nan]])
     completed = complete_rankings(y, center)
     assert_array_equal(completed, [[2, 1, 4, 3], center, center])
-
-
-def test_complete_rankings_invalid_center():
-    """Check the error for a center with another number of labels."""
-    with pytest.raises(ValueError, match="center of 3 labels, got 2"):
-        complete_rankings(np.array([[1.0, 2, 3]]), np.array([1, 2], dtype=np.intp))

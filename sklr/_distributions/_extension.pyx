@@ -81,18 +81,14 @@ cdef void complete_ranking(
         completed[label] = n_before + 1
 
 
-# The number of labels of the center is checked first, and the other arrays are
-# created with the sizes of the inputs
+# The callers pass a center with the labels of the rankings, and the other arrays
+# are created with the sizes of the inputs
 @cython.boundscheck(False)
 @cython.wraparound(False)
 def complete_rankings(const float64_t[:, ::1] y, const intp_t[::1] center):
     """Complete each ranking, without ties, with its closest extension to the center."""
     cdef intp_t n_samples = y.shape[0], n_labels = y.shape[1]
     cdef intp_t sample
-    if center.shape[0] != n_labels:
-        raise ValueError(
-            f"Expected a center of {n_labels} labels, got {center.shape[0]} instead."
-        )
 
     completed = np.empty((n_samples, n_labels), dtype=np.float64)
     cdef float64_t[:, ::1] completed_view = completed

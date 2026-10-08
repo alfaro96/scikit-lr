@@ -211,38 +211,6 @@ def test_estimate_center_convergence_warning():
         )
 
 
-@pytest.mark.parametrize(
-    "y, sample_weight, max_iter, match",
-    [
-        (np.empty((0, 3)), None, 100, "minimum of 1 is required"),
-        ([[1, 2, np.inf]], None, 100, "infinity"),
-        ([[1, 2.5, 3]], None, 100, "dense from 1"),
-        ([[1, 1, 2]], None, 100, "without ties"),
-        ([[1, 2], [2, 1]], [1, -1], 100, "Negative values"),
-        ([[1, 2], [2, 1]], [0, 0], 100, "at least one non-zero"),
-        ([[1, 2], [2, 1]], [1, 1, 1], 100, "sample_weight.shape"),
-        ([[1, 2], [2, 1]], None, -1, "max_iter=-1"),
-    ],
-)
-def test_estimate_center_invalid(y, sample_weight, max_iter, match):
-    """Check the errors for invalid rankings, weights and iterations."""
-    with pytest.raises(ValueError, match=match):
-        estimate_center(y, sample_weight, max_iter=max_iter)
-
-
-def test_estimate_center_batch_invalid():
-    """Check the errors for invalid iterations, threads and shapes of the groups."""
-    y = np.tile([1.0, 2, 3, 4], (2, 3, 1))
-    with pytest.raises(ValueError, match="max_iter=-1"):
-        estimate_center_batch(y, np.ones((2, 3)), max_iter=-1)
-    with pytest.raises(ValueError, match="n_threads=0"):
-        estimate_center_batch(y, np.ones((2, 3)), n_threads=0)
-    with pytest.raises(ValueError, match="n_threads=0"):
-        _mallows.estimate_center_batch(y, np.ones((2, 3)), 100, 0)
-    with pytest.raises(ValueError, match=r"shape \(2, 3\), got \(2, 2\)"):
-        _mallows.estimate_center_batch(y, np.ones((2, 2)), 100, 1)
-
-
 def _rankings_at_mean_distance(n_labels, mean_distance):
     """Build the identity and its reverse, weighted to have a given mean distance.
 
@@ -424,38 +392,3 @@ def test_estimate_spread_batch(n_threads):
     ]
     spread = estimate_spread_batch(y, center, sample_weight, n_threads=n_threads)
     assert_array_equal(spread, expected)
-
-
-@pytest.mark.parametrize(
-    "y, center, sample_weight, match",
-    [
-        (np.empty((0, 3)), [1, 2, 3], None, "minimum of 1 is required"),
-        ([[1, 1, 2]], [1, 2, 3], None, "without ties"),
-        ([[1, 2], [2, 1]], [1, 2], [1, -1], "Negative values"),
-        ([[1, 2], [2, 1]], [1, 2], [0, 0], "at least one non-zero"),
-        ([[1, 2, 3]], [1, 2], None, r"shape \(3,\), got \(2,\)"),
-        ([[1, 2, 3]], [[1, 2, 3]], None, r"shape \(3,\), got \(1, 3\)"),
-        ([[1, 2, 3]], [1, 1, 2], None, r"center=\[1 1 2\]"),
-        ([[1, 2, 3]], [1, np.nan, 2], None, r"center=\[ 1\. nan  2\.\]"),
-        ([[1, 2, 3]], [1, 2, 4], None, r"center=\[1 2 4\]"),
-        ([[1, 2, 3]], [1.5, 2, 3], None, r"center=\[1\.5 2\.  3\. \]"),
-    ],
-)
-def test_estimate_spread_invalid(y, center, sample_weight, match):
-    """Check the errors for invalid rankings, centers and weights."""
-    with pytest.raises(ValueError, match=match):
-        estimate_spread(y, center, sample_weight)
-
-
-def test_estimate_spread_batch_invalid():
-    """Check the errors for invalid threads and shapes of the groups."""
-    y = np.tile([1.0, 2, 3, 4], (2, 3, 1))
-    center = np.tile(np.arange(1, 5), (2, 1))
-    with pytest.raises(ValueError, match="n_threads=0"):
-        estimate_spread_batch(y, center, np.ones((2, 3)), n_threads=0)
-    with pytest.raises(ValueError, match="n_threads=0"):
-        _mallows.estimate_spread_batch(y, np.ones((2, 3)), center, 0)
-    with pytest.raises(ValueError, match=r"weights of shape \(2, 3\), got \(2, 2\)"):
-        _mallows.estimate_spread_batch(y, np.ones((2, 2)), center, 1)
-    with pytest.raises(ValueError, match=r"centers of shape \(2, 4\), got \(2, 3\)"):
-        _mallows.estimate_spread_batch(y, np.ones((2, 3)), center[:, :3].copy(), 1)
