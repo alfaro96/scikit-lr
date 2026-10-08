@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Contributing &#8212; scikit-lr 0.3.dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=2b62b5d0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'developers/contributing';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://alfaro96.github.io/scikit-lr/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Setting up the development environment" href="development_setup.html" />
+    <link rel="prev" title="Developer’s guide" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.3" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-lr 0.3.dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../whats_new.html">
+    Release history
+  </a>
+</li>
+
+
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/alfaro96/scikit-lr" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/scikit-lr" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    Release history
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/alfaro96/scikit-lr" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/scikit-lr" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development_setup.html">Setting up the development environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cython.html">Cython and the internals of scikit-learn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintainer.html">Maintainer information</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Developer’s guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Contributing</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="contributing">
+<span id="id1"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h1>
+<p>scikit-lr is developed on <a class="reference external" href="https://github.com/alfaro96/scikit-lr">GitHub</a>, where
+bugs and feature requests are tracked as issues and changes are submitted as pull
+requests. Communications on all channels should respect our <a class="reference external" href="https://github.com/alfaro96/scikit-lr/blob/master/CODE_OF_CONDUCT.md">code of conduct</a>.</p>
+<p>scikit-lr follows the conventions of scikit-learn, so this guide only covers what is
+specific to scikit-lr and links to the <a class="reference external" href="https://scikit-learn.org/1.9/developers/contributing.html#contributing" title="(in scikit-learn v1.9)"><span class="xref std std-ref">scikit-learn contributing guide</span></a> for the rest.</p>
+<section id="ways-to-contribute">
+<span id="id2"></span><h2>Ways to contribute<a class="headerlink" href="#ways-to-contribute" title="Link to this heading">#</a></h2>
+<p>Code is not the only way to help the project. Reporting the problems that you find
+when using scikit-lr, improving the documentation, investigating the <a class="reference external" href="https://github.com/alfaro96/scikit-lr/issues">open issues</a> and reviewing the <a class="reference external" href="https://github.com/alfaro96/scikit-lr/pulls">pull requests</a> of other contributors are just as
+valuable. It also helps to reference scikit-lr from your articles and websites, or to
+star it on GitHub to say that you use it.</p>
+</section>
+<section id="licensing-your-contribution">
+<span id="licensing-contribution"></span><h2>Licensing your contribution<a class="headerlink" href="#licensing-your-contribution" title="Link to this heading">#</a></h2>
+<p>Pull requests are accepted under the <a class="reference external" href="https://github.com/alfaro96/scikit-lr/blob/master/COPYING">MIT license</a> of the project, so you
+must have the right to license every part of your contribution under it. Code taken
+from other projects must have a compatible license and keep its notice.</p>
+</section>
+<section id="automated-contributions-policy">
+<span id="id3"></span><h2>Automated contributions policy<a class="headerlink" href="#automated-contributions-policy" title="Link to this heading">#</a></h2>
+<p>Contributing to scikit-lr requires human judgment and an understanding of the
+project, so issues and pull requests generated by fully automated tools are closed
+without review.</p>
+<p>You may use AI tools to help you, but you must review, understand and test every
+change that they make before submitting it under your name, and be able to explain it
+when asked. State in the description of the pull request what you used them for, as
+its template asks. Do not paste text generated by AI tools in issues, pull requests or
+comments, beyond fixing the grammar or translating your own words.</p>
+<p>This policy does not cover the automated tools that the maintainers set up for the
+project, such as the bot that updates the pinned versions of the tools and the
+actions, or the workflows that open an issue when they fail. Their pull requests are
+reviewed by a maintainer before merging, like any other.</p>
+</section>
+<section id="submitting-a-bug-report-or-a-feature-request">
+<span id="submitting-bug-feature"></span><h2>Submitting a bug report or a feature request<a class="headerlink" href="#submitting-a-bug-report-or-a-feature-request" title="Link to this heading">#</a></h2>
+<p>Before opening an issue, check that it is not already covered by another <a class="reference external" href="https://github.com/alfaro96/scikit-lr/issues?q=">issue</a> or <a class="reference external" href="https://github.com/alfaro96/scikit-lr/pulls?q=">pull request</a>. A feature request should explain
+the problem that it solves and, for a new estimator or metric, cite the article that
+describes it.</p>
+<p>A good bug report contains a <a class="reference external" href="https://scikit-learn.org/1.9/developers/minimal_reproducer.html#minimal-reproducer" title="(in scikit-learn v1.9)"><span class="xref std std-ref">minimal reproducer</span></a>:
+a short snippet that anyone can run to see the problem, with synthetic data instead
+of your own. Include the full traceback of any exception, and the versions of
+scikit-lr, of its dependencies and of the platform, which <a class="reference internal" href="../modules/generated/sklr.show_versions.html#sklr.show_versions" title="sklr.show_versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklr.show_versions()</span></code></a>
+prints:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import sklr; sklr.show_versions()"</span>
+</pre></div>
+</div>
+<p>If <a class="reference internal" href="../api/index.html#module-sklr" title="sklr"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sklr</span></code></a> cannot be imported, report the error, and the output of
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.show_versions.html#sklearn.show_versions" title="(in scikit-learn v1.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.show_versions()</span></code></a> instead.</p>
+</section>
+<section id="contributing-code-and-documentation">
+<span id="contributing-code"></span><h2>Contributing code and documentation<a class="headerlink" href="#contributing-code-and-documentation" title="Link to this heading">#</a></h2>
+<p>The changes are submitted as pull requests from a fork of the repository. To avoid
+duplicated work, search the issues and pull requests first and, for anything beyond
+a small fix, open an issue to discuss it before writing the code.</p>
+<section id="development-workflow">
+<span id="id4"></span><h3>Development workflow<a class="headerlink" href="#development-workflow" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p><a class="reference internal" href="development_setup.html#development-setup"><span class="std std-ref">Set up the development environment</span></a>, from a clone of
+your fork with the main repository as the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote.</p></li>
+<li><p>Create a branch for your changes from the latest <code class="docutils literal notranslate"><span class="pre">master</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>fetch<span class="w"> </span>upstream
+<span class="gp">$ </span>git<span class="w"> </span>switch<span class="w"> </span>-c<span class="w"> </span>my-feature<span class="w"> </span>upstream/master
+</pre></div>
+</div>
+</li>
+<li><p>Commit your changes. The <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks run on each commit and may fix some
+files themselves; in that case, add them again and repeat the commit:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>add<span class="w"> </span>&lt;files&gt;
+<span class="gp">$ </span>git<span class="w"> </span>commit
+</pre></div>
+</div>
+</li>
+<li><p>Push the branch to your fork and open a pull request against <code class="docutils literal notranslate"><span class="pre">master</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>my-feature
+</pre></div>
+</div>
+</li>
+</ol>
+<p>To bring in the changes made to <code class="docutils literal notranslate"><span class="pre">master</span></code> meanwhile, merge <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> into
+your branch and solve the conflicts, if any.</p>
+</section>
+<section id="pull-request-checklist">
+<span id="pr-checklist"></span><h3>Pull request checklist<a class="headerlink" href="#pull-request-checklist" title="Link to this heading">#</a></h3>
+<p>Before asking for a review, make sure that:</p>
+<ul class="simple">
+<li><p>The pull request is focused on one change and does not modify unrelated lines.</p></li>
+<li><p>The title follows <a class="reference external" href="https://www.conventionalcommits.org">Conventional Commits</a>
+(<code class="docutils literal notranslate"><span class="pre">feat:</span></code>, <code class="docutils literal notranslate"><span class="pre">fix:</span></code>, <code class="docutils literal notranslate"><span class="pre">docs:</span></code>, <code class="docutils literal notranslate"><span class="pre">test:</span></code>, …) and summarizes the change. The
+description explains why it is needed and links the issue that it solves with a
+keyword such as <code class="docutils literal notranslate"><span class="pre">Fixes</span> <span class="pre">#&lt;issue&gt;</span></code>, so that the issue is closed with the merge.</p></li>
+<li><p>The code follows the <a class="reference internal" href="#coding-guidelines"><span class="std std-ref">coding guidelines</span></a>.</p></li>
+<li><p>New code is tested, and a bug fix comes with a test that fails without it (see
+<a class="reference internal" href="#testing"><span class="std std-ref">Testing and improving test coverage</span></a>).</p></li>
+<li><p>The public API is documented, and new features are described in the user guide
+and shown in an example (see <a class="reference internal" href="#documentation"><span class="std std-ref">Documentation</span></a>).</p></li>
+<li><p>A change that affects users has a <a class="reference internal" href="#changelog"><span class="std std-ref">changelog entry</span></a>.</p></li>
+<li><p>The <a class="reference internal" href="#checks"><span class="std std-ref">checks</span></a> pass locally, and the CI passes once the pull request
+is opened.</p></li>
+</ul>
+<p>An incomplete contribution can be opened as a draft pull request, and marked as ready
+for review when it is finished.</p>
+</section>
+<section id="continuous-integration">
+<span id="id5"></span><h3>Continuous integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">#</a></h3>
+<p>The pull requests are checked by these workflows of GitHub Actions:</p>
+<ul class="simple">
+<li><p>“Unit tests” builds scikit-lr and runs its tests on Linux, macOS and Windows, with
+every supported Python version and with the minimum and latest versions of the
+dependencies.</p></li>
+<li><p>“Code quality checks” runs the <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks on the whole repository.</p></li>
+<li><p>“Wheels and source distribution” builds and tests the wheels of every platform and
+the source distribution, as they are released.</p></li>
+<li><p>“Coverage” measures the lines that the tests cover and reports the changes to
+Codecov.</p></li>
+<li><p>“Documentation” builds the documentation, which is available as an artifact of the
+run.</p></li>
+<li><p>“CodeQL” looks for security problems in the Python code and the workflows.</p></li>
+<li><p>“Check changelog” checks that a pull request that changes the tests adds a
+<a class="reference internal" href="#changelog"><span class="std std-ref">changelog entry</span></a> named after its number, unless a maintainer
+labels it “no changelog needed” because it does not affect users.</p></li>
+</ul>
+<p>The workflow “Upcoming scikit-learn” runs every night instead, and builds and tests
+scikit-lr against the next release of scikit-learn (see
+<a class="reference internal" href="cython.html#sklearn-version-coupling"><span class="std std-ref">Coupling with the version of scikit-learn</span></a>). When it fails, it opens an issue, which it closes
+once it passes again.</p>
+</section>
+</section>
+<section id="checks">
+<span id="id6"></span><h2>Checks<a class="headerlink" href="#checks" title="Link to this heading">#</a></h2>
+<p>Before submitting a pull request, make sure that the tests and the linters pass:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pytest
+<span class="gp">$ </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hooks run <code class="docutils literal notranslate"><span class="pre">ruff</span></code> (lint and format), <code class="docutils literal notranslate"><span class="pre">pyrefly</span></code> (type checking),
+<code class="docutils literal notranslate"><span class="pre">cython-lint</span></code>, <code class="docutils literal notranslate"><span class="pre">sphinx-lint</span></code> (reStructuredText) and <code class="docutils literal notranslate"><span class="pre">codespell</span></code>, among others.
+They only look at the files tracked by <code class="docutils literal notranslate"><span class="pre">git</span></code>, so add the new files before running
+them.</p>
+</section>
+<section id="testing-and-improving-test-coverage">
+<span id="testing"></span><h2>Testing and improving test coverage<a class="headerlink" href="#testing-and-improving-test-coverage" title="Link to this heading">#</a></h2>
+<p>The tests use <code class="docutils literal notranslate"><span class="pre">pytest</span></code> and live in the <code class="docutils literal notranslate"><span class="pre">tests</span></code> directory of each subpackage. The
+whole suite also runs the examples of the docstrings and of the documentation pages,
+but you can run only the tests related to your changes:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pytest<span class="w"> </span>sklr/&lt;subpackage&gt;/tests/test_&lt;module&gt;.py
+<span class="gp">$ </span>pytest<span class="w"> </span>sklr/&lt;subpackage&gt;/&lt;module&gt;.py
+<span class="gp">$ </span>pytest<span class="w"> </span>doc/&lt;page&gt;.rst
+</pre></div>
+</div>
+<p>The scikit-learn <a class="reference external" href="https://scikit-learn.org/1.9/developers/tips.html#pytest-tips" title="(in scikit-learn v1.9)"><span class="xref std std-ref">pytest tips</span></a> apply here too. Every
+warning is turned into an error, and a test marked as an expected failure fails if
+it passes.</p>
+<p>The tests of scikit-lr follow these rules:</p>
+<ul class="simple">
+<li><p>Tests import the public API from its public module, as users do.</p></li>
+<li><p>Every estimator passes the scikit-learn estimator checks with the
+<code class="docutils literal notranslate"><span class="pre">parametrize_with_checks</span></code> of <code class="docutils literal notranslate"><span class="pre">sklr/utils/_estimator_checks.py</span></code>. It runs the
+checks of <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.utils.estimator_checks.parametrize_with_checks.html#sklearn.utils.estimator_checks.parametrize_with_checks" title="(in scikit-learn v1.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">parametrize_with_checks()</span></code></a>, whose
+targets are meant for classifiers and regressors, with the targets of the rankers
+turned into rankings. A check that cannot pass is listed in
+<code class="docutils literal notranslate"><span class="pre">expected_failed_checks</span></code> with the reason.</p></li>
+<li><p>Numerical results are checked against independent oracles: a naive implementation,
+a known property, or an equivalent function of NumPy, SciPy or scikit-learn, never
+against the output of a previous version.</p></li>
+<li><p>The tests also cover the edge cases: empty and single-sample inputs, ties,
+different dtypes, <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> and reproducibility with <code class="docutils literal notranslate"><span class="pre">random_state</span></code>.</p></li>
+<li><p>Random seeds are fixed, and tolerances are explicit, with
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.testing.assert_allclose.html#numpy.testing.assert_allclose" title="(in NumPy v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.testing.assert_allclose()</span></code></a>, and justified in a comment.</p></li>
+</ul>
+<p>New code should be covered by the tests. To see the lines that they miss:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>coverage<span class="w"> </span>run<span class="w"> </span>-m<span class="w"> </span>pytest
+<span class="gp">$ </span>coverage<span class="w"> </span>report<span class="w"> </span>--show-missing
+</pre></div>
+</div>
+<p>The coverage of the Cython extensions is measured every night by the continuous
+integration, which compiles them with the <code class="docutils literal notranslate"><span class="pre">linetrace</span></code> option of <code class="docutils literal notranslate"><span class="pre">meson.options</span></code>.</p>
+</section>
+<section id="documentation">
+<span id="id7"></span><h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>The documentation has four parts, written in reStructuredText:</p>
+<ul class="simple">
+<li><p>The docstrings of the public API, in the code of <code class="docutils literal notranslate"><span class="pre">sklr</span></code>, from which the API
+reference is generated.</p></li>
+<li><p>The user guide, which explains the problems and the algorithms with the details
+that the API reference leaves out, in <code class="docutils literal notranslate"><span class="pre">doc</span></code>.</p></li>
+<li><p>The examples, in <code class="docutils literal notranslate"><span class="pre">examples</span></code>, which Sphinx-Gallery runs and renders when the
+documentation is built.</p></li>
+<li><p>The release history, with a file per minor release in <code class="docutils literal notranslate"><span class="pre">doc/whats_new</span></code>, which is
+generated from the <a class="reference internal" href="#changelog"><span class="std std-ref">changelog entries</span></a> of the pull requests.</p></li>
+</ul>
+<p>Docstrings follow the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpydoc style guide</a> and, for what it leaves
+open, the guidelines for docstrings, the user guide and the references of
+<a class="reference external" href="https://scikit-learn.org/1.9/developers/contributing.html#contribute-documentation" title="(in scikit-learn v1.9)"><span class="xref std std-ref">scikit-learn</span></a>. Lines are at most 88
+characters long, in docstrings and in the <code class="docutils literal notranslate"><span class="pre">.rst</span></code> pages. The docstrings of the
+public API pass the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/validation.html#validation-checks">validation checks of numpydoc</a>,
+except the ones that scikit-learn ignores, as <code class="docutils literal notranslate"><span class="pre">sklr/tests/test_docstrings.py</span></code>
+tests. The examples of the docstrings and of the pages run as tests without the
+names of the module where they are, so they must import everything they use.</p>
+<section id="changelog-entries">
+<span id="changelog"></span><h3>Changelog entries<a class="headerlink" href="#changelog-entries" title="Link to this heading">#</a></h3>
+<p>A pull request that affects users describes its changes in a changelog fragment, a
+short reStructuredText file in <code class="docutils literal notranslate"><span class="pre">doc/whats_new/upcoming_changes</span></code> that <a class="reference external" href="https://towncrier.readthedocs.io">towncrier</a> adds to the release history of the upcoming
+version when it is released. The release history is not edited by hand, so that the
+pull requests do not conflict with each other.</p>
+<p>The fragment goes in the directory of the public module that the pull request
+changes, such as <code class="docutils literal notranslate"><span class="pre">sklr</span></code>, or in <code class="docutils literal notranslate"><span class="pre">custom-top-level</span></code> if it changes none in
+particular. Each directory is a section of <code class="docutils literal notranslate"><span class="pre">[tool.towncrier]</span></code> in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>,
+so a pull request that adds a public module also adds its section there. The
+fragment is named <code class="docutils literal notranslate"><span class="pre">&lt;pull</span> <span class="pre">request&gt;.&lt;type&gt;.rst</span></code>, with the number of the pull
+request and one of these types, whose meaning the legend of the release history
+explains:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">major-feature</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feature</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">efficiency</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enhancement</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fix</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">api</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">other</span></code>, without a badge, mostly for <code class="docutils literal notranslate"><span class="pre">custom-top-level</span></code>.</p></li>
+</ul>
+<p>A pull request with more than one change of the same type and directory adds a
+counter to the name of the other fragments, as in <code class="docutils literal notranslate"><span class="pre">&lt;pull</span> <span class="pre">request&gt;.&lt;type&gt;.1.rst</span></code>.
+Each fragment is a single bullet point, which ends by crediting its authors with the
+<code class="docutils literal notranslate"><span class="pre">:user:</span></code> role and their GitHub username, and the link to the pull request is added
+when the release history is generated. For example, the pull request that added
+<a class="reference internal" href="../modules/generated/sklr.show_versions.html#sklr.show_versions" title="sklr.show_versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">show_versions()</span></code></a> added <code class="docutils literal notranslate"><span class="pre">99.feature.rst</span></code> to the <code class="docutils literal notranslate"><span class="pre">sklr</span></code> directory:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="m">*</span> <span class="na">:func:</span><span class="nv">`show_versions`</span> prints the versions of scikit-lr, of the scikit-learn that
+  it was built against and of the dependencies, to include them in bug reports.
+  By <span class="na">:user:</span><span class="nv">`Juan Carlos Alfaro Jiménez &lt;alfaro96&gt;`</span>.
+</pre></div>
+</div>
+<p>The documentation of the development version renders the fragments into the release
+history of the upcoming version. To preview it locally, run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>towncrier<span class="w"> </span>build<span class="w"> </span>--draft
+</pre></div>
+</div>
+</section>
+<section id="building-the-documentation">
+<span id="building-documentation"></span><h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Link to this heading">#</a></h3>
+<p>The documentation is built with Sphinx, from the <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>make<span class="w"> </span>-C<span class="w"> </span>doc<span class="w"> </span>html
+</pre></div>
+</div>
+<p>The pages are written to <code class="docutils literal notranslate"><span class="pre">doc/_build/html</span></code>. Every warning is an error, so that the
+pages that would render wrongly are not published. The build needs network access,
+to download the inventories that link to the documentation of Python, NumPy, SciPy
+and scikit-learn. <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">doc</span> <span class="pre">clean</span></code> removes the build and the pages generated
+from the docstrings and the examples.</p>
+</section>
+</section>
+<section id="coding-guidelines">
+<span id="id8"></span><h2>Coding guidelines<a class="headerlink" href="#coding-guidelines" title="Link to this heading">#</a></h2>
+<p>scikit-lr follows the <a class="reference external" href="https://scikit-learn.org/1.9/developers/develop.html#coding-guidelines" title="(in scikit-learn v1.9)"><span class="xref std std-ref">coding guidelines</span></a> of
+scikit-learn, and its estimators follow the <a class="reference external" href="https://scikit-learn.org/1.9/developers/develop.html#rolling-your-own-estimator" title="(in scikit-learn v1.9)"><span class="xref std std-ref">scikit-learn API</span></a>. In addition:</p>
+<ul class="simple">
+<li><p>Only the public API is exported; every other module, function and attribute starts
+with an underscore. Changes to the public API are recorded in the release history.</p></li>
+<li><p>The signatures of the public API have type hints, which are distributed with the
+package. The private code does not, as in scikit-learn.</p></li>
+<li><p>The private API of scikit-learn is only imported by <code class="docutils literal notranslate"><span class="pre">sklr/utils/_sklearn_compat.py</span></code>,
+which adapts it to the supported versions, and a <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> hook enforces it.
+The internals of scikit-learn used from Cython follow <a class="reference internal" href="cython.html#cython"><span class="std std-ref">their own rules</span></a>.</p></li>
+<li><p>Error messages include the value that was received, and warnings use a specific
+category.</p></li>
+<li><p>Comments explain why the code does what it does, not what it does.</p></li>
+<li><p>New dependencies need to be discussed in an issue first.</p></li>
+</ul>
+</section>
+<section id="code-review">
+<span id="id9"></span><h2>Code review<a class="headerlink" href="#code-review" title="Link to this heading">#</a></h2>
+<p>Anybody can review a pull request, and doing so is a good way to learn the code base.
+The scikit-learn <a class="reference external" href="https://scikit-learn.org/1.9/developers/contributing.html#code-review" title="(in scikit-learn v1.9)"><span class="xref std std-ref">code review guidelines</span></a> describe what to
+look at, and how to communicate it.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Developer’s guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="development_setup.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Setting up the development environment</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ways-to-contribute">Ways to contribute</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#licensing-your-contribution">Licensing your contribution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automated-contributions-policy">Automated contributions policy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-a-bug-report-or-a-feature-request">Submitting a bug report or a feature request</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing-code-and-documentation">Contributing code and documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-workflow">Development workflow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pull-request-checklist">Pull request checklist</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous integration</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checks">Checks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-and-improving-test-coverage">Testing and improving test coverage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changelog-entries">Changelog entries</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation">Building the documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coding-guidelines">Coding guidelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-review">Code review</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/developers/contributing.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2019-2026, Juan Carlos Alfaro Jiménez.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
