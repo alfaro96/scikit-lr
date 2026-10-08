@@ -1,16 +1,18 @@
 """Naive implementations of the estimation of the models, to test the Cython ones.
 
-They follow Propositions 1 and 2 and Algorithm 1 of [cheng_decision_2009] literally, in
-exact arithmetic with :class:`fractions.Fraction`, so that ties are not decided by
-rounding. The spread is found in floating point instead, from the probabilities of all
-the rankings rather than a formula for their expected distance.
+The Mallows model follows Propositions 1 and 2 and Algorithm 1 of
+[cheng_decision_2009] literally, in exact arithmetic with :class:`fractions.Fraction`,
+so that ties are not decided by rounding. The spread is found in floating point
+instead, from the probabilities of all the rankings rather than a formula for their
+expected distance. The Plackett-Luce model follows the log-likelihood and equation (30)
+of [hunter_mm_2004] term by term, and is also fitted by a general optimizer.
 """
 
 import itertools
 from fractions import Fraction
 
 import numpy as np
-from scipy.optimize import brentq
+from scipy.optimize import brentq, minimize
 from sklearn.utils import check_random_state
 
 
@@ -145,3 +147,85 @@ def estimate_spread(y, center, sample_weight):
         xtol=1e-300,
         rtol=1e-15,
     )
+
+
+def ordered_labels(row):
+    """List the ranked labels of a ranking from the first to the last."""
+    ranked = np.flatnonzero(~np.isnan(row))
+    return list(ranked[np.argsort(row[ranked])])
+
+
+def plackett_luce_log_likelihood(y, sample_weight, parameters):
+    """Compute the weighted log-likelihood of the rankings for the Plackett-Luce model.
+
+    Each ranking adds the logarithm of its probability, the product over its
+    positions but the last of the parameter of the label there divided by the sum of
+    the parameters of that label and those after it.
+    """
+    log_likelihood = 0.0
+    for row, weight in zip(y, sample_weight, strict=True):
+        labels = ordered_labels(row)
+        for i in range(len(labels) - 1):
+            log_likelihood += weight * (
+                np.log(parameters[labels[i]]) - np.log(parameters[labels[i:]].sum())
+            )
+    return log_likelihood
+
+
+def estimate_plackett_luce(y, sample_weight, *, tol, max_iter):
+    """Estimate the parameters by the MM algorithm of equation (30), term by term.
+
+    Some ranking with a positive weight must have two labels. The labels that are
+    never ranked above the last label of such a ranking get a zero parameter.
+    Returns the parameters, which add up to one, the number of iterations and
+    whether they converged.
+    """
+    n_labels = y.shape[1]
+    rankings = [
+        (ordered_labels(row), weight)
+        for row, weight in zip(y, sample_weight, strict=True)
+        if weight > 0
+    ]
+    wins = np.zeros(n_labels)
+    for labels, weight in rankings:
+        for label in labels[:-1]:
+            wins[label] += weight
+    parameters = np.full(n_labels, 1 / n_labels)
+    for n_iter in range(1, max_iter + 1):
+        denominators = np.zeros(n_labels)
+        for t in range(n_labels):
+            for labels, weight in rankings:
+                for i in range(len(labels) - 1):
+                    if t in labels[i:]:
+                        denominators[t] += weight / parameters[labels[i:]].sum()
+        updated = np.zeros(n_labels)
+        has_wins = wins > 0
+        updated[has_wins] = wins[has_wins] / denominators[has_wins]
+        updated /= updated.sum()
+        change = np.max(np.abs(updated - parameters))
+        parameters = updated
+        if change <= tol:
+            return parameters, n_iter, True
+    return parameters, max_iter, False
+
+
+def maximize_plackett_luce(y, sample_weight):
+    """Maximize the log-likelihood over the logarithms of the parameters.
+
+    The logarithm of the parameter of the first label is fixed to zero, since the
+    likelihood does not change when all the parameters are scaled. The parameters
+    are returned scaled to add up to one.
+    """
+
+    def negative_log_likelihood(log_parameters):
+        parameters = np.exp(np.r_[0, log_parameters])
+        return -plackett_luce_log_likelihood(y, sample_weight, parameters)
+
+    log_parameters = minimize(
+        negative_log_likelihood,
+        np.zeros(y.shape[1] - 1),
+        method="BFGS",
+        options={"gtol": 1e-10},
+    ).x
+    parameters = np.exp(np.r_[0, log_parameters])
+    return parameters / parameters.sum()
