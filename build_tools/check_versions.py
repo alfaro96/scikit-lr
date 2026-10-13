@@ -10,7 +10,9 @@ dependencies, because the extension modules only work with the minor release
 they were built against.
 The runtime and build dependencies in ``environment.yml`` must have the same
 ranges as in ``pyproject.toml``, and its Python version must be the minimum
-supported one.
+supported one. So must those of the environment of the reproduction of the papers,
+``reproducibility/environment.yml``, which builds scikit-lr from the repository,
+although its Python version may be any supported one.
 
 The tools pinned in ``environment.yml`` that also run as ``pre-commit`` hooks must
 have the version of their hook in ``.pre-commit-config.yaml``. The packages
@@ -65,6 +67,8 @@ WORKFLOWS_DIR = Path(".github/workflows")
 RENOVATE_CONFIG = Path(".github/renovate.json")
 
 README = Path("README.md")
+
+REPRODUCIBILITY_ENVIRONMENT = Path("reproducibility/environment.yml")
 
 # The section of README.md that lists the dependencies, up to the next heading,
 # and each of its items: the name of the package and its supported versions
@@ -448,6 +452,7 @@ def check_renovate(renovate, repos, runtime):
 def main():
     pyproject = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
     environment = read_environment(Path("environment.yml"))
+    reproducibility_environment = read_environment(REPRODUCIBILITY_ENVIRONMENT)
     pre_commit = yaml.safe_load(
         Path(".pre-commit-config.yaml").read_text(encoding="utf-8")
     )
@@ -474,6 +479,20 @@ def main():
         *check_dependencies(
             "environment.yml",
             environment,
+            build_only,
+            "build-system.requires",
+            required=True,
+        ),
+        *check_dependencies(
+            str(REPRODUCIBILITY_ENVIRONMENT),
+            reproducibility_environment,
+            runtime,
+            "project.dependencies",
+            required=True,
+        ),
+        *check_dependencies(
+            str(REPRODUCIBILITY_ENVIRONMENT),
+            reproducibility_environment,
             build_only,
             "build-system.requires",
             required=True,

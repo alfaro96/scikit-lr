@@ -228,7 +228,10 @@ The scorers only compare complete rankings, so cross-validation needs complete
 rankings in the validation folds. The example
 :ref:`sphx_glr_auto_examples_neighbors_plot_label_ranking_neighbors.py`
 compares the models and the weights for several numbers of neighbors, also with
-incomplete training rankings.
+incomplete training rankings, and
+:ref:`sphx_glr_auto_examples_reproducibility_plot_paper_reproduction.py`
+compares the results of :class:`KNeighborsLabelRanker` with those published in
+[cheng_decision_2009]_ and [cheng_label_2010]_.
 
 Complexity
 ----------

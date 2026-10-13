@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime
 
+import plotly.io as pio
 import sklearn
 
 import sklr
@@ -20,6 +21,9 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_gallery.gen_gallery",
 ]
+
+# Embed the figures of Plotly in the pages of the examples
+pio.renderers.default = "sphinx_gallery"
 
 root_doc = "index"
 templates_path = ["templates"]
@@ -72,6 +76,8 @@ sphinx_gallery_conf = {
 }
 
 html_theme = "pydata_sphinx_theme"
+html_static_path = ["scripts"]
+html_js_files = ["plotly_resize.js"]
 html_theme_options = {
     # The development version is published in its own directory of the site,
     # and every release in the one of its minor release

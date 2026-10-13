@@ -1,0 +1,26 @@
+name: scikit-lr-reproducibility
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  # Runtime of scikit-lr, with the same ranges as pyproject.toml
+  - joblib>=1.4.0
+  - numpy>=2.2
+  - scipy>=1.15
+  - scikit-learn~=1.9.0
+  # Build of scikit-lr from the repository, at the commit whose results are
+  # reproduced, with the same ranges as the development environment
+  - c-compiler
+  - cython>=3.1.2
+  - llvm-openmp
+  - meson>=1.9.0
+  - meson-python>=0.17.1
+  - ninja
+  - pkg-config
+  # Workflow
+  - pip
+  - psutil  # Describes the machine, and lets the benchmark directive of Snakemake measure memory and CPU
+  - threadpoolctl  # Records the threading libraries of the machine
+  - pip:
+      # Snakemake is published in bioconda but not in conda-forge
+      - snakemake>=9
