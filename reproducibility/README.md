@@ -5,16 +5,18 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
 ## Papers
 
 * `cheng_decision_2009`: W. Cheng, J. Hühn and E. Hüllermeier, "Decision tree and instance-based learning for label ranking", in Proceedings of the 26th International Conference on Machine Learning, Montreal, Canada, pp. 161-168, 2009.
-  * Methods: IBLR, `KNeighborsLabelRanker(model="mallows", weights="dudani")`.
+  * Methods:
+    * IBLR, `KNeighborsLabelRanker(model="mallows", weights="dudani")`.
+    * LRT, `DecisionTreeLabelRanker()`, with a fixed `random_state` and `min_samples_split` twice the number of labels.
   * Datasets: authorship, bodyfat, calhousing, cpu (cpu-small in the paper), elevators, fried, glass, housing, iris, pendigits, segment, stock, vehicle, vowel, wine and wisconsin, with the `label ranking` tag, in Table 1 (p. 6), whose numbers of samples are about 1.8 times those of OpenML and of `cheng_label_2010`, as the report shows.
   * Scenarios: complete training rankings, and 30% and 60% of the labels of each training ranking removed at random.
   * Metric: Kendall's $\tau$.
   * Cross-validation: five repetitions of a ten-fold cross-validation (p. 7), and an inner five-fold cross-validation, since the paper does not specify it.
   * Preprocessing: none, since the features are already normalized in OpenML, as the paper requires (p. 6).
-  * Grid: the number of neighbors among 5, 10, 15 and 20, with the Euclidean distance.
+  * Grid: for IBLR, the number of neighbors among 5, 10, 15 and 20, with the Euclidean distance; none for LRT, whose parameters the paper does not tune.
   * Published results: Table 2 (p. 8).
-  * Not specified: the grid of numbers of neighbors, so that of `cheng_label_2010` is used, and the number of folds of the inner cross-validation.
-  * Notes: the grid of numbers of neighbors most likely explains the lower scores in the scenarios with missing labels, since the more labels are removed, the more often the inner cross-validation chooses the largest number of neighbors of the grid. With missing labels, the published scores seem to need more neighbors than this grid allows, such as up to the square root of the number of samples, which brings the results closer to them on the largest datasets.
+  * Not specified: the grid of numbers of neighbors, so that of `cheng_label_2010` is used, and the number of folds of the inner cross-validation. The second rule that stops growing the tree, on nodes with fewer than $2|\mathcal{Y}| = 2n$ labels (p. 5), where $\mathcal{Y}$ is the set of the $n$ labels, is ambiguous: it is read as nodes with fewer than $2n$ samples, so `min_samples_split` is set to $2n$ in each training fold, rather than as nodes whose rankings $\sigma_i$ rank fewer than $2n$ labels in total, $\sum_i |\mathcal{Y}(\sigma_i)| < 2n$, which with complete rankings would only stop at single samples.
+  * Notes: LRT differs from the paper by design in three points, so its scores may differ from the published ones even with the same data: each split of a node $t$ into children $t_L$ and $t_R$ minimizes the weighted mean of the impurities $I_{t_L}$ and $I_{t_R}$ of the children, with $I_t = 1/(1 + \hat\theta_t)$ for the estimated spread $\hat\theta_t$ of node $t$, instead of maximizing the weighted mean of their spreads $\hat\theta_{t_L}$ and $\hat\theta_{t_R}$ (equation (6), p. 5), which is infinite whenever a child has a single sample; the rule of $2|\mathcal{Y}|$ labels is read as described above; and, as in scikit-learn, a node becomes a leaf when its best split increases the impurity. For IBLR, the grid of numbers of neighbors most likely explains the lower scores in the scenarios with missing labels, since the more labels are removed, the more often the inner cross-validation chooses the largest number of neighbors of the grid. With missing labels, the published scores seem to need more neighbors than this grid allows, such as up to the square root of the number of samples, which brings the results closer to them on the largest datasets.
 * `cheng_label_2010`: W. Cheng, K. Dembczyński and E. Hüllermeier, "Label ranking methods based on the Plackett-Luce model", in Proceedings of the 27th International Conference on Machine Learning, Haifa, Israel, pp. 215-222, 2010.
   * Methods:
     * IB-PL, `KNeighborsLabelRanker(model="plackett_luce")`.

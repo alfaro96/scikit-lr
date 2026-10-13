@@ -23,6 +23,7 @@ from sklearn.model_selection import KFold, RepeatedKFold
 
 from sklr.metrics import kendall_tau_score
 from sklr.neighbors import KNeighborsLabelRanker
+from sklr.tree import DecisionTreeLabelRanker
 
 # The datasets uploaded to OpenML by the authors of scikit-lr, with their identifiers
 # under each of their tags, since a name may have several versions there
@@ -175,6 +176,15 @@ PAPERS = {
                 "estimator": KNeighborsLabelRanker,
                 "params": {"model": "mallows", "weights": "dudani"},
                 "grid": {"n_neighbors": [5, 10, 15, 20]},
+            },
+            # The paper tunes no parameter of the tree, which stops growing on
+            # consistent nodes and on nodes with fewer than 2|Y| labels, where Y is
+            # the set of labels (p. 5), read as fewer than 2|Y| samples
+            "lrt": {
+                "estimator": DecisionTreeLabelRanker,
+                "params": {"random_state": 0},
+                "data_params": lambda X, y: {"min_samples_split": 2 * y.shape[1]},
+                "grid": {},
             },
         },
     },
