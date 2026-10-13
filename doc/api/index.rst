@@ -81,6 +81,19 @@ See the :ref:`neighbors` section of the user guide for further details.
 
    KNeighborsLabelRanker
 
+:mod:`sklr.tree`: Decision trees
+--------------------------------
+
+.. module:: sklr.tree
+
+See the :ref:`tree` section of the user guide for further details.
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   DecisionTreeLabelRanker
+
 :mod:`sklr.utils`: Utilities
 ----------------------------
 

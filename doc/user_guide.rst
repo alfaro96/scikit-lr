@@ -13,4 +13,5 @@ with the details that the :ref:`API reference <api_ref>` leaves out.
 
    modules/ranking_representation
    modules/neighbors
+   modules/tree
    modules/model_evaluation
