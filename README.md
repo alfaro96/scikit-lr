@@ -31,6 +31,7 @@ Website: https://alfaro96.github.io/scikit-lr
 scikit-lr requires:
 
 * Python (>= 3.13)
+* joblib (>= 1.4.0)
 * NumPy (>= 2.2)
 * SciPy (>= 1.15)
 * scikit-learn (1.9.x)
@@ -47,6 +48,7 @@ The documentation includes more detailed [installation instructions](https://alf
 
 ## Documentation
 
+* [Getting started](https://alfaro96.github.io/scikit-lr/dev/getting_started.html)
 * [User guide](https://alfaro96.github.io/scikit-lr/dev/user_guide.html)
 * [API reference](https://alfaro96.github.io/scikit-lr/dev/api/index.html)
 * [Examples](https://alfaro96.github.io/scikit-lr/dev/auto_examples/index.html)

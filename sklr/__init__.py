@@ -12,7 +12,7 @@ __version__ = "0.3.dev0"
 from sklr import __check_build, _sklearn_version  # noqa: F401
 from sklr.utils._show_versions import show_versions
 
-_submodules = ["base", "metrics", "utils"]
+_submodules = ["base", "metrics", "neighbors", "utils"]
 
 __all__ = ["show_versions"]
 __all__.extend(_submodules)

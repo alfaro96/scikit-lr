@@ -68,6 +68,19 @@ Partial label ranking metrics
 
    tau_x_score
 
+:mod:`sklr.neighbors`: Nearest neighbors
+----------------------------------------
+
+.. module:: sklr.neighbors
+
+See the :ref:`neighbors` section of the user guide for further details.
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   KNeighborsLabelRanker
+
 :mod:`sklr.utils`: Utilities
 ----------------------------
 

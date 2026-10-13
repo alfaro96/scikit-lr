@@ -12,10 +12,22 @@ from contextlib import contextmanager
 from functools import partial
 from unittest import mock
 
-from sklearn.utils._param_validation import validate_params
+from sklearn.base import _fit_context
+from sklearn.neighbors._base import KNeighborsMixin, NeighborsBase, _get_weights
+from sklearn.utils._param_validation import Interval, StrOptions, validate_params
 from sklearn.utils.validation import _check_sample_weight
 
-__all__ = ["_check_sample_weight", "_patch_enforce_estimator_tags_y", "validate_params"]
+__all__ = [
+    "Interval",
+    "KNeighborsMixin",
+    "NeighborsBase",
+    "StrOptions",
+    "_check_sample_weight",
+    "_fit_context",
+    "_get_weights",
+    "_patch_enforce_estimator_tags_y",
+    "validate_params",
+]
 
 
 @contextmanager
