@@ -170,9 +170,12 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
 
     Notes
     -----
-    Let :math:`d_{(1)} \\leq \\dots \\leq d_{(k)}` be the distances of the
-    :math:`k` nearest neighbors of a sample. With ``weights="distance"``, the
-    weight of the :math:`i`-th neighbor is :math:`1 / d_{(i)}`, and with
+    Let :math:`d_{(1)} \\leq \\dots \\leq d_{(k)}` be the sorted distances
+    :math:`d(\\boldsymbol{x}, \\boldsymbol{x}_i)` of the :math:`k` nearest neighbors
+    :math:`\\boldsymbol{x}_1, \\dots, \\boldsymbol{x}_k` of an instance
+    :math:`\\boldsymbol{x}`, numbered from the nearest one, whose rankings are
+    :math:`\\sigma_1, \\dots, \\sigma_k`. With ``weights="distance"``, the weight of the
+    :math:`i`-th nearest neighbor is :math:`w_i = 1 / d_{(i)}`, and with
     ``weights="dudani"`` it is
 
     .. math::
@@ -180,14 +183,14 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
         w_i = \\frac{d_{(k)} - d_{(i)}}{d_{(k)} - d_{(1)}},
 
     or ``1`` if :math:`d_{(k)} = d_{(1)}`, as in equation (1) of
-    [dudani_distance_1976]_. With ``model="mallows"``, the weight is multiplied by
-    the fraction :math:`|Y(\\sigma_i)| / n` of the :math:`n` labels ranked by the
-    ranking :math:`\\sigma_i` of the neighbor, because Algorithm 1 of
-    [cheng_decision_2009]_ completes the incomplete rankings, and a completed
-    ranking is less reliable than an observed one. The Plackett-Luce model does
-    not complete the rankings, since the probability of an incomplete ranking has
-    a closed form [cheng_label_2010]_, so its weights are not multiplied by that
-    fraction.
+    [dudani_distance_1976]_. With ``model="mallows"``, the weight is multiplied by the
+    fraction :math:`|\\mathcal{Y}(\\sigma_i)| / n` of the :math:`n` labels ranked by
+    :math:`\\sigma_i`, where :math:`\\mathcal{Y}(\\sigma_i)` is the set of labels that
+    it ranks, because Algorithm 1 of [cheng_decision_2009]_ completes the incomplete
+    rankings, and a completed ranking is less reliable than an observed one. The
+    Plackett-Luce model does not complete the rankings, since the probability of an
+    incomplete ranking has a closed form [cheng_label_2010]_, so its weights are not
+    multiplied by that fraction.
 
     See :ref:`Nearest Neighbors <sklearn:neighbors>` in the user guide of
     scikit-learn for a discussion of the choice of `algorithm` and `leaf_size`. If

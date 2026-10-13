@@ -49,6 +49,30 @@ estimators of scikit-lr learn from incomplete rankings, unless their documentati
 says otherwise, while the :ref:`metrics <model_evaluation>` only compare complete
 rankings.
 
+.. _ranking_notation:
+
+Notation
+--------
+
+The user guide and the documentation of the estimators and the metrics use the standard
+notation of (partial) label ranking, common to both problems. An instance
+:math:`\boldsymbol{x}` of the instance space :math:`\mathcal{X}` has the features
+:math:`x_j`, and :math:`\boldsymbol{x}_i` is the :math:`i`-th of the :math:`N` training
+samples. The labels are :math:`\mathcal{Y} = \{y_1, \dots, y_n\}`, with
+:math:`n = |\mathcal{Y}|`, and a ranking :math:`\pi` of them gives the position
+:math:`\pi(i)` of each label :math:`y_i`. In label ranking, the rankings have no ties,
+so they are permutations of :math:`\{1, \dots, n\}`, while in partial label ranking they
+may have ties, and tied labels share their dense position. The observed rankings, those
+of the training samples and the true rankings of the test samples, are written
+:math:`\sigma`, and :math:`\sigma_i` is the ranking of :math:`\boldsymbol{x}_i`, while
+:math:`\pi` is a generic ranking or the center of a probability model, and the
+predictions and the estimates carry a hat, such as :math:`\hat{\pi}`. Therefore,
+counting rows and columns from one, row :math:`i` of the training rankings ``y`` is
+:math:`\sigma_i`, and its column :math:`j` holds :math:`\sigma_i(j)`. An incomplete
+ranking :math:`\sigma` only ranks the labels
+:math:`\mathcal{Y}(\sigma) \subseteq \mathcal{Y}`, which are
+:math:`m = |\mathcal{Y}(\sigma)| \leq n`.
+
 Type of the rankings
 --------------------
 

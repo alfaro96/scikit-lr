@@ -101,14 +101,16 @@ def kendall_tau_score(
 
     Notes
     -----
-    Given a ranking :math:`y` of :math:`m` labels, where :math:`y_i` is the
-    position of label :math:`i`, let :math:`a_{ij}` be ``1`` if :math:`y_i < y_j`
-    and ``-1`` if :math:`y_i > y_j`. Kendall's :math:`\\tau` between the rankings
-    :math:`y` and :math:`\\hat{y}` is
+    Given a ranking :math:`\\pi` of the labels :math:`y_1, \\dots, y_n`, where
+    :math:`\\pi(i)` is the position of :math:`y_i`, let :math:`a_{ij}(\\pi)` be ``1``
+    if :math:`\\pi(i) < \\pi(j)` and ``-1`` if :math:`\\pi(i) > \\pi(j)`. Kendall's
+    :math:`\\tau` between the predicted ranking :math:`\\hat{\\pi}` and the true
+    ranking :math:`\\sigma` is
 
     .. math::
 
-        \\tau(y, \\hat{y}) = \\frac{2}{m(m - 1)} \\sum_{i < j} a_{ij} \\hat{a}_{ij}.
+        \\tau(\\hat{\\pi}, \\sigma) = \\frac{2}{n(n - 1)} \\sum_{i < j}
+        a_{ij}(\\hat{\\pi}) \\, a_{ij}(\\sigma).
 
     Without ties, it is equal to Kendall's :math:`\\tau_a` and :math:`\\tau_b`, to
     the coefficient computed by :func:`scipy.stats.kendalltau` and to the
@@ -191,21 +193,26 @@ def tau_x_score(
 
     Notes
     -----
-    Given a ranking :math:`y` of :math:`m` labels, where :math:`y_i` is the
-    position of label :math:`i`, let :math:`a'_{ij}` be ``1`` if
-    :math:`y_i \\leq y_j` and ``-1`` if :math:`y_i > y_j`, for :math:`i \\neq j`.
-    The :math:`\\tau_x` coefficient between the rankings :math:`y` and
-    :math:`\\hat{y}` is
+    Given a ranking :math:`\\pi` of the labels :math:`y_1, \\dots, y_n`, possibly
+    with ties, where :math:`\\pi(i)` is the position of :math:`y_i`, let
+    :math:`a'_{ij}(\\pi)` be ``1`` if :math:`\\pi(i) \\leq \\pi(j)` and ``-1`` if
+    :math:`\\pi(i) > \\pi(j)`, for :math:`i \\neq j`. The :math:`\\tau_x` coefficient
+    between the predicted ranking :math:`\\hat{\\pi}` and the true ranking
+    :math:`\\sigma` is
 
     .. math::
 
-        \\tau_x(y, \\hat{y}) = \\frac{1}{m(m - 1)} \\sum_{i \\neq j} a'_{ij}
-        \\hat{a}'_{ij}.
+        \\tau_x(\\hat{\\pi}, \\sigma) = \\frac{1}{n(n - 1)} \\sum_{i \\neq j}
+        a'_{ij}(\\hat{\\pi}) \\, a'_{ij}(\\sigma).
 
     Unlike Kendall's :math:`\\tau_b`, its denominator does not depend on the ties,
     so a ranking with all its labels tied has a coefficient of ``1`` with itself.
-    It is related to the Kemeny-Snell distance :math:`d` by
-    :math:`\\tau_x = 1 - 2 d / (m(m - 1))`.
+    It is related to the Kemeny-Snell distance :math:`D_{\\mathrm{KS}}` by
+
+    .. math::
+
+        \\tau_x(\\hat{\\pi}, \\sigma) = 1 - \\frac{2 D_{\\mathrm{KS}}(\\hat{\\pi},
+        \\sigma)}{n(n - 1)}.
 
     References
     ----------
@@ -228,8 +235,8 @@ def tau_x_score(
     n_pairs = n_labels * (n_labels - 1) / 2
     # Each pair of labels i < j stands for the ordered pairs (i, j) and (j, i),
     # and negating the positions gives the comparisons of the pairs (j, i).
-    # With each agreement scoring +1 and each disagreement -1 over the m(m - 1)
-    # ordered pairs, tau_x is one minus the disagreements divided by m(m - 1) / 2
+    # With each agreement scoring +1 and each disagreement -1 over the n(n - 1)
+    # ordered pairs, tau_x is one minus the disagreements divided by n(n - 1) / 2
     disagreements = (
         _is_ahead(y_true, or_tied=True) != _is_ahead(y_pred, or_tied=True)
     ).sum(axis=1) + (
@@ -295,10 +302,19 @@ def kendall_distance(
 
     Notes
     -----
-    The normalized distance :math:`d` is related to Kendall's :math:`\\tau` by
-    :math:`d = (1 - \\tau) / 2`, sample by sample. Rankings with ties are rejected,
-    because a pair of labels that is tied in one ranking is neither concordant nor
-    discordant.
+    Given the predicted ranking :math:`\\hat{\\pi}` and the true ranking
+    :math:`\\sigma` of the labels :math:`y_1, \\dots, y_n`, where
+    :math:`\\sigma(i)` is the position of :math:`y_i`, the Kendall distance is
+
+    .. math::
+
+        D(\\hat{\\pi}, \\sigma) = |\\{(i, j) : i < j, \\,
+        (\\hat{\\pi}(i) - \\hat{\\pi}(j)) (\\sigma(i) - \\sigma(j)) < 0\\}|,
+
+    and the normalized distance, :math:`D(\\hat{\\pi}, \\sigma)` divided by
+    :math:`n(n - 1) / 2`, is :math:`(1 - \\tau(\\hat{\\pi}, \\sigma)) / 2`, sample
+    by sample. Rankings with ties are rejected, because a pair of labels that is
+    tied in one ranking is neither concordant nor discordant.
 
     References
     ----------

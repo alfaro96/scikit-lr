@@ -94,7 +94,7 @@ def remove_labels(y, random_state, *, probability):
 
 
 def observed_kendall_tau(y_true, y_pred):
-    """Average Kendall's tau over the pairs of labels ranked by each true ranking.
+    """Average Kendall's :math:`\\tau` on the labels ranked by each true ranking.
 
     The training rankings may be incomplete, and so are the validation rankings of
     the inner cross-validation, which the metrics of scikit-lr reject. The rankings

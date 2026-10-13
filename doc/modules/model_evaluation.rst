@@ -12,6 +12,12 @@ computes a correlation or a distance between the true and the predicted ranking 
 each sample, and returns their average, which may be weighted with
 ``sample_weight``.
 
+Each metric is written as a function of two rankings of the :math:`n` labels
+:math:`y_1, \dots, y_n`, such as :math:`\tau(\hat{\pi}, \sigma)` for the predicted
+ranking :math:`\hat{\pi}` and the true ranking :math:`\sigma` of a sample, where
+:math:`\pi(i)` is the position of label :math:`y_i` in a ranking :math:`\pi`, as
+described in :ref:`ranking_representation`.
+
 The rankings follow the representation described in :ref:`ranking_representation`,
 and they must be complete: the metrics reject rankings with unranked labels, in
 the true rankings as well as in the predicted ones.
@@ -72,14 +78,13 @@ Kendall's :math:`\tau`
 :func:`kendall_tau_score` computes Kendall's :math:`\tau` [kendall_new_1938]_,
 which scores each pair of labels with ``+1`` if the true and the predicted ranking
 order it in the same way (a concordant pair) and with ``-1`` otherwise (a
-discordant pair). Given the positions :math:`y` and :math:`\hat{y}` of the
-:math:`m` labels in the true and the predicted ranking, let :math:`a_{ij}` be ``1``
-if :math:`y_i < y_j` and ``-1`` if :math:`y_i > y_j`, and likewise
-:math:`\hat{a}_{ij}` for :math:`\hat{y}`. Then
+discordant pair). Let :math:`a_{ij}(\pi)` be ``1`` if :math:`\pi(i) < \pi(j)` and
+``-1`` if :math:`\pi(i) > \pi(j)`. Then
 
 .. math::
 
-    \tau(y, \hat{y}) = \frac{2}{m(m - 1)} \sum_{i < j} a_{ij} \hat{a}_{ij},
+    \tau(\hat{\pi}, \sigma) = \frac{2}{n(n - 1)} \sum_{i < j}
+    a_{ij}(\hat{\pi}) \, a_{ij}(\sigma),
 
 which ranges from ``-1``, when one ranking is the reverse of the other, to ``1``,
 when both rankings are equal:
@@ -100,11 +105,18 @@ instead, described in :ref:`partial_label_ranking_metrics`.
 Kendall distance
 ~~~~~~~~~~~~~~~~
 
-:func:`kendall_distance` counts the discordant pairs of labels, which is also the
-minimum number of swaps of adjacent labels that turn one ranking into the other.
-By default, it is divided by the number of pairs, :math:`m(m - 1) / 2`, so that it
-ranges from ``0`` to ``1`` and is related to Kendall's :math:`\tau` by
-:math:`d = (1 - \tau) / 2`:
+:func:`kendall_distance` computes the Kendall distance, the number of discordant
+pairs of labels,
+
+.. math::
+
+    D(\hat{\pi}, \sigma) = |\{(i, j) : i < j, \,
+    (\hat{\pi}(i) - \hat{\pi}(j)) (\sigma(i) - \sigma(j)) < 0\}|,
+
+which is also the minimum number of swaps of adjacent labels that turn one ranking
+into the other. By default, it is divided by the number of pairs,
+:math:`n(n - 1) / 2`, so that it ranges from ``0`` to ``1`` and is equal to
+:math:`(1 - \tau(\hat{\pi}, \sigma)) / 2`:
 
 >>> from sklr.metrics import kendall_distance
 >>> kendall_distance(y_true, y_pred)
@@ -126,13 +138,14 @@ The metrics of partial label ranking compare rankings that may have ties.
 
 :func:`tau_x_score` computes the :math:`\tau_x` rank correlation coefficient
 [emond_new_2002]_, which extends Kendall's :math:`\tau` to rankings with ties.
-Let :math:`a'_{ij}` be ``1`` if :math:`y_i \leq y_j`, that is, if label :math:`i`
-is ahead of or tied with label :math:`j`, and ``-1`` if :math:`y_i > y_j`, for
-:math:`i \neq j`. Then
+Let :math:`a'_{ij}(\pi)` be ``1`` if :math:`\pi(i) \leq \pi(j)`, that is, if label
+:math:`y_i` is ahead of or tied with label :math:`y_j`, and ``-1`` if
+:math:`\pi(i) > \pi(j)`, for :math:`i \neq j`. Then
 
 .. math::
 
-    \tau_x(y, \hat{y}) = \frac{1}{m(m - 1)} \sum_{i \neq j} a'_{ij} \hat{a}'_{ij}.
+    \tau_x(\hat{\pi}, \sigma) = \frac{1}{n(n - 1)} \sum_{i \neq j}
+    a'_{ij}(\hat{\pi}) \, a'_{ij}(\sigma).
 
 Unlike Kendall's :math:`\tau_b`, its denominator does not depend on the ties, so
 a ranking with all its labels tied has a coefficient of ``1`` with itself and of
@@ -148,7 +161,12 @@ Kendall's :math:`\tau`:
 0.333...
 
 The :math:`\tau_x` coefficient is also equivalent to the Kemeny-Snell distance
-:math:`d` between rankings with ties, by :math:`\tau_x = 1 - 2 d / (m(m - 1))`.
+:math:`D_{\mathrm{KS}}` between rankings with ties, by
+
+.. math::
+
+    \tau_x(\hat{\pi}, \sigma)
+    = 1 - \frac{2 D_{\mathrm{KS}}(\hat{\pi}, \sigma)}{n(n - 1)}.
 
 .. rubric:: References
 

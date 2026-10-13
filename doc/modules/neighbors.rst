@@ -7,11 +7,13 @@ Nearest neighbors
 
 :class:`KNeighborsLabelRanker` implements the instance-based label rankers of
 [cheng_decision_2009]_ and [cheng_label_2010]_. They assume that the probability
-distribution of the rankings is approximately constant around each sample, so the
-rankings of the :math:`k` training samples nearest to it are taken as a sample of a
-probability model of the rankings. The parameters of the model are estimated from
-these rankings, which may be incomplete, and the predicted ranking is the mode of
-the model, its most probable ranking:
+distribution of the rankings is approximately constant around each instance
+:math:`\boldsymbol{x}`, so the rankings :math:`\sigma_1, \dots, \sigma_k` of its
+:math:`k` nearest training samples :math:`\boldsymbol{x}_1, \dots, \boldsymbol{x}_k`,
+numbered from the nearest one, are taken as a sample of a probability model of the
+rankings, with the notation of :ref:`ranking_notation`. The parameters of the
+model are estimated from these rankings, which may be incomplete, and the predicted
+ranking is the mode of the model, its most probable ranking:
 
 >>> import numpy as np
 >>> from sklr.neighbors import KNeighborsLabelRanker
@@ -66,22 +68,23 @@ The Mallows model is a distance-based model whose mode is a center ranking
 :math:`\pi`: the probability of a ranking decreases with its distance to
 :math:`\pi`, at a rate given by a spread parameter :math:`\theta \geq 0`
 [cheng_label_2010]_. With ``model="mallows"``, the predicted ranking is the
-estimate of :math:`\pi`, found as in Algorithm 1 of [cheng_decision_2009]_.
+estimate :math:`\hat{\pi}` of :math:`\pi`, found as in Algorithm 1 of
+[cheng_decision_2009]_.
 
-When the rankings of the neighbors are complete, :math:`\pi` is found by the
-weighted Borda count [ho_decision_1994]_. Each ranking of :math:`n` labels gives
-:math:`n` votes to its first label, :math:`n - 1` to the second one and so on, each
-vote is multiplied by the weight of the neighbor, and the labels are ranked by
-decreasing total votes. When some rankings are incomplete, the initial center is
-found by the generalized Borda count of Proposition 2 of [cheng_decision_2009]_: in
-a ranking of :math:`m \leq n` of the :math:`n` labels, the label at position
-:math:`i` receives :math:`(m - i + 1)(n + 1) / (m + 1)` votes and each unranked
-label receives :math:`(n + 1) / 2`, its expected votes when the ranking is
-completed uniformly at random. Then, each incomplete ranking is completed with its
-closest extension to the center in Kendall distance, found as in Proposition 1 of
-[cheng_decision_2009]_, and the center is found again by the Borda count of the
-completed rankings. These two steps are repeated until the center no longer
-changes.
+When the rankings of the neighbors are complete, :math:`\hat{\pi}` is found by the
+weighted Borda count [ho_decision_1994]_. Each ranking :math:`\sigma_i` gives
+:math:`n - \sigma_i(j) + 1` votes to each label :math:`y_j`, that is, :math:`n` votes to
+its first label, :math:`n - 1` to the second one and so on, each vote is multiplied by
+the weight :math:`w_i` of the neighbor, and the labels are ranked by decreasing total
+votes. When some rankings are incomplete, the initial center is found by the generalized
+Borda count of Proposition 2 of [cheng_decision_2009]_: if :math:`\sigma_i` ranks
+:math:`m = |\mathcal{Y}(\sigma_i)| \leq n` labels, each ranked label :math:`y_j`
+receives :math:`(m - \sigma_i(j) + 1)(n + 1) / (m + 1)` votes and each unranked label
+receives :math:`(n + 1) / 2`, its expected votes when the ranking is completed uniformly
+at random. Then, each incomplete ranking is completed with its closest extension to the
+center in Kendall distance, found as in Proposition 1 of [cheng_decision_2009]_, and the
+center is found again by the Borda count of the completed rankings. These two steps are
+repeated until the center no longer changes.
 
 [cheng_decision_2009]_ also estimate :math:`\theta` as a measure of the reliability
 of the prediction, which :class:`KNeighborsLabelRanker` does not compute.
@@ -90,18 +93,21 @@ Plackett-Luce model
 ~~~~~~~~~~~~~~~~~~~
 
 The Plackett-Luce model has a positive parameter :math:`v_j` for each label
-:math:`j`. If a ranking ranks :math:`m` labels and :math:`\pi(i)` denotes the label
-at position :math:`i`, its probability is
+:math:`y_j`, which form the vector :math:`\boldsymbol{v} = (v_1, \dots, v_n)`. If a
+ranking :math:`\pi` ranks :math:`m = |\mathcal{Y}(\pi)|` labels and
+:math:`\pi^{-1}(i)` denotes the index of the label at position :math:`i`, its
+probability is
 
 .. math::
 
-    P(\pi \mid v) = \prod_{i=1}^{m} \frac{v_{\pi(i)}}{\sum_{l=i}^{m} v_{\pi(l)}},
+    P(\pi \mid \boldsymbol{v}) = \prod_{i=1}^{m}
+    \frac{v_{\pi^{-1}(i)}}{\sum_{l=i}^{m} v_{\pi^{-1}(l)}},
 
 which has the same form for complete and incomplete rankings [cheng_label_2010]_.
 With ``model="plackett_luce"``, the parameters are the maximum likelihood estimate
 from the rankings of the neighbors, which maximizes
-:math:`\sum_i w_i \log P(\sigma_i \mid v)` for the rankings :math:`\sigma_i` and
-the weights :math:`w_i` of the neighbors, the log-likelihood of
+:math:`\sum_{i=1}^{k} w_i \log P(\sigma_i \mid \boldsymbol{v})` for the rankings
+:math:`\sigma_i` and the weights :math:`w_i` of the neighbors, the log-likelihood of
 [cheng_label_2010]_ when the weights are uniform. It is found by the MM algorithm
 of [hunter_mm_2004]_, which starts from equal parameters, scales them to add up to
 one after each iteration and stops when no parameter changes by more than ``tol``.
@@ -130,8 +136,10 @@ the estimation of the model:
   as the nearest neighbors estimators of scikit-learn do. If some neighbors are at
   zero distance, only they are weighted.
 * ``"dudani"`` follows equation (1) of [dudani_distance_1976]_, which
-  [cheng_decision_2009]_ use. If :math:`d_{(1)} \leq \dots \leq d_{(k)}` are the
-  distances of the neighbors to the sample, the :math:`i`-th neighbor weighs
+  [cheng_decision_2009]_ use. If :math:`d_{(1)} \leq \dots \leq d_{(k)}` are the sorted
+  distances :math:`d(\boldsymbol{x}, \boldsymbol{x}_i)` of the neighbors
+  :math:`\boldsymbol{x}_i` to the instance :math:`\boldsymbol{x}`, the :math:`i`-th
+  nearest neighbor weighs
 
   .. math::
 
@@ -149,8 +157,9 @@ array([[1, 2, 3],
        [3, 2, 1]])
 
 With ``model="mallows"``, the weight of each neighbor is also multiplied by the
-fraction :math:`|Y(\sigma_i)| / n` of the :math:`n` labels that its ranking
-:math:`\sigma_i` ranks, as in [cheng_decision_2009]_: a ranking completed by the
+fraction :math:`|\mathcal{Y}(\sigma_i)| / n` of the :math:`n` labels that its
+ranking :math:`\sigma_i` ranks, where :math:`\mathcal{Y}(\sigma_i)` is the set of
+those labels, as in [cheng_decision_2009]_: a ranking completed by the
 estimation is less reliable than an observed one. The Plackett-Luce model does not
 complete the rankings, so its weights are not multiplied by that fraction.
 

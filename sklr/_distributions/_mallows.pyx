@@ -134,12 +134,12 @@ cdef intp_t _kendall_distance(
 cdef float64_t _expected_distance(float64_t theta, intp_t n_labels) noexcept nogil:
     """Compute the expected Kendall distance to the center for a spread `theta`.
 
-    The expected distance of [cheng_decision_2009] is the sum, over :math:`j` from
-    :math:`2` to :math:`n`, of the mean of a variable from :math:`0` to
-    :math:`j - 1` with probabilities proportional to :math:`q^r`, where :math:`q`
-    is the exponential of minus `theta`. Its closed form subtracts terms that grow
-    as the inverse of `theta` and cancel out near zero, while these means only add
-    up positive terms.
+    The expected distance of [cheng_decision_2009] for :math:`n` labels is the sum, over
+    :math:`j` from :math:`2` to :math:`n`, of the mean of a variable taking the values
+    :math:`r = 0, \\dots, j - 1` with probabilities proportional to
+    :math:`e^{-\\theta r}`, where the spread :math:`\\theta` is `theta`. Its closed form
+    subtracts terms that grow as the inverse of `theta` and cancel out near zero, while
+    these means only add up positive terms.
     """
     cdef float64_t q = exp(-theta)
     cdef float64_t power = 1, total = 1, weighted = 0, distance = 0
