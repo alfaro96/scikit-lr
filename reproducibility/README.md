@@ -55,7 +55,7 @@ The "Reproducibility" workflow runs the experiments of a release, by hand from t
 gh workflow run reproducibility.yml --ref <branch>
 ```
 
-It downloads the datasets once, splits the experiments into batches that run in parallel, with `snakemake cells --batch`, and then writes the reports and opens a pull request with the results against that branch. GitHub Actions must be allowed to create pull requests in the settings of the repository.
+It downloads the datasets once, splits the experiments into batches that run in parallel, with `snakemake cells --config batch=<i>/<n>`, and then writes the reports and opens a pull request with the results against that branch. GitHub Actions must be allowed to create pull requests in the settings of the repository.
 
 Adding the `reproducibility` label to a pull request runs the same experiments on its last commit, to check its changes, such as a new method, before a release. The reports are then stored as an artifact of the run instead of opening a pull request, and the label is removed, so that adding it again runs them again.
 
@@ -78,4 +78,4 @@ cd reproducibility
 snakemake --cores 8
 ```
 
-Snakemake only runs the jobs whose results are missing, so an interrupted run continues where it stopped (add `--rerun-incomplete` to repeat the jobs that were running), and the results of another version of scikit-lr go to their own directory. The experiments can be restricted with `--config`, for instance `snakemake --cores 8 --config 'datasets=["iris","wine"]' 'papers=["cheng_label_2010"]'`. The other options are `scenarios`, `n_jobs` (the threads of each ranker, `1` by default) and `data_home` (the directory where the datasets are downloaded, `~/scikit_learn_data` by default).
+Snakemake only runs the jobs whose results are missing, so an interrupted run continues where it stopped (add `--rerun-incomplete` to repeat the jobs that were running), and the results of another version of scikit-lr go to their own directory. The experiments can be restricted with `--config`, for instance `snakemake --cores 8 --config 'datasets=["iris","wine"]' 'papers=["cheng_label_2010"]'`. The other options are `scenarios`, `batch` (the batch of the cells to run, such as `3/20`, with `snakemake cells`), `n_jobs` (the threads of each ranker, `1` by default) and `data_home` (the directory where the datasets are downloaded, `~/scikit_learn_data` by default).

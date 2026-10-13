@@ -3,8 +3,8 @@
 # and scenario, and writes its results under the version of scikit-lr, so that
 # a new version recomputes everything without overwriting the results of the
 # previous ones. Snakemake only runs the jobs whose results are missing, so the
-# results of the jobs can also be computed elsewhere, split with --batch over the
-# inputs of the cells rule, and gathered here to write the reports.
+# results of the jobs can also be computed elsewhere, split into batches with
+# --config batch=i/n, and gathered here to write the reports.
 
 import sys
 
@@ -16,6 +16,7 @@ from experiments import PAPERS, n_repetitions
 VERSION = sklr.__version__
 # Restricted with --config, for instance to run a single dataset
 PAPER_NAMES = config.get("papers", list(PAPERS))
+BATCH = config.get("batch")
 DATASET_NAMES = config.get("datasets")
 SCENARIO_NAMES = config.get("scenarios")
 N_JOBS = config.get("n_jobs", 1)
@@ -55,9 +56,22 @@ rule all:
         expand(RESULTS + "/environment.txt", paper=PAPER_NAMES),
 
 
+def batch(files):
+    """Keep the files of batch i of n, every n-th one from the i-th.
+
+    The --batch option of Snakemake is not used, since it only runs its last
+    batch once the others have been run in the same directory. Taking every n-th
+    cell spreads the costly datasets among the batches.
+    """
+    if BATCH is None:
+        return files
+    i, n = map(int, str(BATCH).split("/"))
+    return files[i - 1 :: n]
+
+
 rule cells:
     input:
-        [cell for paper in PAPER_NAMES for cell in cells(paper)],
+        batch([cell for paper in PAPER_NAMES for cell in cells(paper)]),
 
 
 rule cell:
