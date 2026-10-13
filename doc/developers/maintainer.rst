@@ -22,14 +22,27 @@ Python version.
 
       $ towncrier build --version <version>
 
-2. Create the tag on the commit to release and push it:
+2. Push that commit to its branch and reproduce the experiments of the papers
+   from it with the "Reproducibility" workflow, described in
+   ``reproducibility/README.md``, which stores their results under the version
+   and opens a pull request with them against the branch. Review the reports in
+   ``reproducibility/<paper>/results/<version>`` and merge it, so that the tag
+   and the documentation of the version include the results. A version that does
+   not change the estimators may skip this step: the documentation then shows the
+   results of the latest version that has them.
+
+   .. code-block:: console
+
+      $ gh workflow run reproducibility.yml --ref <branch>
+
+3. Create the tag on the commit to release and push it:
 
    .. code-block:: console
 
       $ git tag -s <version> -m "scikit-lr <version>"
       $ git push origin <version>
 
-3. Run the workflow by hand from the tag, with ``testpypi`` as the repository
+4. Run the workflow by hand from the tag, with ``testpypi`` as the repository
    to upload the distributions to. It builds and tests the wheels and the
    source distribution, uploads them to `TestPyPI <https://test.pypi.org>`_,
    then installs the release from there and runs the tests again. This checks
@@ -41,7 +54,7 @@ Python version.
 
       $ gh workflow run wheels.yml --ref <version> -f publish=testpypi
 
-4. If it passes, publish a GitHub release from the same tag. The workflow
+5. If it passes, publish a GitHub release from the same tag. The workflow
    builds and tests the distributions again, and then waits for a maintainer
    to approve the deployment to the ``pypi`` environment before uploading them
    to PyPI. A version cannot be uploaded again to PyPI, even after deleting
