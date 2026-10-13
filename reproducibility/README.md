@@ -49,13 +49,15 @@ Each job writes `results/<version>/<dataset>/<method>/<scenario>/rep<repetition>
 
 ### On GitHub Actions
 
-The Reproducibility workflow runs the experiments of a release, by hand from the branch with the commit of its version:
+The "Reproducibility" workflow runs the experiments of a release, by hand from the branch with the commit of its version:
 
 ```
 gh workflow run reproducibility.yml --ref <branch>
 ```
 
 It downloads the datasets once, splits the experiments into batches that run in parallel, with `snakemake cells --batch`, and then writes the reports and opens a pull request with the results against that branch. GitHub Actions must be allowed to create pull requests in the settings of the repository.
+
+Adding the `reproducibility` label to a pull request runs the same experiments on its last commit, to check its changes, such as a new method, before a release. The reports are then stored as an artifact of the run instead of opening a pull request, and the label is removed, so that adding it again runs them again.
 
 ### On a machine of your own
 

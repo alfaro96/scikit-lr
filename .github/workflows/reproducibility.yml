@@ -1,21 +1,27 @@
-# Reproduce the experiments of the papers whose methods scikit-lr implements,
-# and open a pull request with the results
+# Reproduce the experiments of the papers whose methods scikit-lr implements
 name: Reproducibility
 
-# Run by hand from the commit of a release, before its tag, since the
-# experiments take hours of computation and their results are only kept for
-# the releases
+# The experiments take hours of computation, so they only run on request. Run
+# by hand from the commit of a release, before its tag, the workflow opens a
+# pull request with the results, which are kept for the releases. Adding the
+# reproducibility label to a pull request runs them on its last commit and
+# stores the reports, to check its changes, and the label is then removed, so
+# that adding it again runs them again
 on:
   workflow_dispatch:
+  pull_request:
+    types:
+      - labeled
 
 permissions:
   contents: read
 
-# A second run from the same branch waits for the first one, instead of
-# cancelling it, since both would compute the same results
+# The runs of a pull request share a group, named after its number, so a new
+# request cancels the outdated run, while the runs by hand from the same
+# branch wait for each other, since both would compute the same results
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   # Where the datasets are downloaded from OpenML and restored from the cache
@@ -28,8 +34,11 @@ jobs:
   datasets:
     name: Download the datasets
     runs-on: ubuntu-latest
-    # Skip the runs in forks
-    if: github.repository == 'alfaro96/scikit-lr'
+    # Skip the runs in forks and those of the other labels
+    if: >-
+      github.repository == 'alfaro96/scikit-lr' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.label.name == 'reproducibility')
 
     defaults:
       run:
@@ -40,6 +49,9 @@ jobs:
       - name: Checkout scikit-lr
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # The last commit of a pull request, whose version the results are
+          # stored under, instead of its merge with the base branch
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       # Cached, so that the other jobs restore it instead of solving and
@@ -83,6 +95,7 @@ jobs:
       - name: Checkout scikit-lr
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Set up the environment of the reproduction
@@ -113,12 +126,13 @@ jobs:
           path: reproducibility/*/results/
 
   report:
-    name: Write the reports and open a pull request
+    name: Write the reports
     needs: experiments
     runs-on: ubuntu-latest
 
     permissions:
-      # Push the branch with the results and open the pull request
+      # Push the branch with the results and open the pull request, only in
+      # the runs by hand
       contents: write
       pull-requests: write
 
@@ -130,6 +144,7 @@ jobs:
       - name: Checkout scikit-lr
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Set up the environment of the reproduction
@@ -151,7 +166,14 @@ jobs:
       - name: Write the reports
         run: bash build_tools/github/report_reproducibility.sh
 
+      - name: Store the results and the reports
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reproducibility
+          path: reproducibility/*/results/
+
       - name: Open a pull request with the results
+        if: github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}

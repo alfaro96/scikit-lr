@@ -18,5 +18,5 @@ gh pr create --base "$BASE_BRANCH" --head "$branch" \
     --title "docs: add the reproduction of the papers with scikit-lr $version" \
     --body "Results of the reproduction of the papers with scikit-lr $version, from \
 run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID of the \
-Reproducibility workflow on $GITHUB_SHA. Review the reports in \
+\"Reproducibility\" workflow on $GITHUB_SHA. Review the reports in \
 \`reproducibility/<paper>/results/$version/report.md\` before merging."
