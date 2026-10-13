@@ -10,6 +10,7 @@ of [hunter_mm_2004] term by term, and is also fitted by a general optimizer.
 
 import itertools
 from fractions import Fraction
+from typing import cast
 
 import numpy as np
 from scipy.optimize import brentq, minimize
@@ -140,12 +141,17 @@ def estimate_spread(y, center, sample_weight):
     upper = 1.0
     while expected_distance(upper, n_labels) >= mean_distance:
         upper *= 2
-    return brentq(
-        lambda theta: expected_distance(theta, n_labels) - mean_distance,
-        0,
-        upper,
-        xtol=1e-300,
-        rtol=1e-15,
+    # pyrefly takes the return type of brentq from its overload with full_output,
+    # a tuple, so it rejects arithmetic on the spread
+    return cast(
+        float,
+        brentq(
+            lambda theta: expected_distance(theta, n_labels) - mean_distance,
+            0,
+            upper,
+            xtol=1e-300,
+            rtol=1e-15,
+        ),
     )
 
 

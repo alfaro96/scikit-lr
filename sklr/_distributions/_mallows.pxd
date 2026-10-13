@@ -20,3 +20,6 @@ cdef float64_t estimate_spread(
     float64_t[::1] completed,
     intp_t[:, ::1] work,
 ) noexcept nogil
+
+
+cdef float64_t solve_spread(float64_t mean_distance, intp_t n_labels) noexcept nogil

@@ -70,7 +70,8 @@ cdef bint estimate_center(
     `max_iter` iterations are done. Returns whether the center converged, and sets
     ``n_iter[0]`` to the number of iterations, ``0`` for complete rankings.
     `completed` has the shape of `y`, `scores` has ``n_labels`` elements and `work`
-    has shape ``(4, n_labels)``.
+    has shape ``(4, n_labels)``. The rows of `y`, `completed` and `work` may be
+    further apart in memory than their length, as in the slices of larger arrays.
     """
     cdef intp_t n_samples = y.shape[0]
     cdef intp_t[::1] previous = work[0], saved = work[1]
@@ -159,7 +160,7 @@ cdef float64_t _spread_equation(float64_t theta, void* args) noexcept nogil:
 
 # A mean distance of zero has no finite spread, and from n_labels(n_labels - 1)/4,
 # the expected distance of the uniform distribution, the spread would be negative
-cdef float64_t _solve_spread(float64_t mean_distance, intp_t n_labels) noexcept nogil:
+cdef float64_t solve_spread(float64_t mean_distance, intp_t n_labels) noexcept nogil:
     """Find the spread whose expected distance is the mean observed distance."""
     cdef _SpreadEquation equation
     cdef float64_t lower = 0, upper = 1
@@ -203,7 +204,9 @@ cdef float64_t estimate_spread(
     estimate, whose expected distance to the center is the weighted mean of their
     Kendall distances to it: ``0`` if it is not below that of the uniform
     distribution, and infinite if it is zero. `completed` has ``n_labels``
-    elements and `work` has shape ``(2, n_labels)``.
+    elements and `work` has shape ``(2, n_labels)``. The rows of `y` and `work` may
+    be further apart in memory than their length, as in the slices of larger
+    arrays.
     """
     cdef intp_t sample
     cdef float64_t distance = 0, total_weight = 0
@@ -211,7 +214,7 @@ cdef float64_t estimate_spread(
         complete_ranking(y[sample], center, completed, work[0], work[1])
         distance += sample_weight[sample] * _kendall_distance(completed, center)
         total_weight += sample_weight[sample]
-    return _solve_spread(distance / total_weight, y.shape[1])
+    return solve_spread(distance / total_weight, y.shape[1])
 
 
 # The callers pass inputs of matching shapes and at least one thread, and the other
