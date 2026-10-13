@@ -244,6 +244,12 @@ def n_repetitions(splitter):
 
 
 def make_ranker(paper, method, n_jobs):
-    """Build the ranker of a method of a paper, with its fixed parameters."""
+    """Build the ranker of a method of a paper, with its fixed parameters.
+
+    `n_jobs` is passed to the rankers that have that parameter.
+    """
     method = PAPERS[paper]["methods"][method]
-    return method["estimator"](**method["params"], n_jobs=n_jobs)
+    ranker = method["estimator"](**method["params"])
+    if "n_jobs" in ranker.get_params():
+        ranker.set_params(n_jobs=n_jobs)
+    return ranker
