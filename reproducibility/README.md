@@ -13,7 +13,8 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Preprocessing: none, since the features are already normalized in OpenML, as the paper requires (p. 6).
   * Grid: the number of neighbors among 5, 10, 15 and 20, with the Euclidean distance.
   * Published results: Table 2 (p. 8).
-  * Not specified: the grid of numbers of neighbors, so that of `cheng_label_2010` is used, the number of folds of the inner cross-validation, its score with incomplete rankings and the random splits.
+  * Not specified: the grid of numbers of neighbors, so that of `cheng_label_2010` is used, and the number of folds of the inner cross-validation.
+  * Notes: the grid of numbers of neighbors most likely explains the lower scores in the scenarios with missing labels, since the more labels are removed, the more often the inner cross-validation chooses the largest number of neighbors of the grid. With missing labels, the published scores seem to need more neighbors than this grid allows, such as up to the square root of the number of samples, which brings the results closer to them on the largest datasets.
 * `cheng_label_2010`: W. Cheng, K. Dembczyński and E. Hüllermeier, "Label ranking methods based on the Plackett-Luce model", in Proceedings of the 27th International Conference on Machine Learning, Haifa, Israel, pp. 215-222, 2010.
   * Methods:
     * IB-PL, `KNeighborsLabelRanker(model="plackett_luce")`.
@@ -25,7 +26,8 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Preprocessing: none, since the features are already normalized in OpenML, as the paper requires (p. 5).
   * Grid: the number of neighbors among 5, 10, 15 and 20 (p. 5), with the Euclidean distance.
   * Published results: Table 2 (p. 7).
-  * Not specified: the number of folds of the inner cross-validation, its score with incomplete rankings and the random splits.
+  * Not specified: the number of folds of the inner cross-validation.
+  * Notes: IB-Mal on segment differs from the published score far more than the scores of the folds vary, while IB-PL in the same table and IBLR in `cheng_decision_2009`, with the same model, match theirs on the same data, so the difference does not seem to come from the method or the data.
 
 Each directory holds the published scores (`paper_results.csv`, with the metric of each one) and datasets (`paper_datasets.csv`), with the table and page they come from, and the results of each version of scikit-lr under `results/<version>/`. `workflow/experiments.py` declares the datasets, scenarios, metric, cross-validation and methods of each paper, as its docstring describes, so adding a paper only takes its directory and its entry there.
 

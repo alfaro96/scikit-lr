@@ -160,8 +160,8 @@ PAPERS = {
         },
         "metric": "kendall_tau",
         # Five repetitions of a ten-fold cross-validation (p. 7). The paper does not
-        # say how many folds the inner cross-validation has, so it has five, nor the
-        # seeds of the splits, so they are zero
+        # say how many folds the inner cross-validation has, so it has five, and the
+        # splits have fixed seeds
         "cross_validation": {
             "outer": RepeatedKFold(n_splits=10, n_repeats=5, random_state=0),
             "inner": KFold(n_splits=5, shuffle=True, random_state=0),
