@@ -1,8 +1,9 @@
 """Run one repetition of the cross-validation of a method on a dataset and scenario.
 
 In each fold of the outer cross-validation of the paper, the training rankings are
-transformed as the scenario says, the parameters of the method in its grid are
-chosen by the inner cross-validation of the paper, and the method is scored with
+transformed as the scenario says, the parameters of the method that depend on the
+training data are set from them, those in its grid are chosen by the inner
+cross-validation of the paper, and the method is scored with
 the metric of the paper on the test rankings. The results are written as JSON to
 the output path.
 """
@@ -46,12 +47,18 @@ def choose_params(ranker, grid, scoring, cv, X, y):
     return search.best_params_, search.cv_results_["mean_test_score"].tolist()
 
 
-def run_fold(paper, ranker, grid, transform, X, y, train, test, seed):
-    """Choose the parameters on a training fold and score the test fold."""
+def run_fold(paper, ranker, data_params, grid, transform, X, y, train, test, seed):
+    """Choose the parameters on a training fold and score the test fold.
+
+    The parameters that depend on the training data are set from the training fold
+    before the inner cross-validation, which keeps them in its own folds.
+    """
     metric = METRICS[paper["metric"]]
     y_train = y[train]
     if transform is not None:
         y_train = transform(y_train, np.random.RandomState(seed))
+    fold_params = {} if data_params is None else data_params(X[train], y_train)
+    ranker = clone(ranker).set_params(**fold_params)
     # The convergence warnings are counted, so that the report shows how often the
     # estimation of the models stops at max_iter
     with warnings.catch_warnings(record=True) as caught:
@@ -71,6 +78,7 @@ def run_fold(paper, ranker, grid, transform, X, y, train, test, seed):
         y_pred, predict_wall, predict_cpu = timed(best.predict, X[test])
     return {
         "score": metric["score"](y[test], y_pred),
+        "data_params": fold_params,
         "best_params": best_params,
         "inner_scores": inner_scores,
         "unranked_fraction": float(np.isnan(y_train).mean()),
@@ -104,6 +112,7 @@ def main():
     paper = PAPERS[args.paper]
     X, y = load_dataset(paper["datasets"]["tag"], args.dataset, args.data_home or None)
     ranker = make_ranker(args.paper, args.method, args.n_jobs)
+    data_params = paper["methods"][args.method].get("data_params")
     grid = paper["methods"][args.method]["grid"]
     transform = paper["scenarios"][args.scenario]["transform"]
     outer_cv = paper["cross_validation"]["outer"]
@@ -115,7 +124,9 @@ def main():
     first = args.repetition * n_splits
     splits = list(outer_cv.split(X, y))[first : first + n_splits]
     folds = [
-        run_fold(paper, ranker, grid, transform, X, y, train, test, first + fold)
+        run_fold(
+            paper, ranker, data_params, grid, transform, X, y, train, test, first + fold
+        )
         for fold, (train, test) in enumerate(splits)
     ]
 

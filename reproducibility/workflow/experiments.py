@@ -7,8 +7,10 @@ train with them as they are. It also declares the name of its metric in
 ``METRICS``, and its cross-validation: the outer splitter, whose repetitions, if it
 has several, are run as separate jobs, and the inner splitter that chooses the
 parameters of the methods in each outer training fold.
-Finally, it declares the estimator of each method, its fixed parameters and the grid
-of those chosen by the inner cross-validation, which is empty if none is chosen.
+Finally, it declares the estimator of each method, its fixed parameters, those that
+depend on the training data, if any, as a function that receives the samples and
+rankings of each training fold and returns them, and the grid of those chosen by the
+inner cross-validation, which is empty if none is chosen.
 """
 
 from functools import partial
