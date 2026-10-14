@@ -9,6 +9,7 @@ Markdown.
 import argparse
 import csv
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -133,7 +134,13 @@ def report(paper, version, rows, machines, paper_results, paper_datasets):
         (r["dataset"], r["method"], r["scenario"]): float(r["score"])
         for r in paper_results
     }
-    sources = sorted({r["source"] for r in paper_results})
+    # Sorted by the numbers in them, not character by character
+    sources = sorted(
+        {r["source"] for r in paper_results},
+        key=lambda source: [
+            int(part) if part.isdigit() else part for part in re.split(r"(\d+)", source)
+        ],
+    )
     ours = {(r["dataset"], r["method"], r["scenario"]): r for r in rows}
     methods = list(PAPERS[paper]["methods"])
     scenarios = PAPERS[paper]["scenarios"]

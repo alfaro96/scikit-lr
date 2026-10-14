@@ -2,8 +2,8 @@
 
 In each fold of the outer cross-validation of the paper, the training rankings are
 transformed as the scenario says, the parameters of the method that depend on the
-training data are set from them, those in its grid are chosen by the inner
-cross-validation of the paper, and the method is scored with
+training data are set from them, the others are chosen by its search with the
+inner cross-validation of the paper, if it has one, and the method is scored with
 the metric of the paper on the test rankings. The results are written as JSON to
 the output path.
 """
@@ -19,10 +19,10 @@ import numpy as np
 import scipy
 import sklearn
 from experiments import METRICS, PAPERS, load_dataset, make_ranker, n_repetitions
+from experiments.search import describe as describe_search
 from machine import describe
 from sklearn.base import clone
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.model_selection import GridSearchCV
 
 import sklr
 
@@ -34,20 +34,18 @@ def timed(function, *args):
     return result, time.perf_counter() - wall, time.process_time() - cpu
 
 
-def choose_params(ranker, grid, scoring, cv, X, y):
-    """Choose the parameters in the grid by cross-validation.
+def choose_params(ranker, search, scoring, cv, X, y):
+    """Choose the parameters with the search of the method, if it has one.
 
     Returns the chosen parameters and the mean inner score of each candidate, or no
-    parameters and scores if the grid is empty.
+    parameters and scores without a search.
     """
-    if not grid:
+    if search is None:
         return {}, []
-    search = GridSearchCV(ranker, grid, scoring=scoring, cv=cv, refit=False)
-    search.fit(X, y)
-    return search.best_params_, search.cv_results_["mean_test_score"].tolist()
+    return search(ranker, scoring, cv, X, y)
 
 
-def run_fold(paper, ranker, data_params, grid, transform, X, y, train, test, seed):
+def run_fold(paper, ranker, data_params, search, transform, X, y, train, test, seed):
     """Choose the parameters on a training fold and score the test fold.
 
     The parameters that depend on the training data are set from the training fold
@@ -66,7 +64,7 @@ def run_fold(paper, ranker, data_params, grid, transform, X, y, train, test, see
         (best_params, inner_scores), search_wall, search_cpu = timed(
             choose_params,
             ranker,
-            grid,
+            search,
             metric["inner_scorer"],
             paper["cross_validation"]["inner"],
             X[train],
@@ -113,7 +111,7 @@ def main():
     X, y = load_dataset(paper["datasets"]["tag"], args.dataset, args.data_home or None)
     ranker = make_ranker(args.paper, args.method, args.n_jobs)
     data_params = paper["methods"][args.method].get("data_params")
-    grid = paper["methods"][args.method]["grid"]
+    search = paper["methods"][args.method].get("search")
     transform = paper["scenarios"][args.scenario]["transform"]
     outer_cv = paper["cross_validation"]["outer"]
     # The splits of all the repetitions are generated, and those of this one kept.
@@ -125,7 +123,16 @@ def main():
     splits = list(outer_cv.split(X, y))[first : first + n_splits]
     folds = [
         run_fold(
-            paper, ranker, data_params, grid, transform, X, y, train, test, first + fold
+            paper,
+            ranker,
+            data_params,
+            search,
+            transform,
+            X,
+            y,
+            train,
+            test,
+            first + fold,
         )
         for fold, (train, test) in enumerate(splits)
     ]
@@ -141,7 +148,7 @@ def main():
         "n_features": X.shape[1],
         "n_labels": y.shape[1],
         "params": ranker.get_params(),
-        "grid": grid,
+        "search": describe_search(search),
         "outer_cv": repr(outer_cv),
         "inner_cv": repr(paper["cross_validation"]["inner"]),
         "machine": describe(),
