@@ -11,6 +11,10 @@ if [[ "$DEPENDENCIES" == "minimum" ]]; then
     python build_tools/github/minimum_requirements.py > "$requirements"
     cat "$requirements"
     options+=(--requirement "$requirements")
+elif [[ "$DEPENDENCIES" == "conda-forge" ]]; then
+    # Keep the dependencies of the environment, which pip would
+    # otherwise replace with the ones of PyPI
+    options+=(--no-deps)
 fi
 
 if [[ "$RUNNER_OS" == "Windows" ]]; then
@@ -22,3 +26,9 @@ fi
 # A regular (not editable) install in an isolated build environment,
 # to test the package as users get it
 python -m pip install --verbose . "${options[@]}"
+
+if [[ "$DEPENDENCIES" == "conda-forge" ]]; then
+    # Fail if the environment does not satisfy the requirements of scikit-lr,
+    # which pip did not check without installing its dependencies
+    python -m pip check
+fi

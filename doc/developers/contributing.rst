@@ -158,7 +158,8 @@ The pull requests are checked by these workflows of GitHub Actions:
 
 * "Unit tests" builds scikit-lr and runs its tests on Linux, macOS and Windows, with
   every supported Python version and with the minimum and latest versions of the
-  dependencies.
+  dependencies, and also with the dependencies of conda-forge (see
+  :ref:`sklearn_version_coupling`).
 
 * "Code quality checks" runs the ``pre-commit`` hooks on the whole repository.
 

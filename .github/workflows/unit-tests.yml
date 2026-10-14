@@ -77,3 +77,44 @@ jobs:
 
       - name: Run the tests
         run: bash build_tools/github/test_script.sh
+
+  conda-forge:
+    name: Minimum Python on ${{ matrix.os }} (conda-forge dependencies)
+    runs-on: ${{ matrix.os }}
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    defaults:
+      run:
+        # A login shell, to activate the environment
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The extension modules are built against the scikit-learn of PyPI, as
+      # in the wheels, but users who install scikit-learn from conda-forge run
+      # them with that one, which conda-forge builds on its own, possibly with
+      # another release of Cython that lays out its extension types
+      # differently. The development environment has the dependencies from
+      # conda-forge and the minimum Python version. It is not cached, so every
+      # run gets the latest releases of its packages
+      - name: Set up the development environment
+        uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v3.2.1
+        with:
+          environment-file: environment.yml
+
+      - name: Build and install scikit-lr
+        env:
+          DEPENDENCIES: conda-forge
+        run: bash build_tools/github/install.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh

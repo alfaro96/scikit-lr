@@ -51,6 +51,10 @@ reason:
   against the next release of scikit-learn, to find the changes that affect it before
   that release is published.
 
+* The workflow "Unit tests" also runs the tests of scikit-lr, built against the
+  scikit-learn of PyPI as in the wheels, with the scikit-learn of conda-forge, which
+  is built apart, possibly with another release of Cython.
+
 Each minor release of scikit-learn thus has its own release line of scikit-lr.
 
 .. _cython_conventions:
