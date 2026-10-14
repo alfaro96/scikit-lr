@@ -159,7 +159,7 @@ The pull requests are checked by these workflows of GitHub Actions:
 * "Unit tests" builds scikit-lr and runs its tests on Linux, macOS and Windows, with
   every supported Python version and with the minimum and latest versions of the
   dependencies, and also with the dependencies of conda-forge (see
-  :ref:`sklearn_version_coupling`).
+  :ref:`version_coupling`).
 
 * "Code quality checks" runs the ``pre-commit`` hooks on the whole repository.
 
@@ -178,10 +178,14 @@ The pull requests are checked by these workflows of GitHub Actions:
   :ref:`changelog entry <changelog>` named after its number, unless a maintainer
   labels it "no changelog needed" because it does not affect users.
 
-The workflow "Upcoming scikit-learn" runs every night instead, and builds and tests
-scikit-lr against the next release of scikit-learn (see
-:ref:`sklearn_version_coupling`). When it fails, it opens an issue, which it closes
-once it passes again.
+The workflows "Upcoming scikit-learn" and "Upcoming NumPy and SciPy" run every night
+instead, and build and test scikit-lr against the next release of scikit-learn and
+against the nightly wheels of NumPy and SciPy. Every warning is an error in the tests
+of scikit-lr, so they fail on a deprecation in those releases before it reaches
+users, and also on a change in the Cython code of scikit-learn or SciPy that the
+extension modules cimport, or in the private API of scikit-learn (see
+:ref:`version_coupling`). When one of these workflows fails, it opens an issue,
+which it closes once it passes again.
 
 .. _checks:
 

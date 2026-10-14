@@ -1,0 +1,95 @@
+# Build scikit-lr against the upcoming NumPy and SciPy and run its tests
+name: Upcoming NumPy and SciPy
+
+# The tests turn every warning into an error, so a deprecation in the next
+# release of NumPy or SciPy makes them fail, and the extension modules cimport
+# the Cython API of SciPy. Building and testing against their nightly wheels
+# every night finds those changes before they are released, while
+# scikit-learn stays at the minor release supported by scikit-lr, so a
+# failure points to NumPy or SciPy. The runs of the pull requests that change
+# the workflow or its scripts check them before they reach master, where the
+# schedule runs. A failure of the scheduled or manual runs opens an issue,
+# since nobody may look at them, and the issue is closed once they pass again
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+    paths:
+      - .github/workflows/upcoming-numpy-scipy.yml
+      - build_tools/github/build_requirements.py
+      - build_tools/github/install_upcoming_numpy_scipy.sh
+      - build_tools/github/test_script.sh
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # while every other run gets its own, so only the outdated runs of a pull
+  # request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  upcoming-numpy-scipy:
+    name: Nightly NumPy and SciPy
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, whose changes are tested here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
+
+      - name: Build and install scikit-lr against the upcoming NumPy and SciPy
+        run: bash build_tools/github/install_upcoming_numpy_scipy.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
+
+  update-tracking-issue:
+    name: Update the tracking issue
+    needs: upcoming-numpy-scipy
+    runs-on: ubuntu-latest
+    # Only the scheduled and manual runs, which test master or the branch
+    # chosen by hand, report to the issue; the runs of the pull requests are
+    # reported on them. It also runs when the tests fail, so that failure
+    # opens the issue
+    if: >-
+      always() && github.repository == 'alfaro96/scikit-lr' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+
+    permissions:
+      # Open, edit and close the issue with the token of the job
+      issues: write
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Open, update or close the issue
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          LABEL: continuous integration
+          RESULT: ${{ needs.upcoming-numpy-scipy.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: bash build_tools/github/update_tracking_issue.sh

@@ -7,7 +7,7 @@ python -m pip install pytest packaging
 # Building without isolation needs the build requirements installed, and
 # also ninja, which meson-python only adds to an isolated build environment
 requirements="$RUNNER_TEMP/build-requirements.txt"
-python build_tools/github/build_requirements.py > "$requirements"
+python build_tools/github/build_requirements.py scikit-learn > "$requirements"
 cat "$requirements"
 python -m pip install --requirement "$requirements" ninja
 

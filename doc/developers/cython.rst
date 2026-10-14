@@ -1,11 +1,12 @@
 .. _cython:
 
-Cython and the internals of scikit-learn
-========================================
+Cython, scikit-learn and SciPy
+==============================
 
-The extension modules of scikit-lr are written in Cython and build on the internals
-of scikit-learn instead of copying them. This page explains how they are used and
-what it implies, and the conventions of the Cython code. The scikit-learn guides on
+The extension modules of scikit-lr are written in Cython and build on the Cython code
+of scikit-learn and SciPy instead of copying it: the internals of scikit-learn, and
+the public Cython API of SciPy. This page explains how they are used and what it
+implies, and the conventions of the Cython code. The scikit-learn guides on
 :ref:`Cython <sklearn:cython>` and on :ref:`performance <sklearn:performance-howto>`
 also apply.
 
@@ -16,10 +17,10 @@ Using the internals of scikit-learn
 
 The extension modules ``cimport`` the declarations of the ``.pxd`` files that
 scikit-learn installs, and extend its extension types by subclassing them. The
-``meson.build`` of ``sklr`` passes the directory where scikit-learn is installed to
-Cython, so that it finds them. Only the ``.pxd`` files included in the wheels of
-scikit-learn can be used, so check the installed package rather than its
-repository.
+``meson.build`` of ``sklr`` passes the directories where scikit-learn and SciPy are
+installed to Cython, so that it finds their ``.pxd`` files. Only the ``.pxd`` files
+included in the wheels of scikit-learn can be used, so check the installed package
+rather than its repository.
 
 Code is only copied from scikit-learn when what is needed is not declared in a
 ``.pxd`` file, or when it must diverge too much to be extended, and only after
@@ -30,15 +31,27 @@ scikit-lr.
 The Python code follows the same idea with the private API of scikit-learn, which is
 only imported through ``sklr/utils/_sklearn_compat.py`` (see :ref:`coding_guidelines`).
 
-.. _sklearn_version_coupling:
+.. _cimport_scipy:
 
-Coupling with the version of scikit-learn
------------------------------------------
+Using the Cython API of SciPy
+-----------------------------
+
+The extension modules also ``cimport`` the functions that SciPy exposes for Cython,
+such as the root finders of ``scipy.optimize.cython_optimize``, which can be called
+without the GIL. Unlike the internals of scikit-learn, they are a public API of
+SciPy, documented for this use.
+
+.. _version_coupling:
+
+Coupling with the versions of scikit-learn and SciPy
+----------------------------------------------------
 
 The layout of the extension types and structures of scikit-learn may change between
 its minor releases, without any deprecation. An extension module compiled against
-one of them may then crash with another one, instead of raising an error. For this
-reason:
+one of them may then crash with another one, instead of raising an error. The
+private API of scikit-learn imported by ``sklr/utils/_sklearn_compat.py`` may also
+change between its minor releases without deprecation, and is adapted there when
+moving to a new one. For these reasons:
 
 * scikit-lr is built against a single minor release of scikit-learn, which
   ``pyproject.toml`` requires both to build and to run it.
@@ -56,6 +69,12 @@ reason:
   is built apart, possibly with another release of Cython.
 
 Each minor release of scikit-learn thus has its own release line of scikit-lr.
+
+SciPy keeps the ABI of its public Cython API stable across its releases, so it is
+not restricted to a single minor release, and scikit-lr only sets a minimum version
+of it. The workflow "Upcoming NumPy and SciPy" still builds and tests scikit-lr every
+night against the nightly wheels of SciPy, to find the changes that affect it before
+they are released.
 
 .. _cython_conventions:
 

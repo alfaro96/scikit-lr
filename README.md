@@ -1,6 +1,6 @@
 # scikit-lr
 
-[![Unit tests][unit-tests-badge]][unit-tests] [![Code quality checks][code-quality-badge]][code-quality] [![Wheels][wheels-badge]][wheels] [![Upcoming scikit-learn][upcoming-sklearn-badge]][upcoming-sklearn] [![Coverage][coverage-badge]][coverage] [![Ruff][ruff-badge]][ruff] [![PyPI][pypi-badge]][pypi] [![Python versions][python-badge]][pypi]
+[![Unit tests][unit-tests-badge]][unit-tests] [![Code quality checks][code-quality-badge]][code-quality] [![Wheels][wheels-badge]][wheels] [![Upcoming scikit-learn][upcoming-sklearn-badge]][upcoming-sklearn] [![Upcoming NumPy and SciPy][upcoming-numpy-scipy-badge]][upcoming-numpy-scipy] [![Coverage][coverage-badge]][coverage] [![Ruff][ruff-badge]][ruff] [![PyPI][pypi-badge]][pypi] [![Python versions][python-badge]][pypi]
 
 [unit-tests-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/unit-tests.yml/badge.svg?branch=master
 [unit-tests]: https://github.com/alfaro96/scikit-lr/actions/workflows/unit-tests.yml?query=branch%3Amaster
@@ -10,6 +10,8 @@
 [wheels]: https://github.com/alfaro96/scikit-lr/actions/workflows/wheels.yml?query=branch%3Amaster
 [upcoming-sklearn-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-sklearn.yml/badge.svg?event=schedule
 [upcoming-sklearn]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-sklearn.yml?query=event%3Aschedule
+[upcoming-numpy-scipy-badge]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-numpy-scipy.yml/badge.svg?event=schedule
+[upcoming-numpy-scipy]: https://github.com/alfaro96/scikit-lr/actions/workflows/upcoming-numpy-scipy.yml?query=event%3Aschedule
 [coverage-badge]: https://codecov.io/gh/alfaro96/scikit-lr/branch/master/graph/badge.svg
 [coverage]: https://codecov.io/gh/alfaro96/scikit-lr
 [ruff-badge]: https://img.shields.io/badge/code%20style-ruff-000000.svg
