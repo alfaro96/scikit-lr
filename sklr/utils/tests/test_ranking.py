@@ -2,7 +2,7 @@ import re
 
 import numpy as np
 import pytest
-from scipy.sparse import csr_array, csr_matrix
+from scipy.sparse import csr_array
 from scipy.stats import rankdata
 from sklearn.base import BaseEstimator
 
@@ -264,10 +264,12 @@ def test_check_ranking_invalid_input(y, err_msg):
         check_ranking(y, allow_ties=True, allow_incomplete=True)
 
 
-@pytest.mark.parametrize("csr_container", [csr_array, csr_matrix])
-def test_check_ranking_sparse(csr_container):
+def test_check_ranking_sparse():
+    # Only a sparse array: SciPy is deprecating the sparse matrices, and
+    # check_ranking detects both alike with issparse. Sparse data is not an
+    # array-like, which is what the test checks, so pyrefly rejects it
     with pytest.raises(TypeError, match="Sparse data was passed for y"):
-        check_ranking(csr_container([[1, 2], [2, 1]]))
+        check_ranking(csr_array([[1, 2], [2, 1]]))  # pyrefly: ignore[bad-argument-type]
 
 
 @pytest.mark.parametrize(
