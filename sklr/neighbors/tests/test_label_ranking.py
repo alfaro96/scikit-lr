@@ -13,7 +13,7 @@ from sklr._distributions.tests import _oracles
 from sklr._distributions.tests._oracles import random_rankings
 from sklr.metrics import get_scorer
 from sklr.neighbors import KNeighborsLabelRanker
-from sklr.neighbors._label_ranking import _dudani_weights
+from sklr.neighbors._base import _dudani_weights
 from sklr.utils._estimator_checks import parametrize_with_checks
 
 MODELS = ["mallows", "plackett_luce"]

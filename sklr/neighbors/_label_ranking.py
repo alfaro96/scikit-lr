@@ -8,32 +8,21 @@ import numpy as np
 from joblib import effective_n_jobs
 from numpy.typing import ArrayLike
 from scipy.stats import rankdata
-from sklearn.neighbors import NearestNeighbors
-from sklearn.utils import get_tags
 
 from sklr._distributions.mallows import estimate_center_batch
 from sklr._distributions.plackett_luce import estimate_parameters_batch
 from sklr.base import LabelRankerMixin
-from sklr.utils._ranking import _validate_data
+from sklr.neighbors._base import _fit_rankings, _kneighbors_weights
 from sklr.utils._sklearn_compat import (
     Interval,
     KNeighborsMixin,
     NeighborsBase,
     StrOptions,
     _fit_context,
-    _get_weights,
 )
 
 # The default number of iterations of the estimation of each model
 _DEFAULT_MAX_ITER = {"mallows": 100, "plackett_luce": 1000}
-
-
-def _dudani_weights(dist):
-    """Weigh the neighbors of each query by the rule of [dudani_distance_1976]."""
-    nearest = dist[:, :1]
-    farthest = dist[:, -1:]
-    span = farthest - nearest
-    return np.divide(farthest - dist, span, out=np.ones_like(dist), where=span > 0)
 
 
 class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
@@ -305,27 +294,7 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
         self : object
             Fitted estimator.
         """
-        ensure_all_finite = "allow-nan" if get_tags(self).input_tags.allow_nan else True
-        X, y = _validate_data(
-            self,
-            X,
-            y,
-            accept_sparse="csr",
-            order="C",
-            ensure_all_finite=ensure_all_finite,
-        )
-        # NeighborsBase._fit validates y unless it is given a fitted estimator,
-        # and it would reject the unranked labels
-        neighbors = NearestNeighbors(
-            n_neighbors=self.n_neighbors,
-            algorithm=self.algorithm,
-            leaf_size=self.leaf_size,
-            metric=self.metric,
-            p=self.p,
-            metric_params=self.metric_params,
-            n_jobs=self.n_jobs,
-        ).fit(X)
-        return self._fit(neighbors, y)
+        return _fit_rankings(self, X, y, allow_ties=False)
 
     def predict(self, X: ArrayLike | None) -> np.ndarray:
         """Predict the rankings for the provided data.
@@ -343,15 +312,16 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
             Predicted rankings, complete and without ties, as the positions of the
             labels.
         """
-        if self.weights in {"uniform", None}:
-            # The distances are only needed to weigh the neighbors
-            neigh_ind = self.kneighbors(X, return_distance=False)
-            neigh_dist = None
-        else:
-            neigh_dist, neigh_ind = self.kneighbors(X)
-
+        neigh_ind, weights = _kneighbors_weights(self, X)
         y = self._y[neigh_ind]
-        weights = self._get_neighbor_weights(neigh_dist, y)
+        fallbacks = [np.ones(weights.shape)]
+        if self.model == "mallows":
+            completeness = np.mean(~np.isnan(y), axis=2)
+            weights *= completeness
+            fallbacks.insert(0, completeness)
+        for fallback in fallbacks:
+            is_zero = ~np.any(weights > 0, axis=1)
+            weights[is_zero] = fallback[is_zero]
         max_iter = self.max_iter
         if max_iter is None:
             max_iter = _DEFAULT_MAX_ITER[self.model]
@@ -364,24 +334,3 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
             y, weights, tol=self.tol, max_iter=max_iter, n_threads=n_threads
         )
         return rankdata(-parameters, method="ordinal", axis=1).astype(np.intp)
-
-    def _get_neighbor_weights(self, neigh_dist, y):
-        """Weigh the neighbors of each query point, whose rankings are `y`."""
-        n_queries, n_neighbors, _ = y.shape
-        if self.weights == "dudani":
-            weights = _dudani_weights(neigh_dist)
-        else:
-            weights = _get_weights(neigh_dist, self.weights)
-        if weights is None:
-            weights = np.ones((n_queries, n_neighbors))
-        weights = np.asarray(weights, dtype=np.float64)
-
-        fallbacks = [np.ones((n_queries, n_neighbors))]
-        if self.model == "mallows":
-            completeness = np.mean(~np.isnan(y), axis=2)
-            weights = weights * completeness
-            fallbacks.insert(0, completeness)
-        for fallback in fallbacks:
-            is_zero = ~np.any(weights > 0, axis=1)
-            weights[is_zero] = fallback[is_zero]
-        return weights
