@@ -12,12 +12,9 @@ computes a correlation or a distance between the true and the predicted ranking 
 each sample, and returns their average, which may be weighted with
 ``sample_weight``.
 
-Each metric is written as a function of two rankings of the :math:`n` labels
-:math:`y_1, \dots, y_n`, such as :math:`\tau(\hat{\pi}, \sigma)` for the predicted
-ranking :math:`\hat{\pi}` and the true ranking :math:`\sigma` of a sample, where
-:math:`\pi(i)` is the position of label :math:`y_i` in a ranking :math:`\pi`, as
-described in :ref:`ranking_representation`.
-
+Each metric is written as a function of two rankings, such as
+:math:`\tau(\hat{\pi}, \sigma)` for the predicted ranking :math:`\hat{\pi}` and the
+true ranking :math:`\sigma` of a sample, with the notation of :ref:`ranking_notation`.
 The rankings follow the representation described in :ref:`ranking_representation`,
 and they must be complete: the metrics reject rankings with unranked labels, in
 the true rankings as well as in the predicted ones.
@@ -27,13 +24,10 @@ the true rankings as well as in the predicted ones.
 Scoring
 -------
 
-The model selection tools of scikit-learn, such as
-:func:`sklearn.model_selection.cross_val_score` and
-:class:`sklearn.model_selection.GridSearchCV`, evaluate an estimator with its
-``score`` method unless they are given a scorer with the ``scoring`` parameter.
 The ``score`` method of the label rankers computes Kendall's :math:`\tau`, and
 that of the partial label rankers computes the :math:`\tau_x` coefficient, both
-described below.
+described below. The model selection tools of scikit-learn use it unless they are
+given a scorer with the :ref:`scoring <sklearn:scoring_parameter>` parameter.
 
 scikit-learn only accepts the names of its own scorers as values of ``scoring``,
 so the scorers of scikit-lr are passed as objects, which :func:`get_scorer` gets
@@ -57,10 +51,9 @@ distance returns it negated. :func:`get_scorer_names` lists the names:
 make_scorer(kendall_distance, greater_is_better=False, response_method='predict')
 
 The scorer is then passed as ``scoring``, for instance with
-``cross_val_score(ranker, X, y, scoring=get_scorer("kendall_tau"))``. A scorer can
-also be made from a metric with :func:`sklearn.metrics.make_scorer`, which is how
-the scorers above are built. When metadata routing is enabled, the scorers receive
-``sample_weight`` if it is requested with their ``set_score_request`` method.
+``cross_val_score(ranker, X, y, scoring=get_scorer("kendall_tau"))``. When metadata
+routing is enabled, the scorers receive ``sample_weight`` if it is requested with
+their ``set_score_request`` method.
 
 .. _label_ranking_metrics:
 

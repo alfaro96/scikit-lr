@@ -59,10 +59,11 @@ rate given by a spread parameter :math:`\theta \geq 0`. As in [cheng_decision_20
 the model of a node :math:`t` is estimated only on the labels that some of its rankings
 rank, which gives the estimates :math:`\hat{\pi}_t` and :math:`\hat{\theta}_t`. The
 center ranking is estimated by Algorithm 1 of [cheng_decision_2009]_, the generalized
-Borda count with the completion of the incomplete rankings that :ref:`neighbors`
-describes, and the spread by maximum likelihood from the mean Kendall distance of the
-completed rankings to the center. The spread is zero when that distance is not below
-that of rankings drawn uniformly at random, and infinite when it is zero.
+Borda count with the completion of the incomplete rankings that
+:ref:`nearest neighbors <mallows_neighbors>` describes, and the spread by maximum
+likelihood from the mean Kendall distance of the completed rankings to the center. The
+spread is zero when that distance is not below that of rankings drawn uniformly at
+random, and infinite when it is zero.
 
 Impurity
 ~~~~~~~~
@@ -229,35 +230,12 @@ Practical use
 -------------
 
 The splits only depend on the order of the values of each feature, so, unlike the
-nearest neighbors, the tree does not need the features to be scaled. The
-parameters that limit the size of the tree are chosen with
-:class:`~sklearn.model_selection.GridSearchCV` and the scorer of Kendall's
-:math:`\tau` from :func:`sklr.metrics.get_scorer`, as described in
-:ref:`model_evaluation`:
-
->>> from sklearn.model_selection import GridSearchCV
->>> from sklr.metrics import get_scorer
->>> X = rng.normal(size=(200, 3))
->>> utilities = np.sin(2 * X) @ rng.normal(size=(3, 4))
->>> y = rankdata(-(utilities + 0.5 * rng.normal(size=(200, 4))), axis=1)
->>> param_grid = {"max_depth": [2, 4, 6, 8, None]}
->>> search = GridSearchCV(
-...     DecisionTreeLabelRanker(random_state=0),
-...     param_grid,
-...     scoring=get_scorer("kendall_tau"),
-... )
->>> search.fit(X, y).best_params_
-{'max_depth': 4}
->>> search.cv_results_["mean_test_score"].round(2)
-array([0.56, 0.61, 0.6 , 0.6 , 0.57])
-
-The rankings are noisy, so the fully grown tree, the last one, fits the noise and
-scores worse than a tree of depth four.
-
-The scorers only compare complete rankings, so cross-validation needs complete
-rankings in the validation folds. The example
-:ref:`sphx_glr_auto_examples_tree_plot_label_ranking_tree.py` shows how the
-maximum depth controls the fit, also with incomplete training rankings.
+nearest neighbors, the tree does not need the features to be scaled. The parameters
+that limit the size of the tree are chosen by cross-validation, as shown in
+:ref:`getting_started`, with the ``"kendall_tau"`` scorer described in
+:ref:`model_evaluation`. The example
+:ref:`sphx_glr_auto_examples_tree_plot_label_ranking_tree.py` shows how the maximum
+depth controls the fit, also with incomplete training rankings.
 
 Complexity
 ----------
