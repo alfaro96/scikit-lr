@@ -35,7 +35,7 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
     The training rankings may be incomplete, and the neighbors may be weighted by
     their distance to the sample.
 
-    Read more in the :ref:`User Guide <neighbors>`.
+    Read more in the :ref:`User Guide <label_ranking_neighbors>`.
 
     Parameters
     ----------
@@ -150,6 +150,8 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
 
     See Also
     --------
+    KNeighborsPartialLabelRanker : Partial label ranker based on the k-nearest
+        neighbors.
     sklearn.neighbors.KNeighborsClassifier : Classifier implementing the k-nearest
         neighbors vote.
     sklearn.neighbors.KNeighborsRegressor : Regression based on k-nearest

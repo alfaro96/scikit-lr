@@ -80,6 +80,7 @@ See the :ref:`neighbors` section of the user guide for further details.
    :template: base.rst
 
    KNeighborsLabelRanker
+   KNeighborsPartialLabelRanker
 
 :mod:`sklr.tree`: Decision trees
 --------------------------------

@@ -81,7 +81,7 @@ fig.tight_layout()
 # far away. Weighting the neighbors by the inverse of their distance or by the rule
 # of Dudani lets the ranker use more neighbors before the far ones degrade the
 # prediction. In practice, the number of neighbors and the weights are chosen by
-# cross-validation, as described in the :ref:`user guide <neighbors>`.
+# cross-validation, as described in the :ref:`user guide <label_ranking_neighbors>`.
 #
 # Incomplete training rankings
 # ----------------------------
