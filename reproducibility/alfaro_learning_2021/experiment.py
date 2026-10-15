@@ -1,4 +1,4 @@
-"""Protocol of [alfaro_learning_2021] for IBPLR and PLRT."""
+"""Protocol of [alfaro_learning_2021] for Zero-R, IBPLR and PLRT."""
 
 from functools import partial
 
@@ -6,6 +6,7 @@ from experiments.datasets import missing_labels_scenarios
 from experiments.search import doubling_search, inner_train_size
 from sklearn.model_selection import KFold, RepeatedKFold
 
+from sklr.dummy import DummyPartialLabelRanker
 from sklr.neighbors import KNeighborsPartialLabelRanker
 from sklr.tree import DecisionTreePartialLabelRanker
 
@@ -40,11 +41,14 @@ PAPER = {
         "outer": RepeatedKFold(n_splits=10, n_repeats=5, random_state=0),
         "inner": KFold(n_splits=5, shuffle=True, random_state=0),
     },
-    # KNN-E-D in the tables, with the Euclidean distance and the inverse
-    # distance weights, and the number of neighbors chosen from five by doubling it
-    # and then by a binary search (p. 905). The paper does not bound it, so it is
-    # bounded by the training samples of the inner folds
     "methods": {
+        # The baseline, which predicts the consensus bucket order of all the
+        # training rankings for every sample (p. 906)
+        "zero_r": {"estimator": DummyPartialLabelRanker, "params": {}},
+        # KNN-E-D in the tables, with the Euclidean distance and the inverse
+        # distance weights, and the number of neighbors chosen from five by doubling it
+        # and then by a binary search (p. 905). The paper does not bound it, so it is
+        # bounded by the training samples of the inner folds
         "ibplr": {
             "estimator": KNeighborsPartialLabelRanker,
             "params": {"weights": "distance"},
