@@ -4,6 +4,7 @@ py.install_sources(
     'test_base.py',
     'test_conftest.py',
     'test_docstrings.py',
+    'test_dummy.py',
     'test_init.py',
     'test_sklearn_version.py',
   ],

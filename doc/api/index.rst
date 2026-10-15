@@ -32,6 +32,20 @@ more details on how to use them.
    is_label_ranker
    is_partial_label_ranker
 
+:mod:`sklr.dummy`: Dummy estimators
+-----------------------------------
+
+.. module:: sklr.dummy
+
+See the :ref:`dummy_estimators` section of the user guide for further details.
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   DummyLabelRanker
+   DummyPartialLabelRanker
+
 :mod:`sklr.metrics`: Metrics
 ----------------------------
 

@@ -62,6 +62,7 @@ py.install_sources(
     '_sklearn_version.py',
     'base.py',
     'conftest.py',
+    'dummy.py',
     # Tells type checkers that the package ships the type hints of its public
     # API (PEP 561)
     'py.typed',

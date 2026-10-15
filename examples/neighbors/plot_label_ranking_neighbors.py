@@ -36,7 +36,9 @@ print(y[:3])
 #
 # Each combination of model and weights is scored by 5-fold cross-validation with
 # Kendall's :math:`\tau`, whose scorer is given by :func:`~sklr.metrics.get_scorer`.
-# Both features have the same range, so they are not scaled.
+# Both features have the same range, so they are not scaled. As a baseline,
+# :class:`~sklr.dummy.DummyLabelRanker` with the same model predicts the consensus
+# of the training rankings for every sample, without looking at the features.
 #
 # The maximum likelihood estimate of the Plackett-Luce model does not exist when
 # some label is never ranked above another one in a neighborhood, which is common
@@ -51,6 +53,7 @@ import matplotlib.pyplot as plt
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import KFold, cross_val_score
 
+from sklr.dummy import DummyLabelRanker
 from sklr.metrics import get_scorer
 from sklr.neighbors import KNeighborsLabelRanker
 
@@ -70,15 +73,22 @@ for ax, model in zip(axes, models):
                 score = cross_val_score(ranker, X, y, scoring=scoring, cv=cv).mean()
             scores.append(score)
         ax.plot(n_neighbors_grid, scores, marker="o", label=f"weights={weights!r}")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", ConvergenceWarning)
+        baseline = cross_val_score(
+            DummyLabelRanker(model=model), X, y, scoring=scoring, cv=cv
+        ).mean()
+    ax.axhline(baseline, color="gray", linestyle="--", label="DummyLabelRanker")
     ax.set(title=f"model={model!r}", xlabel="Number of neighbors")
     ax.legend()
 axes[0].set_ylabel(r"Kendall's $\tau$ (5-fold CV)")
 fig.tight_layout()
 
 # %%
-# With a single neighbor, both models predict its ranking, whatever the weights.
-# More neighbors average out the noise of the rankings, until they come from too
-# far away. Weighting the neighbors by the inverse of their distance or by the rule
+# All the rankers score well above the baseline, so the features carry information about
+# the rankings. With a single neighbor, both models predict its ranking, whatever the
+# weights. More neighbors average out the noise of the rankings, until they come from
+# too far away. Weighting the neighbors by the inverse of their distance or by the rule
 # of Dudani lets the ranker use more neighbors before the far ones degrade the
 # prediction. In practice, the number of neighbors and the weights are chosen by
 # cross-validation, as described in the :ref:`user guide <label_ranking_neighbors>`.

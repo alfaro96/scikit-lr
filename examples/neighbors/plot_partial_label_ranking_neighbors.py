@@ -37,11 +37,14 @@ print(y[:3])
 #
 # Each weight function is scored by 5-fold cross-validation with the :math:`\tau_x`
 # coefficient, whose scorer is given by :func:`~sklr.metrics.get_scorer`. Both
-# features have the same range, so they are not scaled.
+# features have the same range, so they are not scaled. As a baseline,
+# :class:`~sklr.dummy.DummyPartialLabelRanker` predicts the consensus of the
+# training rankings for every sample, without looking at the features.
 
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold, cross_val_score
 
+from sklr.dummy import DummyPartialLabelRanker
 from sklr.metrics import get_scorer
 from sklr.neighbors import KNeighborsPartialLabelRanker
 
@@ -57,17 +60,22 @@ for weights in weights_grid:
         ranker = KNeighborsPartialLabelRanker(n_neighbors, weights=weights)
         scores.append(cross_val_score(ranker, X, y, scoring=scoring, cv=cv).mean())
     ax.plot(n_neighbors_grid, scores, marker="o", label=f"weights={weights!r}")
+baseline = cross_val_score(
+    DummyPartialLabelRanker(), X, y, scoring=scoring, cv=cv
+).mean()
+ax.axhline(baseline, color="gray", linestyle="--", label="DummyPartialLabelRanker")
 ax.set(xlabel="Number of neighbors", ylabel=r"$\tau_x$ (5-fold CV)")
 ax.legend()
 fig.tight_layout()
 
 # %%
-# With a single neighbor, the ranker predicts its bucket order, whatever the
-# weights. More neighbors average out the noise of the rankings, until they come
-# from too far away. Weighting the neighbors by the inverse of their distance or by
-# the rule of Dudani lets the ranker use more neighbors before the far ones degrade
-# the prediction. In practice, the number of neighbors and the weights are chosen
-# by cross-validation, as described in the
+# All the rankers score well above the baseline, so the features carry information about
+# the bucket orders. With a single neighbor, the ranker predicts its bucket order,
+# whatever the weights. More neighbors average out the noise of the rankings, until they
+# come from too far away. Weighting the neighbors by the inverse of their distance or by
+# the rule of Dudani lets the ranker use more neighbors before the far ones degrade the
+# prediction. In practice, the number of neighbors and the weights are chosen by
+# cross-validation, as described in the
 # :ref:`user guide <partial_label_ranking_neighbors>`.
 #
 # Incomplete training rankings

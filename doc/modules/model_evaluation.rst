@@ -161,6 +161,55 @@ The :math:`\tau_x` coefficient is also equivalent to the Kemeny-Snell distance
     \tau_x(\hat{\pi}, \sigma)
     = 1 - \frac{2 D_{\mathrm{KS}}(\hat{\pi}, \sigma)}{n(n - 1)}.
 
+.. _dummy_estimators:
+
+Dummy estimators
+----------------
+
+.. currentmodule:: sklr.dummy
+
+A simple sanity check of a ranker is to compare it with a ranker that does not
+look at the features. :class:`DummyLabelRanker` and :class:`DummyPartialLabelRanker`
+predict the same ranking :math:`\hat{\pi}` for every sample
+:math:`\boldsymbol{x} \in \mathcal{X}`, chosen by their ``strategy``:
+
+* ``"consensus"`` predicts the consensus of the training rankings, which may be
+  weighted with ``sample_weight`` and be incomplete. In :class:`DummyLabelRanker`,
+  it is the center ranking of the Mallows model or the ranking that sorts the
+  labels by decreasing parameter of the Plackett-Luce model, as chosen by its
+  ``model``. In :class:`DummyPartialLabelRanker`, it is the bucket order found by
+  the Bucket Pivot Algorithm, so that the ranker is the Zero-R baseline of
+  [alfaro_learning_2021]_.
+* ``"constant"`` predicts a ranking given by the user with ``constant``.
+
+With both strategies, ``predict`` ignores the input data, apart from its number of
+samples. On synthetic rankings that depend on the features, a ranker that uses
+them, such as :class:`~sklr.neighbors.KNeighborsLabelRanker`, scores well above
+the consensus:
+
+>>> import numpy as np
+>>> from scipy.stats import rankdata
+>>> from sklearn.model_selection import train_test_split
+>>> from sklr.dummy import DummyLabelRanker
+>>> from sklr.neighbors import KNeighborsLabelRanker
+>>> rng = np.random.RandomState(0)
+>>> X = rng.uniform(-1, 1, size=(200, 2))
+>>> utilities = X @ rng.normal(size=(2, 4)) + 0.3 * rng.normal(size=(200, 4))
+>>> y = rankdata(-utilities, axis=1)
+>>> X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+>>> dummy = DummyLabelRanker().fit(X_train, y_train)
+>>> dummy.ranking_
+array([3, 4, 1, 2])
+>>> round(dummy.score(X_test, y_test), 3)
+-0.093
+>>> ranker = KNeighborsLabelRanker().fit(X_train, y_train)
+>>> round(ranker.score(X_test, y_test), 3)
+0.52
+
+A ranker that does not clearly beat the consensus has probably not learned
+anything from the features: they may not be informative, or its parameters may
+not be well tuned.
+
 .. rubric:: References
 
 .. [kendall_new_1938] M. G. Kendall, "A new measure of rank correlation",

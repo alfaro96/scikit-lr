@@ -35,11 +35,14 @@ print(y[:3])
 #
 # Trees of increasing maximum depth are scored by 5-fold cross-validation with
 # Kendall's :math:`\tau`, whose scorer is given by :func:`~sklr.metrics.get_scorer`,
-# both on the training and on the validation folds.
+# both on the training and on the validation folds. As a baseline,
+# :class:`~sklr.dummy.DummyLabelRanker` predicts the consensus of the training
+# rankings for every sample, without looking at the features.
 
 import matplotlib.pyplot as plt
-from sklearn.model_selection import KFold, cross_validate
+from sklearn.model_selection import KFold, cross_val_score, cross_validate
 
+from sklr.dummy import DummyLabelRanker
 from sklr.metrics import get_scorer
 from sklr.tree import DecisionTreeLabelRanker
 
@@ -59,17 +62,20 @@ for max_depth in max_depths:
 fig, ax = plt.subplots(figsize=(5, 4))
 ax.plot(max_depths, train_scores, marker="o", label="Training folds")
 ax.plot(max_depths, test_scores, marker="o", label="Validation folds")
+baseline = cross_val_score(DummyLabelRanker(), X, y, scoring=scoring, cv=cv).mean()
+ax.axhline(baseline, color="gray", linestyle="--", label="DummyLabelRanker")
 ax.set(xlabel="max_depth", ylabel=r"Kendall's $\tau$ (5-fold CV)")
 ax.legend()
 fig.tight_layout()
 
 # %%
-# The score on the training folds keeps growing with the depth, because each new
-# level separates the training rankings further. The score on the validation folds
-# stops improving after a few levels, and the gap between both grows as the leaves
-# fit the noise of fewer and fewer rankings. In practice, the depth, or the other
-# parameters that limit the size of the tree, are chosen by cross-validation, as
-# described in the :ref:`user guide <tree>`.
+# Even a tree with a single split scores well above the baseline, so the features carry
+# information about the rankings. The score on the training folds keeps growing with the
+# depth, because each new level separates the training rankings further. The score on
+# the validation folds stops improving after a few levels, and the gap between both
+# grows as the leaves fit the noise of fewer and fewer rankings. In practice, the depth,
+# or the other parameters that limit the size of the tree, are chosen by
+# cross-validation, as described in the :ref:`user guide <tree>`.
 #
 # Incomplete training rankings
 # ----------------------------
