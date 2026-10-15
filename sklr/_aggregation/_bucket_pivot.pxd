@@ -17,6 +17,16 @@ cdef intp_t bucket_order(
 ) noexcept nogil
 
 
+cdef intp_t aggregate_pairs(
+    const float64_t[:, ::1] precedes,
+    const float64_t[:, ::1] ties,
+    intp_t[::1] ranking,
+    float64_t[:, ::1] matrix,
+    float64_t[:, ::1] work,
+    intp_t[:, ::1] index_work,
+) noexcept nogil
+
+
 cdef intp_t aggregate(
     const float64_t[:, ::1] y,
     const float64_t[::1] sample_weight,

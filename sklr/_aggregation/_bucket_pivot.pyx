@@ -261,53 +261,29 @@ cdef intp_t bucket_order(
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef intp_t aggregate(
-    const float64_t[:, ::1] y,
-    const float64_t[::1] sample_weight,
+cdef intp_t aggregate_pairs(
+    const float64_t[:, ::1] precedes,
+    const float64_t[:, ::1] ties,
     intp_t[::1] ranking,
-    float64_t[:, :, ::1] matrices,
+    float64_t[:, ::1] matrix,
     float64_t[:, ::1] work,
     intp_t[:, ::1] index_work,
 ) noexcept nogil:
-    """Find a consensus bucket order of possibly incomplete partial rankings.
+    """Find a consensus bucket order of partial rankings from their pairs of labels.
 
-    The labels that some ranking of positive weight ranks together with another
-    label are ordered by ``bucket_order``, and the others go together to a last
-    bucket. Returns the number of buckets. `matrices` has shape
-    ``(3, n_labels, n_labels)``, `work` shape ``(2, n_labels)`` and `index_work`
-    shape ``(5, n_labels)``.
+    `precedes` and `ties` are as in ``pair_order_matrix``. The labels that some
+    ranking of positive weight ranks together with another label are ordered by
+    ``bucket_order``, and the others go together to a last bucket. Returns the
+    number of buckets. `ranking` has length ``n_labels``, `matrix` shape
+    ``(n_labels, n_labels)``, `work` shape ``(2, n_labels)`` and `index_work` shape
+    ``(5, n_labels)``.
     """
-    cdef intp_t n_samples = y.shape[0], n_labels = y.shape[1]
-    cdef float64_t[:, ::1] precedes = matrices[0], ties = matrices[1]
-    cdef float64_t[:, ::1] matrix = matrices[2]
+    cdef intp_t n_labels = matrix.shape[0]
     cdef intp_t[::1] items = index_work[0]
-    cdef intp_t sample, label, other, n_items = 0, n_buckets
-    cdef float64_t weight
+    cdef intp_t label, other, n_items = 0, n_buckets
     cdef bint has_information
 
-    for label in range(n_labels):
-        for other in range(n_labels):
-            precedes[label, other] = 0.0
-            ties[label, other] = 0.0
-    for sample in range(n_samples):
-        weight = sample_weight[sample]
-        if weight == 0:
-            continue
-        for label in range(n_labels):
-            if isnan(y[sample, label]):
-                continue
-            for other in range(label + 1, n_labels):
-                if isnan(y[sample, other]):
-                    continue
-                if y[sample, label] < y[sample, other]:
-                    precedes[label, other] += weight
-                elif y[sample, label] > y[sample, other]:
-                    precedes[other, label] += weight
-                else:
-                    ties[label, other] += weight
-                    ties[other, label] += weight
     pair_order_matrix(precedes, ties, matrix)
-
     for label in range(n_labels):
         # The labels without information keep this mark
         ranking[label] = 0
@@ -332,6 +308,54 @@ cdef intp_t aggregate(
             if ranking[label] == 0:
                 ranking[label] = n_buckets
     return n_buckets
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef intp_t aggregate(
+    const float64_t[:, ::1] y,
+    const float64_t[::1] sample_weight,
+    intp_t[::1] ranking,
+    float64_t[:, :, ::1] matrices,
+    float64_t[:, ::1] work,
+    intp_t[:, ::1] index_work,
+) noexcept nogil:
+    """Find a consensus bucket order of possibly incomplete partial rankings.
+
+    The weights of the pairs of labels of the rankings are aggregated by
+    ``aggregate_pairs``. Returns the number of buckets. `matrices` has shape
+    ``(3, n_labels, n_labels)``, `work` shape ``(2, n_labels)`` and `index_work`
+    shape ``(5, n_labels)``.
+    """
+    cdef intp_t n_samples = y.shape[0], n_labels = y.shape[1]
+    cdef float64_t[:, ::1] precedes = matrices[0], ties = matrices[1]
+    cdef intp_t sample, label, other
+    cdef float64_t weight
+
+    for label in range(n_labels):
+        for other in range(n_labels):
+            precedes[label, other] = 0.0
+            ties[label, other] = 0.0
+    for sample in range(n_samples):
+        weight = sample_weight[sample]
+        if weight == 0:
+            continue
+        for label in range(n_labels):
+            if isnan(y[sample, label]):
+                continue
+            for other in range(label + 1, n_labels):
+                if isnan(y[sample, other]):
+                    continue
+                if y[sample, label] < y[sample, other]:
+                    precedes[label, other] += weight
+                elif y[sample, label] > y[sample, other]:
+                    precedes[other, label] += weight
+                else:
+                    ties[label, other] += weight
+                    ties[other, label] += weight
+    return aggregate_pairs(
+        precedes, ties, ranking, matrices[2], work, index_work
+    )
 
 
 # The callers pass inputs of matching shapes and at least one thread, and the other
