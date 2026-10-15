@@ -1,5 +1,5 @@
-"""Decision tree label rankers."""
+"""Decision tree label rankers and partial label rankers."""
 
-from sklr.tree._classes import DecisionTreeLabelRanker
+from sklr.tree._classes import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 
-__all__ = ["DecisionTreeLabelRanker"]
+__all__ = ["DecisionTreeLabelRanker", "DecisionTreePartialLabelRanker"]

@@ -3,8 +3,9 @@
 import numpy as np
 
 cimport cython
-from libc.math cimport NAN, isnan
+from libc.math cimport NAN, isnan, log2
 
+from sklr._aggregation._bucket_pivot cimport aggregate_pairs
 from sklr._distributions._mallows cimport (
     estimate_center,
     estimate_spread,
@@ -143,24 +144,34 @@ cdef class RankingCriterion(Criterion):
     ) noexcept nogil:
         """Compute the impurities of the left and right children."""
         cdef intp_t label, other
+        # The node and the left child add up the weights in different orders, so a
+        # pair that no ranking of the right child puts in a relation gets a weight
+        # of zero for it instead of the rounding error of the subtraction, which
+        # the consensus would take as information
         for label in range(self.n_outputs):
             for other in range(self.n_outputs):
-                self.precedence_weight[_RIGHT, label, other] = (
-                    self.precedence_weight[_NODE, label, other]
-                    - self.precedence_weight[_LEFT, label, other]
-                )
                 self.precedence_count[_RIGHT, label, other] = (
                     self.precedence_count[_NODE, label, other]
                     - self.precedence_count[_LEFT, label, other]
                 )
-                self.tie_weight[_RIGHT, label, other] = (
-                    self.tie_weight[_NODE, label, other]
-                    - self.tie_weight[_LEFT, label, other]
-                )
+                if self.precedence_count[_RIGHT, label, other] == 0:
+                    self.precedence_weight[_RIGHT, label, other] = 0.0
+                else:
+                    self.precedence_weight[_RIGHT, label, other] = (
+                        self.precedence_weight[_NODE, label, other]
+                        - self.precedence_weight[_LEFT, label, other]
+                    )
                 self.tie_count[_RIGHT, label, other] = (
                     self.tie_count[_NODE, label, other]
                     - self.tie_count[_LEFT, label, other]
                 )
+                if self.tie_count[_RIGHT, label, other] == 0:
+                    self.tie_weight[_RIGHT, label, other] = 0.0
+                else:
+                    self.tie_weight[_RIGHT, label, other] = (
+                        self.tie_weight[_NODE, label, other]
+                        - self.tie_weight[_LEFT, label, other]
+                    )
         impurity_left[0] = self._part_impurity(_LEFT)
         impurity_right[0] = self._part_impurity(_RIGHT)
 
@@ -549,3 +560,183 @@ cdef class MallowsCriterion(RankingCriterion):
             self.scores[:n_labels],
             self.work[:, :n_labels],
         )
+
+
+# The buffers of the consensus are created with the sizes that aggregate_pairs needs
+# for n_labels labels, and the consensus is indexed by the labels
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.initializedcheck(False)
+cdef class PairwiseCriterion(RankingCriterion):
+    """Impurity of the partial rankings of a node from each pair of labels.
+
+    As in [alfaro_learning_2021], the impurity of a part adds up a measure of the
+    disagreement of its rankings on each pair of labels that some of them rank,
+    multiplied by a factor that depends on the subclass. The measure is computed
+    from the weights of the rankings that put the first label ahead, tie them and
+    put the second one ahead, and, for some measures, from the relation of the pair
+    in the consensus bucket order of the part. The value of a node is that
+    consensus, found by the Bucket Pivot Algorithm on the labels that some of its
+    rankings rank together with another label, with the others tied in a last
+    bucket.
+    """
+
+    # Whether the impurity of each pair depends on the consensus of the part, and
+    # the factor of the sum over the pairs
+    cdef bint uses_consensus
+    cdef float64_t scale
+
+    # The consensus bucket order of a part and the buffers of the Bucket Pivot
+    # Algorithm
+    cdef intp_t[::1] consensus
+    cdef float64_t[:, ::1] matrix
+    cdef float64_t[:, ::1] work
+    cdef intp_t[:, ::1] index_work
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples, *args, **kwargs):
+        self.uses_consensus = False
+        self.scale = 1.0
+        self.consensus = np.empty(n_labels, dtype=np.intp)
+        self.matrix = np.empty((n_labels, n_labels), dtype=np.float64)
+        self.work = np.empty((2, n_labels), dtype=np.float64)
+        self.index_work = np.empty((5, n_labels), dtype=np.intp)
+
+    def __reduce__(self):
+        return (type(self), (self.n_outputs, self.n_samples))
+
+    cdef void node_value(self, float64_t* dest) noexcept nogil:
+        """Write the consensus bucket order of the node."""
+        cdef intp_t label
+        self._aggregate(_NODE)
+        for label in range(self.n_outputs):
+            dest[label] = self.consensus[label]
+
+    cdef void _aggregate(self, int part) noexcept nogil:
+        """Find the consensus bucket order of a part into `consensus`."""
+        aggregate_pairs(
+            self.precedence_weight[part],
+            self.tie_weight[part],
+            self.consensus,
+            self.matrix,
+            self.work,
+            self.index_work,
+        )
+
+    # As in MallowsCriterion, the pairs with a positive count have a positive
+    # weight, so the divisor is positive up to the rounding of the subtraction for
+    # the right child
+    @cython.cdivision(True)
+    cdef float64_t _impurity(self, int part) noexcept nogil:
+        """Compute the impurity of a part whose rankings are not consistent."""
+        cdef intp_t label, other
+        cdef float64_t ahead, tied, behind, total, impurity = 0.0
+        cdef int relation = 0
+
+        if self.uses_consensus:
+            self._aggregate(part)
+        for label in range(self.n_outputs):
+            for other in range(label + 1, self.n_outputs):
+                if (
+                    self.precedence_count[part, label, other]
+                    + self.tie_count[part, label, other]
+                    + self.precedence_count[part, other, label]
+                ) == 0:
+                    continue
+                ahead = self.precedence_weight[part, label, other]
+                tied = self.tie_weight[part, label, other]
+                behind = self.precedence_weight[part, other, label]
+                total = ahead + tied + behind
+                if self.uses_consensus:
+                    relation = (self.consensus[label] < self.consensus[other]) - (
+                        self.consensus[label] > self.consensus[other]
+                    )
+                impurity += self._pair_impurity(
+                    ahead / total, tied / total, behind / total, relation
+                )
+        return self.scale * impurity
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the impurity of a pair from the fractions of its relations.
+
+        The fractions are those of the rankings that put the first label ahead,
+        tie them and put the second one ahead. If the impurity uses the consensus,
+        `relation` is that of the pair in it: ``1`` if the first label is ahead,
+        ``0`` if they are tied and ``-1`` otherwise.
+        """
+        return 0.0
+
+
+cdef class DisagreementsCriterion(PairwiseCriterion):
+    """Impurity from the rankings that order each pair unlike the consensus."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.uses_consensus = True
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the fraction of the rankings that disagree with the consensus."""
+        if relation == 1:
+            return tied + behind
+        if relation == 0:
+            return ahead + behind
+        return ahead + tied
+
+
+cdef class DistanceCriterion(PairwiseCriterion):
+    """Impurity from the distance of the rankings to the consensus on each pair."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.uses_consensus = True
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the mean distance of the rankings to the consensus on the pair."""
+        if relation == 1:
+            return tied + 2.0 * behind
+        if relation == 0:
+            return ahead + behind
+        return 2.0 * ahead + tied
+
+
+cdef class EntropyCriterion(PairwiseCriterion):
+    """Impurity from the mean entropy of the relations of each pair."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.scale = _mean_factor(n_labels)
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the entropy in bits of the relations of the pair."""
+        return _plogp(ahead) + _plogp(tied) + _plogp(behind)
+
+
+cdef class GiniCriterion(PairwiseCriterion):
+    """Impurity from the mean Gini index of the relations of each pair."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.scale = _mean_factor(n_labels)
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the Gini index of the relations of the pair."""
+        return 1.0 - ahead * ahead - tied * tied - behind * behind
+
+
+# The rankings have at least two labels, so there is at least one pair
+@cython.cdivision(True)
+cdef inline float64_t _mean_factor(intp_t n_labels) noexcept:
+    """Return the inverse of the number of pairs of labels."""
+    return 2.0 / (n_labels * (n_labels - 1.0))
+
+
+cdef inline float64_t _plogp(float64_t probability) noexcept nogil:
+    """Return the term of a probability in its entropy in bits, zero for zero."""
+    if probability == 0.0:
+        return 0.0
+    return -probability * log2(probability)

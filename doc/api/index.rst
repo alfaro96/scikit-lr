@@ -94,6 +94,7 @@ See the :ref:`tree` section of the user guide for further details.
    :template: base.rst
 
    DecisionTreeLabelRanker
+   DecisionTreePartialLabelRanker
 
 :mod:`sklr.utils`: Utilities
 ----------------------------

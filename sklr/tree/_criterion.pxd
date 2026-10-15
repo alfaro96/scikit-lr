@@ -14,7 +14,7 @@ cdef class RankingCriterion(Criterion):
     # The weight and the number of the rankings of each part that put each label ahead
     # of each other one and that tie them. The numbers tell exactly whether a part is
     # consistent, while the weights of the right child, found by subtraction, may be
-    # rounded
+    # rounded, except that they are exactly zero where their numbers are zero
     cdef float64_t[:, :, ::1] precedence_weight
     cdef intp_t[:, :, ::1] precedence_count
     cdef float64_t[:, :, ::1] tie_weight
