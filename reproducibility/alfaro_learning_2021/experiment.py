@@ -1,4 +1,4 @@
-"""Protocol of [alfaro_learning_2021] for IBPLR."""
+"""Protocol of [alfaro_learning_2021] for IBPLR and PLRT."""
 
 from functools import partial
 
@@ -7,6 +7,7 @@ from experiments.search import doubling_search, inner_train_size
 from sklearn.model_selection import KFold, RepeatedKFold
 
 from sklr.neighbors import KNeighborsPartialLabelRanker
+from sklr.tree import DecisionTreePartialLabelRanker
 
 PAPER = {
     "datasets": {
@@ -53,6 +54,23 @@ PAPER = {
                 start=5,
                 upper=inner_train_size,
             ),
+        },
+        # PLRT-A, PLRT-D, PLRT-E and PLRT-G in the tables, with the four criteria
+        # and no tuned parameter. The trees stop growing on consistent nodes and,
+        # as the label ranking trees, on nodes with fewer than 2n samples, where n
+        # is the number of labels (pp. 901 and 897)
+        **{
+            method: {
+                "estimator": DecisionTreePartialLabelRanker,
+                "params": {"criterion": criterion, "random_state": 0},
+                "data_params": lambda X, y: {"min_samples_split": 2 * y.shape[1]},
+            }
+            for method, criterion in [
+                ("plrt_a", "disagreements"),
+                ("plrt_d", "distance"),
+                ("plrt_e", "entropy"),
+                ("plrt_g", "gini"),
+            ]
         },
     },
 }
