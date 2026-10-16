@@ -29,27 +29,27 @@ cdef void complete_ranking(
     ``n_labels`` elements.
     """
     cdef intp_t n_labels = y.shape[0]
-    cdef intp_t n_ranked = 0
-    cdef intp_t label, other, position, cost, best_cost, n_before
+    cdef intp_t n_ranked = 0, n_unranked = 0
+    cdef intp_t label, other, position, i, j, cost, best_cost, n_before
 
+    # The unranked labels fill ranked_at from the end, in any order, so that the
+    # loops below go through them alone instead of checking every label
     for label in range(n_labels):
-        if not isnan(y[label]):
+        if isnan(y[label]):
+            n_unranked += 1
+            ranked_at[n_labels - n_unranked] = label
+        else:
             ranked_at[<intp_t> y[label] - 1] = label
             n_ranked += 1
 
-    for label in range(n_labels):
-        if not isnan(y[label]):
-            continue
-        # In the first gap, ahead of every ranked label, the label disagrees with
-        # the ranked labels that the center puts ahead of it. Moving it past the
-        # next ranked label adds a disagreement if the center puts that label
-        # behind it and removes one otherwise, so the cost of each next gap takes
-        # constant time
+    for i in range(n_ranked, n_labels):
+        label = ranked_at[i]
+        # Moving the label past the next ranked label adds a disagreement with the
+        # center if the center puts that label behind it and removes one
+        # otherwise. The cost of each gap is counted from that of the first one,
+        # ahead of every ranked label, which is enough to find the best gap
         cost = 0
-        for position in range(n_ranked):
-            if center[ranked_at[position]] < center[label]:
-                cost += 1
-        best_cost = cost
+        best_cost = 0
         gaps[label] = 0
         for position in range(n_ranked):
             if center[ranked_at[position]] > center[label]:
@@ -64,20 +64,22 @@ cdef void complete_ranking(
     # after the unranked labels of the gaps before its position, and an unranked
     # label in the gap j after the first j ranked labels, the unranked labels of
     # the earlier gaps and those of its own gap that the center puts ahead of it
-    for label in range(n_labels):
-        if isnan(y[label]):
-            n_before = gaps[label]
-            for other in range(n_labels):
-                if isnan(y[other]) and (
-                    gaps[other] < gaps[label]
-                    or (gaps[other] == gaps[label] and center[other] < center[label])
-                ):
-                    n_before += 1
-        else:
-            n_before = <intp_t> y[label] - 1
-            for other in range(n_labels):
-                if isnan(y[other]) and gaps[other] < y[label]:
-                    n_before += 1
+    for position in range(n_ranked):
+        label = ranked_at[position]
+        n_before = position
+        for j in range(n_ranked, n_labels):
+            if gaps[ranked_at[j]] <= position:
+                n_before += 1
+        completed[label] = n_before + 1
+    for i in range(n_ranked, n_labels):
+        label = ranked_at[i]
+        n_before = gaps[label]
+        for j in range(n_ranked, n_labels):
+            other = ranked_at[j]
+            if gaps[other] < gaps[label] or (
+                gaps[other] == gaps[label] and center[other] < center[label]
+            ):
+                n_before += 1
         completed[label] = n_before + 1
 
 

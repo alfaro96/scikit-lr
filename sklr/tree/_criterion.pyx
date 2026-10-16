@@ -8,6 +8,7 @@ from libc.math cimport NAN, isnan, log2
 from sklr._aggregation._bucket_pivot cimport aggregate_pairs
 from sklr._distributions._mallows cimport (
     estimate_center,
+    estimate_complete_spread,
     estimate_spread,
     solve_spread,
 )
@@ -372,12 +373,12 @@ cdef class MallowsCriterion(RankingCriterion):
 
     cdef void node_value(self, float64_t* dest) noexcept nogil:
         """Write the center ranking of the node, ``nan`` for its unranked labels."""
-        cdef intp_t n_rankings, n_labels, label
+        cdef intp_t n_rankings, n_labels, label, n_iter
         cdef bint converged = True
 
         n_labels = self._gather(_NODE, &n_rankings)
         if n_labels > 1:
-            converged = self._estimate_center(n_rankings, n_labels)
+            converged = self._estimate_center(n_rankings, n_labels, &n_iter)
         elif n_labels == 1:
             self.center[0] = 1
         for label in range(self.n_outputs):
@@ -470,20 +471,37 @@ cdef class MallowsCriterion(RankingCriterion):
     @cython.cdivision(True)
     cdef float64_t _incomplete_impurity(self, int part) noexcept nogil:
         """Compute the impurity of incomplete rankings from their Mallows model."""
-        cdef intp_t n_rankings, n_labels
+        cdef intp_t n_rankings, n_labels, n_iter
+        cdef bint converged
         cdef float64_t spread
 
         n_labels = self._gather(part, &n_rankings)
         # Only the centers of the nodes, in node_value, count for the convergence
         # warning, not those of the candidate splits
-        self._estimate_center(n_rankings, n_labels)
-        spread = estimate_spread(
-            self.node_y[:n_rankings, :n_labels],
-            self.node_weight[:n_rankings],
-            self.center[:n_labels],
-            self.completed[0, :n_labels],
-            self.work[:2, :n_labels],
-        )
+        converged = self._estimate_center(n_rankings, n_labels, &n_iter)
+        # The last iteration of a center that converged completed the rankings
+        # with that center, as the estimation of the spread would do again, and
+        # without iterations the rankings of the part are already complete
+        if n_iter == 0:
+            spread = estimate_complete_spread(
+                self.node_y[:n_rankings, :n_labels],
+                self.node_weight[:n_rankings],
+                self.center[:n_labels],
+            )
+        elif converged:
+            spread = estimate_complete_spread(
+                self.completed[:n_rankings, :n_labels],
+                self.node_weight[:n_rankings],
+                self.center[:n_labels],
+            )
+        else:
+            spread = estimate_spread(
+                self.node_y[:n_rankings, :n_labels],
+                self.node_weight[:n_rankings],
+                self.center[:n_labels],
+                self.completed[0, :n_labels],
+                self.work[:2, :n_labels],
+            )
         # An infinite spread gives exactly zero
         return 1.0 / (1.0 + spread)
 
@@ -544,9 +562,14 @@ cdef class MallowsCriterion(RankingCriterion):
             n_rankings[0] += 1
         return n_labels
 
-    cdef bint _estimate_center(self, intp_t n_rankings, intp_t n_labels) noexcept nogil:
-        """Estimate the center ranking of the gathered rankings into `center`."""
-        cdef intp_t n_iter
+    cdef bint _estimate_center(
+        self, intp_t n_rankings, intp_t n_labels, intp_t* n_iter
+    ) noexcept nogil:
+        """Estimate the center of the gathered rankings into `center`.
+
+        Returns whether it converged, and sets ``n_iter[0]`` to the number of
+        iterations.
+        """
         # The slices keep the row stride of the whole buffers. Cython takes them as
         # C-contiguous without checking or copying them, since only their last
         # axis has to be contiguous, and the estimation indexes them by rows
@@ -555,7 +578,7 @@ cdef class MallowsCriterion(RankingCriterion):
             self.node_weight[:n_rankings],
             self.max_iter,
             self.center[:n_labels],
-            &n_iter,
+            n_iter,
             self.completed[:n_rankings, :n_labels],
             self.scores[:n_labels],
             self.work[:, :n_labels],

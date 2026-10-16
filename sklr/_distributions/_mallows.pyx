@@ -217,6 +217,30 @@ cdef float64_t estimate_spread(
     return solve_spread(distance / total_weight, y.shape[1])
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.cdivision(True)
+cdef float64_t estimate_complete_spread(
+    const float64_t[:, ::1] y,
+    const float64_t[::1] sample_weight,
+    const intp_t[::1] center,
+) noexcept nogil:
+    """Estimate the spread of the Mallows model of complete rankings given its center.
+
+    The rankings `y` must be complete and without ties, such as those that
+    ``estimate_center`` completes with the center it returns when it converges,
+    and the weights must not all be zero. The spread is that of
+    ``estimate_spread``, which completes the rankings first. The rows of `y` may be
+    further apart in memory than their length, as in the slices of larger arrays.
+    """
+    cdef intp_t sample
+    cdef float64_t distance = 0, total_weight = 0
+    for sample in range(y.shape[0]):
+        distance += sample_weight[sample] * _kendall_distance(y[sample], center)
+        total_weight += sample_weight[sample]
+    return solve_spread(distance / total_weight, y.shape[1])
+
+
 # The callers pass inputs of matching shapes and at least one thread, and the other
 # arrays are created with those shapes
 @cython.boundscheck(False)

@@ -22,4 +22,11 @@ cdef float64_t estimate_spread(
 ) noexcept nogil
 
 
+cdef float64_t estimate_complete_spread(
+    const float64_t[:, ::1] y,
+    const float64_t[::1] sample_weight,
+    const intp_t[::1] center,
+) noexcept nogil
+
+
 cdef float64_t solve_spread(float64_t mean_distance, intp_t n_labels) noexcept nogil
