@@ -1,10 +1,8 @@
-import importlib
 import inspect
-import pkgutil
 
 import pytest
 
-import sklr
+from sklr.utils._testing import public_modules
 
 # numpydoc is a dependency of the documentation, so the jobs that only test the
 # installed package skip these tests, which run with the development environment
@@ -19,23 +17,12 @@ IGNORED_CHECKS = {"GL01", "GL02", "RT02"}
 IGNORED_METHOD_CHECKS = IGNORED_CHECKS | {"ES01", "SA01", "EX01"}
 
 
-def _public_modules(module=sklr):
-    """Yield `module` and its public submodules, recursively."""
-    yield module
-    # Only a package has a __path__ in which to look for submodules
-    path = getattr(module, "__path__", [])
-    for module_info in pkgutil.iter_modules(path, f"{module.__name__}."):
-        name = module_info.name.rpartition(".")[2]
-        if not name.startswith("_") and name not in {"conftest", "tests"}:
-            yield from _public_modules(importlib.import_module(module_info.name))
-
-
 def _public_objects():
     """Yield each public function, class and method, with the checks to ignore."""
     # The public names are often defined in private modules, so an object is
     # validated once, under the first public module that exports it
     paths = {}
-    for module in _public_modules():
+    for module in public_modules():
         for name, obj in inspect.getmembers(module):
             if (
                 not name.startswith("_")

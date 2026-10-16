@@ -2,6 +2,7 @@ py.install_sources(
   [
     '__init__.py',
     'test_base.py',
+    'test_common.py',
     'test_conftest.py',
     'test_docstrings.py',
     'test_dummy.py',

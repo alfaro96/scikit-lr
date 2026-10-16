@@ -5,6 +5,7 @@ py.install_sources(
     '_ranking.py',
     '_show_versions.py',
     '_sklearn_compat.py',
+    '_testing.py',
   ],
   subdir: 'sklr/utils',
 )

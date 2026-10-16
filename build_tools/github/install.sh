@@ -2,7 +2,9 @@
 
 set -e
 
-python -m pip install pytest packaging
+# pandas for the tests with data frames, which the jobs that
+# do not install it skip
+python -m pip install pytest packaging pandas
 
 options=()
 
