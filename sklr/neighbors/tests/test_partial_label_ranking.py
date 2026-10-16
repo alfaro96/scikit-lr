@@ -45,9 +45,19 @@ def _naive_weights(dist, weights):
         weights = [1.0] * len(dist)
     else:
         weights = [(dist[-1] - d) / (dist[-1] - dist[0]) for d in dist]
-    if not any(w > 0 for w in weights):
-        weights = [1.0] * len(dist)
     return weights
+
+
+def _check_predict_oracle(X_train, X_test, y, n_neighbors, weights):
+    """Check the predictions of a ranker against the naive implementations."""
+    ranker = KNeighborsPartialLabelRanker(n_neighbors, weights=weights)
+    y_pred = ranker.fit(X_train, y).predict(X_test)
+
+    for ranking, (ind, dist) in zip(
+        y_pred, _naive_neighbors(X_train, X_test, n_neighbors), strict=True
+    ):
+        expected = _oracles.aggregate(y[ind], _naive_weights(dist, weights))
+        assert_array_equal(ranking, expected)
 
 
 @pytest.mark.parametrize("weights", ["uniform", "distance", "dudani"])
@@ -63,14 +73,15 @@ def test_predict_oracle(weights, missing):
         len(X_train), n_labels, missing=missing, random_state=rng
     )
 
-    ranker = KNeighborsPartialLabelRanker(n_neighbors, weights=weights)
-    y_pred = ranker.fit(X_train, y).predict(X_test)
+    _check_predict_oracle(X_train, X_test, y, n_neighbors, weights)
 
-    for ranking, (ind, dist) in zip(
-        y_pred, _naive_neighbors(X_train, X_test, n_neighbors), strict=True
-    ):
-        expected = _oracles.aggregate(y[ind], _naive_weights(dist, weights))
-        assert_array_equal(ranking, expected)
+
+@pytest.mark.parametrize("weights", ["uniform", "distance", "dudani"])
+def test_predict_oracle_tied_distances(weights):
+    # All the neighbors of the query are at the same distance
+    X_train = [[1, 0], [-1, 0], [0, 1], [0, -1], [5, 5]]
+    y = random_partial_rankings(len(X_train), 4, missing=0, random_state=0)
+    _check_predict_oracle(np.array(X_train), [[0, 0]], y, 4, weights)
 
 
 @pytest.mark.parametrize(

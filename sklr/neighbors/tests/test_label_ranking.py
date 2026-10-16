@@ -82,9 +82,27 @@ def _naive_weights(dist, y, *, weights, model):
         weights = [w * c for w, c in zip(weights, completeness, strict=True)]
         if not any(w > 0 for w in weights):
             weights = completeness
-    if not any(w > 0 for w in weights):
-        weights = [1.0] * len(dist)
     return np.array(weights)
+
+
+def _check_predict_oracle(X_train, X_test, y, n_neighbors, model, weights):
+    """Check the predictions of a ranker against the naive implementations."""
+    ranker = KNeighborsLabelRanker(n_neighbors, model=model, weights=weights)
+    y_pred = ranker.fit(X_train, y).predict(X_test)
+
+    for ranking, (ind, dist) in zip(
+        y_pred, _naive_neighbors(X_train, X_test, n_neighbors), strict=True
+    ):
+        y_neigh = y[ind]
+        w = _naive_weights(dist, y_neigh, weights=weights, model=model)
+        if model == "mallows":
+            expected, _ = _oracles.estimate_center(y_neigh, w)
+        else:
+            parameters, _, _ = _oracles.estimate_plackett_luce(
+                y_neigh, w, tol=1e-6, max_iter=1000
+            )
+            expected = rankdata(-parameters, method="ordinal")
+        assert_array_equal(ranking, expected)
 
 
 @pytest.mark.parametrize("model", MODELS)
@@ -102,22 +120,27 @@ def test_predict_oracle(model, weights, missing):
     X_test = rng.rand(15, 3)
     y = random_rankings(len(X_train), n_labels, missing=missing, random_state=rng)
 
-    ranker = KNeighborsLabelRanker(n_neighbors, model=model, weights=weights)
-    y_pred = ranker.fit(X_train, y).predict(X_test)
+    _check_predict_oracle(X_train, X_test, y, n_neighbors, model, weights)
 
-    for ranking, (ind, dist) in zip(
-        y_pred, _naive_neighbors(X_train, X_test, n_neighbors), strict=True
-    ):
-        y_neigh = y[ind]
-        w = _naive_weights(dist, y_neigh, weights=weights, model=model)
-        if model == "mallows":
-            expected, _ = _oracles.estimate_center(y_neigh, w)
-        else:
-            parameters, _, _ = _oracles.estimate_plackett_luce(
-                y_neigh, w, tol=1e-6, max_iter=1000
-            )
-            expected = rankdata(-parameters, method="ordinal")
-        assert_array_equal(ranking, expected)
+
+@pytest.mark.parametrize("model", MODELS)
+@pytest.mark.parametrize("weights", ["uniform", "distance", "dudani"])
+def test_predict_oracle_degenerate(model, weights):
+    # Each query has its four neighbors in a group far from the others, all of
+    # them at the same distance for the first query. Only the nearest neighbor of
+    # the second query has a positive Dudani weight, and it ranks no label, so the
+    # Mallows model falls back on the fraction of ranked labels, which predicts
+    # [1, 2, 3] where equal weights would predict [1, 3, 2]. With the Plackett-Luce
+    # model and the Dudani weights, no ranked label weighs, which its naive
+    # estimation does not support, and test_predict_zero_weights checks that case
+    X_train = [[1, 0], [-1, 0], [0, 1], [0, -1]]
+    X_train += [[21, 0], [23, 0], [20, 3], [20, -3]]
+    X_test = [[0, 0], [20, 0]]
+    if model == "plackett_luce" and weights == "dudani":
+        X_test = X_test[:1]
+    y = random_rankings(4, 3, missing=0, random_state=0)
+    y = np.vstack([y, [[np.nan] * 3, [1, 2, 3], [1, 2, np.nan], [1, 2, np.nan]]])
+    _check_predict_oracle(np.array(X_train), X_test, y, 4, model, weights)
 
 
 @pytest.mark.parametrize(
