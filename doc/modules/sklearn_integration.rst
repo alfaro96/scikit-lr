@@ -93,7 +93,7 @@ states whether it wants them too:
 >>> sample_weight = rng.uniform(size=100)
 >>> with sklearn.config_context(enable_metadata_routing=True):
 ...     ranker = (
-...         DecisionTreeLabelRanker(max_depth=4, random_state=0)
+...         DecisionTreeLabelRanker(max_depth=3, random_state=0)
 ...         .set_fit_request(sample_weight=True)
 ...         .set_score_request(sample_weight=True)
 ...     )
@@ -103,7 +103,7 @@ states whether it wants them too:
 ...         pipeline, X, y, params={"sample_weight": sample_weight}
 ...     )
 >>> results["test_score"].round(2)
-array([0.83, 0.57, 0.86, 0.86, 0.8 ])
+array([0.68, 0.67, 0.82, 0.84, 0.75])
 
 The scorers of :func:`~sklr.metrics.get_scorer` request the weights with their own
 ``set_score_request`` method.
