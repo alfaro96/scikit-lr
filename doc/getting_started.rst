@@ -81,6 +81,9 @@ parameters can be tuned with :class:`~sklearn.model_selection.GridSearchCV`:
 >>> search.fit(X, y).best_params_
 {'kneighborslabelranker__n_neighbors': 1}
 
+:ref:`sklearn_integration` describes how the rankers work with these and other tools
+of scikit-learn, such as metadata routing and pandas data frames.
+
 Next steps
 ----------
 

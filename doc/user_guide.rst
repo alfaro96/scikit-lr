@@ -15,3 +15,4 @@ with the details that the :ref:`API reference <api_ref>` leaves out.
    modules/neighbors
    modules/tree
    modules/model_evaluation
+   modules/sklearn_integration
