@@ -24,3 +24,17 @@ may change between its minor releases, so each release of scikit-lr is built
 against a single minor release of scikit-learn and only works with it.
 Importing :mod:`sklr` with another one raises an :class:`ImportError` that tells
 which one is needed.
+
+.. _sklearn_compatibility:
+
+Each minor release of scikit-lr works with these versions of scikit-learn and
+Python:
+
+=========  ============  ==========
+scikit-lr  scikit-learn  Python
+=========  ============  ==========
+0.3        1.9           3.13--3.15
+=========  ============  ==========
+
+Only the latest minor release of scikit-lr receives bug fixes, so with an older
+release of scikit-learn the fixes are only available by upgrading both.
