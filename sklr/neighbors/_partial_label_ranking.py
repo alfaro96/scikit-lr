@@ -6,6 +6,7 @@ from typing import Literal, Self
 import numpy as np
 from joblib import effective_n_jobs
 from numpy.typing import ArrayLike
+from sklearn.utils import Tags
 
 from sklr._aggregation.bucket_pivot import aggregate_batch
 from sklr.base import PartialLabelRankerMixin
@@ -218,7 +219,7 @@ class KNeighborsPartialLabelRanker(
         )
         self.weights = weights
 
-    def __sklearn_tags__(self):
+    def __sklearn_tags__(self) -> Tags:
         tags = super().__sklearn_tags__()
         # For cross-validation routines to split data correctly
         tags.input_tags.pairwise = self.metric == "precomputed"

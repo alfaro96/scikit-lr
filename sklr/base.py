@@ -1,7 +1,7 @@
 """Base classes for all estimators and various utility functions."""
 
 from numpy.typing import ArrayLike
-from sklearn.utils import get_tags
+from sklearn.utils import Tags, get_tags
 
 from sklr.metrics import kendall_tau_score, tau_x_score
 
@@ -44,7 +44,7 @@ class LabelRankerMixin:
     True
     """
 
-    def __sklearn_tags__(self):
+    def __sklearn_tags__(self) -> Tags:
         # The mixin comes before an estimator class in the bases of the estimator,
         # which defines the method, but pyrefly only sees the bases of the mixin
         tags = super().__sklearn_tags__()  # pyrefly: ignore[missing-attribute]
@@ -120,7 +120,7 @@ class PartialLabelRankerMixin:
     True
     """
 
-    def __sklearn_tags__(self):
+    def __sklearn_tags__(self) -> Tags:
         tags = super().__sklearn_tags__()  # pyrefly: ignore[missing-attribute]
         tags.estimator_type = "partial_label_ranker"
         tags.target_tags.required = True

@@ -8,6 +8,7 @@ import numpy as np
 from joblib import effective_n_jobs
 from numpy.typing import ArrayLike
 from scipy.stats import rankdata
+from sklearn.utils import Tags
 
 from sklr._distributions.mallows import estimate_center_batch
 from sklr._distributions.plackett_luce import estimate_parameters_batch
@@ -268,7 +269,7 @@ class KNeighborsLabelRanker(LabelRankerMixin, KNeighborsMixin, NeighborsBase):
         self.max_iter = max_iter
         self.tol = tol
 
-    def __sklearn_tags__(self):
+    def __sklearn_tags__(self) -> Tags:
         tags = super().__sklearn_tags__()
         # For cross-validation routines to split data correctly
         tags.input_tags.pairwise = self.metric == "precomputed"
