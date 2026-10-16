@@ -277,6 +277,22 @@ def test_node_completed_from_parent():
     assert_array_equal(ranker.predict([[0], [1]]), [[2, 3, 1], [3, 2, 1]])
 
 
+def test_node_ranking_a_single_label():
+    # The rankings of the left child only rank the second label, which does not
+    # disagree with any ranking, so the child takes the ranking of the root
+    X = np.array([[0], [0], [1], [1]], dtype=np.float32)
+    y = np.array([[np.nan, 1, np.nan], [np.nan, 1, np.nan], [1, 2, 3], [3, 2, 1]])
+    sample_weight = np.ones(len(X))
+    ranker = DecisionTreeLabelRanker(random_state=0).fit(X, y)
+    _check_node(
+        ranker, X, y, sample_weight, 0, np.arange(len(X)), None, _impurity, _value
+    )
+    left = ranker.tree_.children_left[0]
+    assert ranker.tree_.children_left[left] == -1
+    assert_array_equal(ranker.apply(X[:2]), [left, left])
+    assert_array_equal(ranker.tree_.value[left], ranker.tree_.value[0])
+
+
 def test_label_never_ranked():
     # The third label is never ranked, so the ranking of the root goes to its
     # closest extension to its own Borda count, which puts that label in the middle
