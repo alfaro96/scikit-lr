@@ -91,6 +91,7 @@ def load_results(paper):
                 "mean": float(row["score_mean"]),
                 "std": float(row["score_std"]),
                 "best_params": row["best_params_mode"],
+                "machines": row["machines"],
                 "wall_time": sum(
                     float(row[step])
                     for step in ["search_wall", "fit_wall", "predict_wall"]
@@ -332,8 +333,12 @@ plot_scenarios()
 # ----
 #
 # The wall time of all the repetitions of the cross-validation of each dataset,
-# including the choice of the parameters, on the machine described in the report
-# of each version. The times are only comparable between runs on the same machine.
+# including the choice of the parameters. The experiments run on the shared runners
+# of GitHub Actions, whose hardware and load change from run to run, and the
+# repetitions of a dataset may run on different machines, which hovering over a bar
+# shows by their names in the report of the version. So the times only give the
+# order of magnitude of the cost of each method, and are not comparable between
+# versions of scikit-lr.
 
 
 def plot_times():
@@ -359,7 +364,8 @@ def plot_times():
                         name=method,
                         legendgroup=method,
                         showlegend=method not in shown,
-                        hovertemplate="%{x}<br>%{y:.1f} s",
+                        customdata=[row["machines"] for row in selected],
+                        hovertemplate="%{x}<br>%{y:.1f} s<br>machines: %{customdata}",
                     ),
                     row=i,
                     col=col,
