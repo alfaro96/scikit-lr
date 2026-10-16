@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_array_equal
@@ -50,7 +52,7 @@ def test_estimators(estimator, check):
     check(estimator)
 
 
-def _impurity(y, sample_weight):
+def _impurity(y, sample_weight, max_iter=None):
     """Compute the impurity of a node as the docstring describes, label by label."""
     is_ranked = ~np.all(np.isnan(y), axis=0)
     y = y[:, is_ranked]
@@ -69,22 +71,24 @@ def _impurity(y, sample_weight):
     )
     if n_labels <= 1 or consistent:
         return 0.0
-    center, _ = _oracles.estimate_center(y, sample_weight)
+    center, _ = _oracles.estimate_center(y, sample_weight, max_iter)
     return 1 / (1 + _oracles.estimate_spread(y, center, sample_weight))
 
 
-def _center(y, sample_weight):
+def _center(y, sample_weight, max_iter=None):
     """Estimate the center of a node on its ranked labels, ``nan`` for the others."""
     is_ranked = ~np.all(np.isnan(y), axis=0)
     value = np.full(y.shape[1], np.nan)
     if np.any(is_ranked):
-        value[is_ranked], _ = _oracles.estimate_center(y[:, is_ranked], sample_weight)
+        value[is_ranked], _ = _oracles.estimate_center(
+            y[:, is_ranked], sample_weight, max_iter
+        )
     return value
 
 
-def _value(y, sample_weight, parent_value):
+def _value(y, sample_weight, parent_value, max_iter=None):
     """Compute the ranking of a node, completed from that of its parent."""
-    value = _center(y, sample_weight)
+    value = _center(y, sample_weight, max_iter)
     if parent_value is None:
         value, _ = _oracles.estimate_center(value[np.newaxis], [1])
     else:
@@ -167,11 +171,14 @@ def _check_node(
 @pytest.mark.parametrize("seed", [0, 6])
 @pytest.mark.parametrize("missing", [0, 0.3, 0.6])
 @pytest.mark.parametrize("weighted", [False, True])
-def test_tree_oracle(seed, missing, weighted):
+@pytest.mark.parametrize("max_iter", [100, 1])
+@pytest.mark.filterwarnings("ignore::sklearn.exceptions.ConvergenceWarning")
+def test_tree_oracle(seed, missing, weighted, max_iter):
     # Every node is checked against the naive estimates of the impurity and the
     # ranking, and against an exhaustive search of the best split. The weights are
     # integers, so that the Borda counts are exact and their ties do not depend on
-    # rounding
+    # rounding. A single iteration leaves the centers of some incomplete rankings
+    # unconverged, whose spread is then estimated from their last center
     rng = np.random.RandomState(seed)
     n_samples, n_labels = 25, 4
     X = rng.rand(n_samples, 2).astype(np.float32)
@@ -182,7 +189,7 @@ def test_tree_oracle(seed, missing, weighted):
         else np.ones(n_samples)
     )
 
-    ranker = DecisionTreeLabelRanker(random_state=0)
+    ranker = DecisionTreeLabelRanker(random_state=0, max_iter=max_iter)
     ranker.fit(X, y, sample_weight=sample_weight if weighted else None)
 
     _check_node(
@@ -193,8 +200,8 @@ def test_tree_oracle(seed, missing, weighted):
         0,
         np.arange(n_samples),
         None,
-        _impurity,
-        _value,
+        partial(_impurity, max_iter=max_iter),
+        partial(_value, max_iter=max_iter),
     )
     leaves = ranker.apply(X)
     assert_array_equal(ranker.predict(X), ranker.tree_.value[leaves, :, 0])

@@ -94,11 +94,12 @@ def rank_by_scores(scores):
     return ranking
 
 
-def estimate_center(y, sample_weight):
-    """Estimate the center by Algorithm 1, without an iteration cap.
+def estimate_center(y, sample_weight, max_iter=None):
+    """Estimate the center by Algorithm 1, stopping after `max_iter` iterations.
 
     Returns the center and the number of iterations, ``0`` if the rankings are
-    complete.
+    complete. Without `max_iter`, the iterations do not stop until the center
+    converges.
     """
     center = rank_by_scores(borda_scores(y, sample_weight))
     if not np.any(np.isnan(y)):
@@ -109,7 +110,7 @@ def estimate_center(y, sample_weight):
         completed = np.array([complete_ranking(row, center) for row in y])
         previous = center
         center = rank_by_scores(borda_scores(completed, sample_weight))
-        if np.array_equal(center, previous):
+        if np.array_equal(center, previous) or n_iter == max_iter:
             return center, n_iter
 
 
