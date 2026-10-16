@@ -22,7 +22,7 @@
 
 scikit-lr is a Python package for label ranking and partial label ranking, built on top of [scikit-learn](https://scikit-learn.org) and distributed under the MIT license.
 
-In label ranking, each sample is associated with a ranking of a fixed set of labels instead of a single class, and the goal is to learn a model that predicts that ranking for new samples. Partial label ranking extends the problem to rankings with ties. scikit-lr provides estimators and metrics for both problems that follow the scikit-learn API, so they can be used with tools such as pipelines, cross-validation and hyperparameter search.
+In label ranking, each sample is associated with a ranking of a fixed set of labels instead of a single class, and the goal is to learn a model that predicts that ranking for new samples. Partial label ranking extends the problem to rankings with ties. scikit-lr provides nearest neighbors and decision tree rankers for both problems, dummy rankers to compare them with, and metrics, all following the scikit-learn API, so they can be used with tools such as pipelines, cross-validation and hyperparameter search.
 
 Website: https://alfaro96.github.io/scikit-lr
 
@@ -46,7 +46,7 @@ The easiest way to install scikit-lr is using `pip`:
 pip install -U scikit-lr
 ```
 
-The documentation includes more detailed [installation instructions](https://alfaro96.github.io/scikit-lr/dev/install.html).
+The documentation includes more detailed [installation instructions](https://alfaro96.github.io/scikit-lr/dev/install.html), with the [versions of scikit-learn](https://alfaro96.github.io/scikit-lr/dev/install.html#sklearn-compatibility) that each release of scikit-lr works with.
 
 ## Documentation
 
