@@ -61,17 +61,26 @@ Python version.
    to PyPI. A version cannot be uploaded again to PyPI, even after deleting
    it, so this is the last chance to stop the release.
 
+6. After the first release of a minor release, create its release branch from the
+   commit of the release, and start the development of the next minor release on
+   the development branch, with ``__version__`` set to its development version,
+   such as ``X.Y.dev0``:
+
+   .. code-block:: console
+
+      $ git branch <major>.<minor>.X <version>
+      $ git push origin <major>.<minor>.X
+
 When the development of a new minor release starts, add its file to
 ``doc/whats_new``, with a header like the one of the previous file, list it in
 ``doc/whats_new.rst``, and point ``filename`` in ``[tool.towncrier]`` of
 ``pyproject.toml`` to it, so that the fragments are written there.
 
 Only the latest minor release receives bug fixes, in patch releases made from its
-release branch, named after it as ``<major>.<minor>.X`` and created from the
-commit of its first release. A fix is merged into the development branch first,
-and then picked onto the release branch with ``git cherry-pick``. The workflows
-run on the pull requests that target a release branch as they do on those that
-target the development branch.
+release branch, named after it as ``<major>.<minor>.X``. A fix is merged into the
+development branch first, and then picked onto the release branch with
+``git cherry-pick``. The workflows run on the pull requests that target a release
+branch as they do on those that target the development branch.
 
 The project uploads to PyPI and TestPyPI with trusted publishing, so no token
 is stored in the repository: each index only accepts the uploads of this
