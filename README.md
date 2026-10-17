@@ -46,14 +46,14 @@ The easiest way to install scikit-lr is using `pip`:
 pip install -U scikit-lr
 ```
 
-The documentation includes more detailed [installation instructions](https://alfaro96.github.io/scikit-lr/dev/install.html), with the [versions of scikit-learn](https://alfaro96.github.io/scikit-lr/dev/install.html#sklearn-compatibility) that each release of scikit-lr works with.
+The documentation includes more detailed [installation instructions](https://alfaro96.github.io/scikit-lr/stable/install.html), with the [versions of scikit-learn](https://alfaro96.github.io/scikit-lr/stable/install.html#sklearn-compatibility) that each release of scikit-lr works with.
 
 ## Documentation
 
-* [Getting started](https://alfaro96.github.io/scikit-lr/dev/getting_started.html)
-* [User guide](https://alfaro96.github.io/scikit-lr/dev/user_guide.html)
-* [API reference](https://alfaro96.github.io/scikit-lr/dev/api/index.html)
-* [Examples](https://alfaro96.github.io/scikit-lr/dev/auto_examples/index.html)
+* [Getting started](https://alfaro96.github.io/scikit-lr/stable/getting_started.html)
+* [User guide](https://alfaro96.github.io/scikit-lr/stable/user_guide.html)
+* [API reference](https://alfaro96.github.io/scikit-lr/stable/api/index.html)
+* [Examples](https://alfaro96.github.io/scikit-lr/stable/auto_examples/index.html)
 
 ## Changelog
 
@@ -61,7 +61,7 @@ See the [release history](https://alfaro96.github.io/scikit-lr/dev/whats_new.htm
 
 ## Development
 
-Contributions are welcome. The [developer's guide](https://alfaro96.github.io/scikit-lr/dev/developers/index.html) has detailed information about contributing code, documentation and tests, and about the Cython extensions. All communications should respect our [code of conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome. The [developer's guide](https://alfaro96.github.io/scikit-lr/stable/developers/index.html) has detailed information about contributing code, documentation and tests, and about the Cython extensions. All communications should respect our [code of conduct](CODE_OF_CONDUCT.md).
 
 ### Important links
 
