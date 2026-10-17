@@ -1,0 +1,31 @@
+comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        # A change should not decrease the coverage of the
+        # project by more than 1%
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        # Tolerate small differences in the coverage of the changed lines,
+        # whose missed lines can still be inspected on Codecov
+        target: auto
+        threshold: 1%
+
+# Each run of .github/workflows/coverage.yml uploads its report with a flag. The
+# Cython modules are only traced at night, so Codecov carries their coverage
+# forward to the commits that only have the report of the Python code
+flag_management:
+  individual_flags:
+    - name: python
+      paths:
+        - "**/*.py"
+    - name: cython
+      paths:
+        - "**/*.pyx"
+        - "**/*.pxd"
+        - "**/*.pxi"
+      carryforward: true

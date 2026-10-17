@@ -1,0 +1,70 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "schedule:monthly"
+  ],
+  "enabledManagers": ["github-actions", "pre-commit", "custom.regex"],
+  "pre-commit": {
+    "enabled": true
+  },
+  "minimumReleaseAge": "7 days",
+  "semanticCommits": "enabled",
+  "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "description": "The tools pinned in environment.yml, whose versions build_tools/check_versions.py checks against their pre-commit hooks. The version ranges are changed by hand, so only the exact pins are matched.",
+      "customType": "regex",
+      "managerFilePatterns": ["/^environment\\.yml$/"],
+      "matchStrings": ["\\n\\s*-\\s*(?<depName>[\\w.-]+)=(?<currentValue>\\d[^\\s#]*)"],
+      "datasourceTemplate": "conda",
+      "packageNameTemplate": "conda-forge/{{depName}}",
+      "versioningTemplate": "conda"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "The updates are build changes in Conventional Commits, and those of the actions are CI changes, instead of the types of config:recommended.",
+      "matchPackageNames": ["*"],
+      "semanticCommitType": "build"
+    },
+    {
+      "description": "Update the actions together, in a single pull request.",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "semanticCommitType": "ci"
+    },
+    {
+      "description": "The development environment uses the minimum supported Python version, which is raised by hand.",
+      "matchFileNames": ["environment.yml"],
+      "matchDepNames": ["python"],
+      "enabled": false
+    },
+    {
+      "description": "Update the hook of each tool along with its pin in environment.yml, so that build_tools/check_versions.py passes.",
+      "matchDepNames": ["astral-sh/ruff-pre-commit", "ruff"],
+      "groupName": "ruff"
+    },
+    {
+      "matchDepNames": ["facebook/pyrefly-pre-commit", "pyrefly"],
+      "groupName": "pyrefly"
+    },
+    {
+      "description": "The runtime dependencies installed in the hooks stay within their range in project.dependencies in pyproject.toml, which build_tools/check_versions.py checks to match.",
+      "matchManagers": ["pre-commit"],
+      "matchPackageNames": ["numpy"],
+      "allowedVersions": ">=2.2"
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "matchPackageNames": ["scipy"],
+      "allowedVersions": ">=1.15"
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "matchPackageNames": ["scikit-learn"],
+      "allowedVersions": "~=1.9.0"
+    }
+  ]
+}

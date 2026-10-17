@@ -1,0 +1,68 @@
+# Run the pre-commit hooks on the whole repository
+name: Code quality checks
+
+# The hooks and the packages installed in their environments are pinned, and
+# the hooks only look at the files, so their result can only change when the
+# files of master or a release branch do. The pull requests that target these
+# branches are checked to fix the problems before merging. The merges are
+# checked again, because two pull requests that pass on their own can break a
+# hook once merged, as when one renames a function that the other starts to
+# use and the type checker fails. There is no scheduled run, since nothing but
+# a merge changes the result
+on:
+  push:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # while every push gets its own, so only the outdated runs of a pull
+  # request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Pre-commit hooks
+    runs-on: ubuntu-latest
+    # Skip the runs in forks, since their changes reach this repository
+    # through pull requests, which are checked here
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
+
+      - name: Install pre-commit
+        run: bash build_tools/github/install_pre_commit.sh
+
+      # pre-commit installs every hook in its own environment, which is slow to build
+      - name: Cache the hook environments
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/pre-commit
+          # The environments depend on the operating system, the Python
+          # installation and the pre-commit configuration, so the key includes
+          # all of them and the cache is reused until any of them changes
+          key: pre-commit-${{ runner.os }}-${{ env.pythonLocation }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Run the hooks
+        run: bash build_tools/github/run_pre_commit.sh

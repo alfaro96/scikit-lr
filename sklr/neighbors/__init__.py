@@ -1,17 +1,6 @@
-"""The :mod:`sklr.neighbors` module implements nearest neighbors estimators."""
+"""Label rankers based on the nearest neighbors of each sample."""
 
-
-# =============================================================================
-# Imports
-# =============================================================================
-
-# Local application
-from ._label_ranking import KNeighborsLabelRanker
-from ._partial_label_ranking import KNeighborsPartialLabelRanker
-
-
-# =============================================================================
-# Module public objects
-# =============================================================================
+from sklr.neighbors._label_ranking import KNeighborsLabelRanker
+from sklr.neighbors._partial_label_ranking import KNeighborsPartialLabelRanker
 
 __all__ = ["KNeighborsLabelRanker", "KNeighborsPartialLabelRanker"]

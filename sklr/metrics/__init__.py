@@ -1,19 +1,16 @@
-"""
-The :mod:`sklr.metrics` module includes score functions, performance metrics
-and pairwise metrics and distance computations.
-"""
+"""Score functions and metrics to assess label rankers and partial label rankers."""
 
+from sklr.metrics._ranking import (
+    kendall_distance,
+    kendall_tau_score,
+    tau_x_score,
+)
+from sklr.metrics._scorer import get_scorer, get_scorer_names
 
-# =============================================================================
-# Imports
-# =============================================================================
-
-# Local application
-from .label_ranking import kendall_distance, tau_score
-from .partial_label_ranking import tau_x_score
-
-
-# =============================================================================
-# Module public objects
-# =============================================================================
-__all__ = ["kendall_distance", "tau_score", "tau_x_score"]
+__all__ = [
+    "get_scorer",
+    "get_scorer_names",
+    "kendall_distance",
+    "kendall_tau_score",
+    "tau_x_score",
+]

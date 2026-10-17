@@ -1,50 +1,63 @@
-"""Base functions for nearest neighbors."""
+"""Common code of the nearest neighbors rankers."""
 
-
-# =============================================================================
-# Imports
-# =============================================================================
-
-# Third party
-from sklearn.neighbors._base import _get_weights as get_weights
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
+from sklearn.utils import get_tags
+
+from sklr.utils._ranking import _validate_data
+from sklr.utils._sklearn_compat import _get_weights
 
 
-# =============================================================================
-# Functions
-# =============================================================================
-
-def _get_weights(Y, dist, weights):
-    """Get the weights from an array of rankings and distances."""
-    sample_weight = get_weights(dist, weights)
-
-    # Assign a constant value if applying a uniform weighting
-    # to weigh the samples by the number of available classes
-    sample_weight = sample_weight if sample_weight else 1
-
-    mask = Y != -1
-    sample_weight *= np.mean(mask, axis=2)
-
-    return sample_weight
+def _dudani_weights(dist):
+    """Weigh the neighbors of each query by the rule of [dudani_distance_1976]."""
+    nearest = dist[:, :1]
+    farthest = dist[:, -1:]
+    span = farthest - nearest
+    return np.divide(farthest - dist, span, out=np.ones_like(dist), where=span > 0)
 
 
-def _aggregate_neighbors(estimator, neigh_Y, neigh_weights):
-    """Aggregate the nearest neighbors rankings according to the weights."""
-    aggregate = estimator._rank_algorithm.aggregate
-    neigh_data = zip(neigh_Y, neigh_weights)
+def _fit_rankings(estimator, X, y, *, allow_ties):
+    """Validate the training data of a ranker and fit its neighbor search."""
+    ensure_all_finite = (
+        "allow-nan" if get_tags(estimator).input_tags.allow_nan else True
+    )
+    X, y = _validate_data(
+        estimator,
+        X,
+        y,
+        allow_ties=allow_ties,
+        accept_sparse="csr",
+        order="C",
+        ensure_all_finite=ensure_all_finite,
+    )
+    # NeighborsBase._fit validates y unless it is given a fitted estimator,
+    # and it would reject the unranked labels
+    neighbors = NearestNeighbors(
+        n_neighbors=estimator.n_neighbors,
+        algorithm=estimator.algorithm,
+        leaf_size=estimator.leaf_size,
+        metric=estimator.metric,
+        p=estimator.p,
+        metric_params=estimator.metric_params,
+        n_jobs=estimator.n_jobs,
+    ).fit(X)
+    return estimator._fit(neighbors, y)
 
-    Y = [aggregate(Y, sample_weight) for Y, sample_weight in neigh_data]
 
-    return np.array(Y)
+def _kneighbors_weights(estimator, X):
+    """Find the neighbors of each query and weigh them by `estimator.weights`.
 
-
-def _predict_k_neighbors(estimator, X):
-    """Predict using a k-nearest neighbors estimator."""
-    X = estimator._validate_data(X, reset=False)
-
+    Returns the indices of the neighbors and their weights, both of shape
+    ``(n_queries, n_neighbors)``. The weights may all be zero for some queries.
+    """
+    weights = estimator.weights
+    if weights is None or weights == "uniform":
+        # The distances are only needed to weigh the neighbors
+        neigh_ind = estimator.kneighbors(X, return_distance=False)
+        return neigh_ind, np.ones(neigh_ind.shape)
     neigh_dist, neigh_ind = estimator.kneighbors(X)
-
-    neigh_Y = estimator._y[neigh_ind]
-    neigh_weights = _get_weights(neigh_Y, neigh_dist, estimator.weights)
-
-    return _aggregate_neighbors(estimator, neigh_Y, neigh_weights)
+    if weights == "dudani":
+        neigh_weights = _dudani_weights(neigh_dist)
+    else:
+        neigh_weights = _get_weights(neigh_dist, weights)
+    return neigh_ind, np.array(neigh_weights, dtype=np.float64)

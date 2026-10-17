@@ -1,44 +1,52 @@
-# Issue form to report a bug
 name: Bug report
-description: Create a report to help us reproduce and correct the bug.
-title: "[BUG]"
-labels: bug
-assignees: alfaro96
+description: Report a bug so that it can be reproduced and fixed.
+labels: [bug]
 
 body:
   - type: markdown
     attributes:
-      value: |
-        #### Before submitting a bug, please make sure the issue has not been already addressed by searching through the past issues.
-
+      value: >
+        Before reporting a bug, please search the [past issues](https://github.com/alfaro96/scikit-lr/issues?q=)
+        to make sure that it has not been reported already.
   - type: textarea
     attributes:
       label: Describe the bug
-      description: A clear and concise description of what the bug is.
-
+      description: >
+        A clear and concise description of what the bug is, and how it affects your use of scikit-lr.
+    validations:
+      required: true
   - type: textarea
     attributes:
-      label: Code to reproduce the problem
-      description: Add a minimal example that we can reproduce the error by running the code.
-      placeholder: Sample code to reproduce the problem.
-
+      label: Steps to reproduce
+      description: |
+        A [minimal example](https://scikit-learn.org/stable/developers/minimal_reproducer.html) that reproduces the bug when it is run as it is. It should only use the public API of scikit-lr and synthetic data, generated with `numpy.random` or a few lines of code, instead of your own data files.
+      placeholder: |
+        ```python
+        Code that reproduces the bug
+        ```
+    validations:
+      required: true
   - type: textarea
     attributes:
-      label: Expected behaviour
-      description: Paste or describe the expected behaviour.
-      placeholder: No error is thrown.
-
+      label: Expected results
+      description: The results that you expected.
+    validations:
+      required: true
   - type: textarea
     attributes:
-      label: Actual behaviour
-      description: Paste or describe the behaviour you observe instead of the expected behaviour.
-      placeholder: Paste or describe the actual output or traceback.
-
+      label: Actual results
+      description: The results that you got instead. If an exception is raised, paste the full traceback.
+    validations:
+      required: true
   - type: textarea
     attributes:
-      label: Specifications
-      description: Print the system information for debugging.
-
-  - type: markdown
-    attributes:
-      value: Thanks for contributing!
+      label: Versions
+      description: |
+        Paste the output of the following command:
+        ```
+        python -c "import sklr; sklr.show_versions()"
+        ```
+        If `sklr` cannot be imported, paste the output of `python -c "import sklearn; sklearn.show_versions()"` instead.
+      render: shell
+    validations:
+      required: true

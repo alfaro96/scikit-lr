@@ -1,0 +1,38 @@
+# Remove the label that runs the reproduction of the papers on a pull request
+name: Remove the reproducibility label
+
+# The label is removed as soon as it is added, so that adding it again runs the
+# reproduction again. The pull_request_target event gets a token that can edit
+# the pull request, even when it comes from a fork, unlike the pull_request
+# event. It runs the workflow and the scripts of the base branch, and never
+# checks out the code of the pull request
+on:
+  pull_request_target:
+    types:
+      - labeled
+
+permissions:
+  contents: read
+
+jobs:
+  remove-label:
+    name: Remove the reproducibility label
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'reproducibility'
+
+    permissions:
+      # Remove the label from the pull request
+      pull-requests: write
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Remove the label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LABEL: reproducibility
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash build_tools/github/remove_label.sh

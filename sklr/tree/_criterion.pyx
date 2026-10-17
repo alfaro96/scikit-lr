@@ -1,1178 +1,765 @@
-# cython: language_level=3
-# cython: cdivision=True
-# cython: boundscheck=False
-# cython: wraparound=False
+"""Split criteria of the decision tree rankers."""
 
-
-# =============================================================================
-# Imports
-# =============================================================================
-
-# Third party
-from libc.math cimport exp, fabs, fmin, log
 import numpy as np
-cimport numpy as np
 
-# Always include this statement after cimporting
-# NumPy, to avoid segmentation faults
-np.import_array()
+cimport cython
+from libc.math cimport NAN, isnan, log2
 
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-# The number of iterations, the minimum theta, the maximum
-# theta and a convergence value for the Mallows criterion
-cdef INT64_t N_ITERS = 10
-cdef DTYPE_t LOWER_THETA = -20.0
-cdef DTYPE_t UPPER_THETA = 10.0
-cdef DTYPE_t EPSILON = 1e-5
-
-# Distance measures that can be
-# employed for the Mallows criterion
-DISTANCES = {
-    "kendall": 0
-}
+from sklr._aggregation._bucket_pivot cimport aggregate_pairs
+from sklr._distributions._mallows cimport (
+    estimate_center,
+    estimate_complete_spread,
+    estimate_spread,
+    solve_spread,
+)
+from sklr._distributions._sorting cimport rank_by_scores
 
 
-# =============================================================================
-# Classes
-# =============================================================================
+# The caller creates the criterion with the number of samples and labels of the
+# training set, so the indices of the loops, which are non-negative, are within the
+# bounds of the arrays: the indices of the samples from the splitter are below
+# n_samples, those of the labels below n_labels, and the three parts of the node
+# index the first axis of the pairwise statistics. The arrays are created in
+# __cinit__, and those of the node are set by init, which the splitter calls before
+# any other method
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.initializedcheck(False)
+cdef class RankingCriterion(Criterion):
+    """Base of the impurities of rankings computed from their pairwise statistics.
 
-# =============================================================================
-# Criterion
-# =============================================================================
-cdef class Criterion:
-    """Interface for impurity criteria.
+    The criterion keeps, for the node and each child, the weight and the number of
+    the rankings that put each label ahead of each other one and that tie them,
+    counting a pair only in the rankings that rank both labels. Those of the node
+    are computed in `init`, those of the left child as its samples move in `update`,
+    and those of the right child by subtraction. A part is consistent, and its
+    impurity zero, when no two of its rankings order a pair of labels differently;
+    the subclasses compute the impurity of the other parts in `_impurity`, and can
+    keep their own statistics through the methods that `init`, `reset`,
+    `reverse_reset` and `update` call.
+    """
 
-    This object stores methods on how to calculate how good a split is using
-    different metrics."""
+    # Cython also calls this method with the arguments of the subclasses, so it takes
+    # and ignores the extra ones
+    def __cinit__(self, intp_t n_labels, intp_t n_samples, *args, **kwargs):
+        self.start = 0
+        self.pos = 0
+        self.end = 0
 
-    def __cinit__(self, RankAggregationAlgorithm rank_algorithm,
-                  DISTANCE distance=KENDALL):
-        """Constructor."""
-        # Initialize the hyperparameters
-        self.rank_algorithm = rank_algorithm
-        self.distance = distance
-
-        # Initialize the rankings
-        # and the sample weights
-        self.Y = None
-        self.sample_weight = None
-
-        # Initialize the number of classes
-        # and the number of children
-        self.n_classes = 0
-        self.n_children = 0
-
-        # Initialize the sample indexes and the
-        # position of the samples in the children
-        self.samples = None
-        self.pos = None
-
-        # Initialize the number of samples in total and
-        # the number of samples in the node and
-        # the number of samples in the children
-        self.n_samples = 0
-        self.n_node_samples = 0
-        self.n_children_samples = None
-
-        # Initialize the weighted number of samples in total,
-        # the weighted number of samples in the node and
-        # the weighted number of samples in the children
-        self.weighted_n_samples = 0
-        self.weighted_n_node_samples = 0
-        self.weighted_n_children_samples = None
-
-        # Initialize the impurity of the node
-        # and the impurity in the children
-        self.impurity_node = 0.0
-        self.impurity_children = None
-
-        # Initialize the consensus ranking in the node
-        # the consensus ranking in the children
-        self.consensus_node = None
-        self.consensus_children = None
-
-        # Initialize the rankings in the node, a copy of the
-        # rankings in the node and the sample weights in the node
-        self.Y_node = None
-        self.Y_node_copy = None
-        self.sample_weight_node = None
-
-        # Initialize the count in the node
-        # and the count in the children
-        self.count_node = None
-        self.count_children = None
-
-        # Initialize the precedences matrix in the node
-        # and the precedences matrix in the children
-        self.precedences_matrix_node = None
-        self.precedences_matrix_children = None
-
-    cdef void init_from_rankings(self, INT64_t_2D Y, DTYPE_t_1D sample_weight,
-                                 INT64_t max_children):
-        """Initialize common attributes for the criteria
-        from the rankings and the sample weight."""
-        # Initialize some values from the input arrays
-        cdef INT64_t n_samples = Y.shape[0]
-        cdef INT64_t n_classes = Y.shape[1]
-
-        # Define the indexes
-        cdef SIZE_t sample
-
-        # Initialize the Rank Aggregation algorithm. Even if
-        # the required parameters will be directly passed to
-        # the corresponding methods, for some of them the
-        # inner data structures are needed by them to work
-        self.rank_algorithm.init(n_classes)
-
-        # Initialize the rankings and the sample weights
-        # (not copy, directly the reference)
-        self.Y = Y
-        self.sample_weight = sample_weight
-
-        # Initialize the number of classes
-        # and the number of children
-        self.n_classes = n_classes
-        self.n_children = 1
-
-        # Initialize the sample indexes and
-        # the position of the samples in the child
-        self.samples = np.zeros(n_samples, dtype=np.intp)
-        self.pos = np.zeros(max_children + 1, dtype=np.intp)
-
-        # Initialize the number of samples in total,
-        # the number of samples in the node and
-        # the number of samples in the children
+        self.n_outputs = n_labels
         self.n_samples = n_samples
-        self.n_node_samples = n_samples
-        self.n_children_samples = np.zeros(max_children, dtype=np.int64)
-
-        # Initialize the weighted number of samples in total,
-        # the weighted number of samples in the node
-        # and the weighted number of samples in the children
-        self.weighted_n_samples = 0.0
+        self.n_node_samples = 0
         self.weighted_n_node_samples = 0.0
-        self.weighted_n_children_samples = np.zeros(
-            max_children, dtype=np.float64)
-
-        # Initialize the impurity of the node
-        # and the impurity in the children
-        self.impurity_node = 0.0
-        self.impurity_children = np.zeros(max_children, dtype=np.float64)
-
-        # Initialize the consensus ranking in the node
-        # and the consensus ranking in the children
-        self.consensus_node = np.zeros(
-            n_classes, dtype=np.int64)
-        self.consensus_children = np.zeros(
-            (max_children, n_classes), dtype=np.int64)
-
-        # Compute the sample indexes and the
-        # weighted number of samples in total
-        for sample in range(n_samples):
-            self.samples[sample] = sample
-            self.weighted_n_samples += sample_weight[sample]
-            self.weighted_n_node_samples += sample_weight[sample]
-
-        # Compute the parameters to obtain the consensus ranking
-        # using the underlying RankAggregationAlgorithm object.
-        # This computation is automatically handled by the object
-        # that will automatically determine the parameters to build
-        self.rank_algorithm.build_params(
-            Y, sample_weight, self.count_node, self.precedences_matrix_node)
-
-        # Compute the impurity of the node
-        # using the corresponding criterion
-        self.node_impurity()
-
-    cdef void init_from_record(self, INT64_t n_samples,
-                               DTYPE_t weighted_n_samples, DTYPE_t impurity,
-                               INT64_t_1D consensus, DTYPE_t_1D count,
-                               DTYPE_t_3D precedences_matrix):
-        """Initialize common attributes of the
-        criteria from the information of a record."""
-        # Initialize the number of samples and the
-        # weighted number of samples in the node
-        self.n_node_samples = n_samples
-        self.weighted_n_node_samples = weighted_n_samples
-
-        # Initialize the impurity and the
-        # consensus ranking in the node
-        self.impurity_node = impurity
-        self.consensus_node[:] = consensus
-
-    cdef void reset(self, SIZE_t_1D samples) nogil:
-        """Reset the criterion to the initial position."""
-        # Reset the number of children to one,
-        # since the default behaviour is
-        # that the node is not yet split
-        self.n_children = 1
-
-        # Reset the sample indexes (copy the reference
-        # and not the contents) and the position of
-        # the samples in the children (setting the
-        # position of the left child to zero and the
-        # position of the right child to the number
-        # of samples in this node)
-        self.samples = samples
-        self.pos[:] = 0
-        self.pos[1] = self.n_node_samples
-
-        # Reset the number of samples in the children
-        # (setting the number of samples in the left child
-        # to zero and the number of samples in the right
-        # child to the number of samples in this node)
-        self.n_children_samples[:] = 0
-        self.n_children_samples[0] = self.n_node_samples
-
-        # Reset the weighted number of samples in the children
-        # (setting the weighted number of samples in the left
-        # child to zero and the weighted number of samples in
-        # the right child to the weighted number of samples
-        # in this node)
-        self.weighted_n_children_samples[:] = 0.0
-        self.weighted_n_children_samples[0] = self.weighted_n_node_samples
-
-        # Reset the impurity in the children
-        # (setting the impurity in the left
-        # child to zero and the impurity in the
-        # right child to the impurity in this node)
-        self.impurity_children[:] = 0.0
-        self.impurity_children[0] = self.impurity_node
-
-        # Reset the consensus ranking in the children
-        # (setting the consensus ranking in this node
-        # to the all zeros and the consensus ranking
-        # in the right child to the consensus ranking
-        # in this node)
-        self.consensus_children[:] = 0
-        self.consensus_children[0, :] = self.consensus_node
-
-    cdef void update(self, SIZE_t new_pos) nogil:
-        """Update statistics by moving
-        samples[pos:new_pos] to the left child."""
-        # Define some values to be employed
-        cdef INT64_t_1D y
-        cdef DTYPE_t weight
-        cdef DTYPE_t_1D count_left
-        cdef DTYPE_t_1D count_right
-        cdef DTYPE_t_3D precedences_matrix_left
-        cdef DTYPE_t_3D precedences_matrix_right
-
-        # Define the indexes
-        cdef SIZE_t pos
-        cdef SIZE_t left_child
-        cdef SIZE_t right_child
-        cdef SIZE_t sample
-        cdef SIZE_t sample_idx
-
-        # Initialize the index of the left
-        # child and the index of the right child
-        left_child = self.n_children - 2
-        right_child = self.n_children - 1
-
-        # Initialize the position of
-        # the last evaluated sample
-        pos = self.pos[self.n_children - 1]
-
-        # Initialize the count and the precedences matrix for the left
-        # and right child to None and hereafter they will be properly set
-        count_left = None
-        count_right = None
-        precedences_matrix_left = None
-        precedences_matrix_right = None
-
-        # Set either the count or the precedences matrix
-        # for the left child and the right child by
-        # properly managing the None values, that are
-        # an indicator of which one is necessary
-        if self.count_children is not None:
-            count_left = (
-                self.count_children[left_child])
-            count_right = (
-                self.count_children[right_child])
-        else:
-            precedences_matrix_left = (
-                self.precedences_matrix_children[left_child])
-            precedences_matrix_right = (
-                self.precedences_matrix_children[right_child])
-
-        # Update the statistics for the left child and the right child.
-        # In fact, the statistics are directly updated using the
-        # RankAggregationalgorithm, which automatically determines
-        # the statistics to be updated
-        for sample in range(pos, new_pos):
-            # Initialize the identifier of the
-            # sample, the ranking and its weight
-            sample_idx = self.samples[sample]
-            y = self.Y[sample_idx]
-            weight = self.sample_weight[sample_idx]
-            # Update the weighted number of
-            # samples in the left and right child
-            # (positive weight to the left child
-            # and negative weight to the right child)
-            self.weighted_n_children_samples[left_child] += weight
-            self.weighted_n_children_samples[right_child] -= weight
-            # Update the count or the precedences matrix
-            # for the left and right child (positively
-            # weighting the ranking for the left child
-            # and negatively weighting the ranking for
-            # the right child)
-            self.rank_algorithm.update_params(
-                y, weight, count_left, precedences_matrix_left)
-            self.rank_algorithm.update_params(
-                y, -weight, count_right, precedences_matrix_right)
-
-        # Update the position of
-        # the samples in the children
-        self.pos[self.n_children - 1] = new_pos
-
-        # Update the number of samples in the children
-        # (moving the number of positions from
-        # the right child to the left child)
-        self.n_children_samples[self.n_children - 2] += (new_pos - pos)
-        self.n_children_samples[self.n_children - 1] -= (new_pos - pos)
-
-    cdef void node_children(self) nogil:
-        """Add a new children to the node."""
-        # Define the indexes
-        cdef SIZE_t left_child
-        cdef SIZE_t right_child
-
-        # Increase the number of children
-        self.n_children += 1
-
-        # Initialize the index of the left child
-        # and the index of the right child
-        left_child = self.n_children - 2
-        right_child = self.n_children - 1
-
-        # Move the position of the samples in the children
-        # (setting the position of the samples in the new right child
-        # to the position of the samples in the previous right child
-        # and the same for the new and previous left children)
-        self.pos[right_child + 1] = self.pos[right_child]
-        self.pos[right_child] = self.pos[left_child]
-
-        # Move the number of samples in the children
-        # (setting the number of the samples in the
-        # new right child to the number of samples in
-        # the previous left child and the number of
-        # samples in the new left child to zero)
-        self.n_children_samples[right_child] = (
-            self.n_children_samples[left_child])
-        self.n_children_samples[left_child] = 0
-
-        # Move the weighted number of samples in the children
-        # (setting the weighted number of samples in the
-        # new right child to the weighted number of samples in
-        # the previous left child and the weighted number of
-        # samples in the new left child to zero)
-        self.weighted_n_children_samples[right_child] = (
-            self.weighted_n_children_samples[left_child])
-        self.weighted_n_children_samples[left_child] = 0.0
-
-        # Move the impurity in the children
-        # (setting the impurity in the new right
-        # child to the impurity of the previous left
-        # child and the impurity of the new left
-        # child to zero)
-        self.impurity_children[right_child] = (
-            self.impurity_children[left_child])
-        self.impurity_children[left_child] = 0.0
-
-        # Move the consensus in the children
-        # (setting the consensus ranking in the
-        # new right child to the consensus ranking
-        # of the previous left child and the consensus
-        # ranking of the new left child to all zero)
-        self.consensus_children[right_child, :] = (
-            self.consensus_children[left_child])
-        self.consensus_children[left_child, :] = 0
-
-    cdef void node_impurity(self) nogil:
-        """Placeholder for calculating the impurity of the node.
-
-        Placeholder for a method which will evaluate the impurity of the
-        current node, i.e. the impurity of samples. This is the primary
-        function of the criterion class."""
-
-    cdef void children_impurity(self) nogil:
-        """Placeholder for calculating the impurity of children.
-
-        Placeholder for a method which evaluates the impurity in children
-        nodes, i.e. the impurity of samples indexed by the the start
-        and end positions of each child."""
-
-    cdef DTYPE_t impurity_improvement(self) nogil:
-        """Compute the improvement in impurity.
-
-        This method computes the improvement
-        in impurity when a split occurs."""
-        # Define some values to be employed
-        cdef DTYPE_t impurity_improvement
-
-        # Define the indexes
-        cdef SIZE_t child
-
-        # Initialize the improvement in impurity to
-        # the maximum value, that is, the impurity
-        # before the split (i.e., the impurity in
-        # the node)
-        impurity_improvement = self.impurity_node
-
-        # Compute the impurity of the children
-        self.children_impurity()
-
-        # Compute the improvement in impurity,
-        # that is, the impurity after splitting
-        # the node in these positions
-        for child in range(self.n_children):
-            impurity_improvement -= (self.weighted_n_children_samples[child]
-                                     / self.weighted_n_node_samples
-                                     * self.impurity_children[child])
-        impurity_improvement *= (self.weighted_n_node_samples
-                                 / self.weighted_n_samples)
-
-        # Return the computed
-        # improvement in impurity
-        return impurity_improvement
-
-
-# =============================================================================
-# Label Ranking criterion
-# =============================================================================
-cdef class LabelRankingCriterion(Criterion):
-    """Abstract criterion for Label Ranking."""
-
-    cdef void init_from_rankings(self, INT64_t_2D Y, DTYPE_t_1D sample_weight,
-                                 INT64_t max_children):
-        """Initialize the attributes for this criterion
-        from the rankings and the sample weight."""
-        # Initialize some values from the input arrays
-        cdef INT64_t n_classes = Y.shape[1]
-
-        # For Label Ranking criteria, also initialize the count in
-        # the node and the count in the children. By this way, it
-        # is avoided that several precedences matrices are also
-        # initialized when they are not necessary
-        self.count_node = np.zeros(
-            n_classes, dtype=np.float64)
-        self.count_children = np.zeros(
-            (max_children, n_classes), dtype=np.float64)
-
-        # Call to the method of the parent
-        # to initialize the rest of attributes
-        Criterion.init_from_rankings(self, Y, sample_weight, max_children)
-
-    cdef void init_from_record(self, INT64_t n_samples,
-                               DTYPE_t weighted_n_samples, DTYPE_t impurity,
-                               INT64_t_1D consensus, DTYPE_t_1D count,
-                               DTYPE_t_3D precedences_matrix):
-        """Initialize the attributes of the
-        criterion from the information of a record."""
-        # Call to the method of the parent
-        # to initialize the common attributes
-        Criterion.init_from_record(
-            self, n_samples, weighted_n_samples,
-            impurity, consensus,
-            count, precedences_matrix)
-
-        # Initialize the count in the node
-        self.count_node[:] = count
-
-    cdef void reset(self, SIZE_t_1D samples) nogil:
-        """Reset the criterion to the initial position."""
-        # Call to the method of the parent
-        # to reset common attributes
-        Criterion.reset(self, samples)
-
-        # Reset the count in the children (setting the
-        # count of the first child to the count in the node)
-        self.count_children[:] = 0.0
-        self.count_children[0, :] = self.count_node
-
-    cdef void node_children(self) nogil:
-        """Add a new children to the node."""
-        # Call to the method of the parent
-        # to move the common attributes
-        Criterion.node_children(self)
-
-        # Define the indexes
-        cdef SIZE_t left_child
-        cdef SIZE_t right_child
-
-        # Initialize the left child and the right child
-        left_child = self.n_children - 2
-        right_child = self.n_children - 1
-
-        # Move the count in the children (setting the
-        # count in the new right child to the count
-        # in the previous left child and the count
-        # in the new left child to zero)
-        self.count_children[right_child, :] = (
-            self.count_children[left_child])
-        self.count_children[left_child, :] = 0.0
-
-
-# =============================================================================
-# Mallows criterion
-# =============================================================================
-cdef class Mallows(LabelRankingCriterion):
-    """Mallows impurity criterion."""
-
-    cdef void init_from_rankings(self, INT64_t_2D Y, DTYPE_t_1D sample_weight,
-                                 INT64_t max_children):
-        """Initialize the attributes for this criterion
-        from the rankings and the sample weight."""
-        # Initialize some values from the input arrays
-        cdef INT64_t n_samples = Y.shape[0]
-        cdef INT64_t n_classes = Y.shape[1]
-
-        # Initialize the rankings in the node,
-        # a copy of the rankings in the node
-        # and the sample weights in the node
-        self.Y_node = np.zeros(
-            (n_samples, n_classes), dtype=np.int64)
-        self.Y_node_copy = np.zeros(
-            (n_samples, n_classes), dtype=np.int64)
-        self.sample_weight_node = np.zeros(
-            n_samples, dtype=np.float64)
-
-        # Copy the rankings and the samples
-        # weights to the previous views
-        self.Y_node[:] = Y
-        self.Y_node_copy[:] = Y
-        self.sample_weight_node[:] = sample_weight
-
-        # Call to the method of the parent
-        # to initialize the common attributes
-        LabelRankingCriterion.init_from_rankings(
-            self, Y, sample_weight, max_children)
-
-    cdef void reset(self, SIZE_t_1D samples) nogil:
-        """Reset the Mallows criterion."""
-        # Call to the method of the parent
-        # to initialize the common attributes
-        LabelRankingCriterion.reset(self, samples)
-
-        # Define the indexes
-        cdef SIZE_t sample
-        cdef SIZE_t sample_idx
-
-        # For efficiency purposes, once the node is reset copy,
-        # in sorted order, the rankings and the sample weight
-        for sample in range(self.n_node_samples):
-            # Initialize the identifier of the sample
-            sample_idx = self.samples[sample]
-            # Copy in sorted order the rankings in the node,
-            # the copy of the rankings in the node
-            # and the sample weight in the node
-            self.Y_node[sample, :] = self.Y[sample_idx]
-            self.Y_node_copy[sample, :] = self.Y[sample_idx]
-            self.sample_weight_node[sample] = self.sample_weight[sample_idx]
-
-    cdef DTYPE_t function(self, DTYPE_t theta, DTYPE_t distance) nogil:
-        """Function for the Netwon-Raphson method."""
-        # Define some values to be employed
-        cdef DTYPE_t new_theta
-
-        # Define the indexes
-        cdef SIZE_t label
-
-        # Initialize the new theta to zero
-        # (since it is the default value to compute it)
-        new_theta = 0.0
-
-        # Compute the new theta according to
-        # the distance function to be employed
-        # and taking into account the proper function
-        for label in range(self.n_classes, 1, -1):
-            # Kendall
-            if self.distance == KENDALL:
-                new_theta += ((label * exp(-theta*label))
-                              / (1 - exp(-theta*label)))
-
-        # Compute the last step of the function where
-        # the sign of the new theta value is decided
-
-        # Kendall
-        if self.distance == KENDALL:
-            new_theta = ((((self.n_classes-1) / (exp(theta)-1))
-                         - distance) - new_theta)
-
-        # Return the new theta
-        return new_theta
-
-    cdef DTYPE_t derivative_function(self, DTYPE_t theta) nogil:
-        """Derivative of the function for the Netwon-Raphson method."""
-        # Define some values to be employed
-        cdef DTYPE_t new_theta
-
-        # Define the indexes
-        cdef SIZE_t label
-
-        # Initialize the new theta to zero
-        # (since it is the default value to compute it)
-        new_theta = 0.0
-
-        # Compute the new theta according to
-        # the distance function to be employed
-        # and taking into account the proper
-        # derivative of the function
-        for label in range(self.n_classes, 1, -1):
-            # Kendall
-            if self.distance == KENDALL:
-                new_theta += ((label**2 * exp(-theta*label))
-                              / (1 - exp(-theta*label))**2)
-
-        # Compute the last step of the derivative of the function
-        # where the sign of the new theta value is decided
-
-        # Kendall
-        if self.distance == KENDALL:
-            new_theta = ((((-self.n_classes+1) * exp(theta))
-                         / (exp(theta)-1)**2) + new_theta)
-
-        # Return the new theta
-        return new_theta
-
-    cdef DTYPE_t newton_raphson(self, DTYPE_t distance) nogil:
-        """Execute the Netwon-Raphson method to compute the impurity."""
-        # Define some values to be employed
-        cdef DTYPE_t x1, x2
-        cdef DTYPE_t dx, dxold
-        cdef DTYPE_t temp, xl, xh
-        cdef DTYPE_t f, df, fl, fh
-        cdef BOOL_t out, decreasing
-        cdef DTYPE_t theta
-
-        # Define the indexes
-        cdef SIZE_t label
-        cdef SIZE_t iteration
-
-        # Initialize the lower and upper values
-        # for the theta parameter (impurity)
-        x1 = LOWER_THETA
-        x2 = UPPER_THETA
-
-        # Initialize the lower and upper values
-        # for the function and its derivative
-        fl = self.function(x1, distance)
-        fh = self.derivative_function(x2)
-
-        # Some initial checks, to maintain the theta
-        # parameter in the correspoding range
-        if fl == 0.0:
-            theta = x1
-        elif fh == 0.0:
-            theta = x2
-        else:
-            if fl < 0.0:
-                xl = x1
-                xh = x2
-            else:
-                xh = x1
-                xl = x2
-            # Initialize some needed values to
-            # apply the Newton-Raphson method
-            theta = x1
-            dxold = fabs(x2 - x1)
-            dx = dxold
-            f = self.function(theta, distance)
-            df = self.derivative_function(theta)
-
-            # Execute the specified number of iterations for the
-            # Newton-Raphson method (although an early break
-            # will done the job when convergence)
-            for iteration in range(N_ITERS):
-                # Check whether theta is out of range
-                # and not decreasing fast enough
-                out = ((((theta-xh) * df - f)
-                       * ((theta-xl) * df - f)) > 0.0)
-                decreasing = (fabs(2.0*f) > fabs(dxold*df))
-                # If the theta parameter is out of range or theta
-                # parameter not decreasing fast enough, bisect
-                if out or decreasing:
-                    dxold = dx
-                    dx = 0.5 * (xh-xl)
-                    theta = xl + dx
-                    if xl == theta:
-                        break
-                # Otherwise, update the theta parameter
-                # according to the Newton-Raphson method
+        self.weighted_n_left = 0.0
+        self.weighted_n_right = 0.0
+
+        self.precedence_weight = np.empty((3, n_labels, n_labels), dtype=np.float64)
+        self.precedence_count = np.empty((3, n_labels, n_labels), dtype=np.intp)
+        self.tie_weight = np.empty((3, n_labels, n_labels), dtype=np.float64)
+        self.tie_count = np.empty((3, n_labels, n_labels), dtype=np.intp)
+
+    cdef int init(
+        self,
+        const float64_t[:, ::1] y,
+        const float64_t[:] sample_weight,
+        float64_t weighted_n_samples,
+        const intp_t[:] sample_indices,
+        intp_t start,
+        intp_t end,
+    ) except -1 nogil:
+        """Initialize the criterion at the node ``sample_indices[start:end]``."""
+        cdef intp_t p
+        cdef float64_t weight
+
+        self.y = y
+        self.sample_weight = sample_weight
+        self.sample_indices = sample_indices
+        self.start = start
+        self.end = end
+        self.n_node_samples = end - start
+        self.weighted_n_samples = weighted_n_samples
+        self.weighted_n_node_samples = 0.0
+        self._clear(_NODE)
+        for p in range(start, end):
+            weight = self._weight(sample_indices[p])
+            self.weighted_n_node_samples += weight
+            self._add_pairs(sample_indices[p], weight, _NODE)
+        self._init_node()
+        self.reset()
+        return 0
+
+    cdef int reset(self) except -1 nogil:
+        """Reset the criterion at ``pos=start``."""
+        self.pos = self.start
+        self.weighted_n_left = 0.0
+        self.weighted_n_right = self.weighted_n_node_samples
+        self._clear(_LEFT)
+        self._reset_left()
+        return 0
+
+    cdef int reverse_reset(self) except -1 nogil:
+        """Reset the criterion at ``pos=end``."""
+        cdef intp_t label, other
+        self.pos = self.end
+        self.weighted_n_left = self.weighted_n_node_samples
+        self.weighted_n_right = 0.0
+        for label in range(self.n_outputs):
+            for other in range(self.n_outputs):
+                self.precedence_weight[_LEFT, label, other] = self.precedence_weight[
+                    _NODE, label, other
+                ]
+                self.precedence_count[_LEFT, label, other] = self.precedence_count[
+                    _NODE, label, other
+                ]
+                self.tie_weight[_LEFT, label, other] = self.tie_weight[
+                    _NODE, label, other
+                ]
+                self.tie_count[_LEFT, label, other] = self.tie_count[
+                    _NODE, label, other
+                ]
+        self._reverse_reset_left()
+        return 0
+
+    cdef int update(self, intp_t new_pos) except -1 nogil:
+        """Move the samples ``sample_indices[pos:new_pos]`` to the left child."""
+        cdef intp_t p, sample
+        cdef float64_t weight
+        if new_pos < self.pos:
+            self.reset()
+        for p in range(self.pos, new_pos):
+            sample = self.sample_indices[p]
+            weight = self._weight(sample)
+            self.weighted_n_left += weight
+            self._add_pairs(sample, weight, _LEFT)
+            self._add_left(sample, weight)
+        self.weighted_n_right = self.weighted_n_node_samples - self.weighted_n_left
+        self.pos = new_pos
+        return 0
+
+    cdef float64_t node_impurity(self) noexcept nogil:
+        """Compute the impurity of the node."""
+        return self._part_impurity(_NODE)
+
+    cdef void children_impurity(
+        self, float64_t* impurity_left, float64_t* impurity_right
+    ) noexcept nogil:
+        """Compute the impurities of the left and right children."""
+        cdef intp_t label, other
+        # The node and the left child add up the weights in different orders, so a
+        # pair that no ranking of the right child puts in a relation gets a weight
+        # of zero for it instead of the rounding error of the subtraction, which
+        # the consensus would take as information
+        for label in range(self.n_outputs):
+            for other in range(self.n_outputs):
+                self.precedence_count[_RIGHT, label, other] = (
+                    self.precedence_count[_NODE, label, other]
+                    - self.precedence_count[_LEFT, label, other]
+                )
+                if self.precedence_count[_RIGHT, label, other] == 0:
+                    self.precedence_weight[_RIGHT, label, other] = 0.0
                 else:
-                    dxold = dx
-                    dx = f / df
-                    temp = theta
-                    theta -= dx
-                    if temp == theta:
-                        break
-                # Change is negligible (convergence
-                # has been found), break
-                if fabs(dx) < EPSILON:
+                    self.precedence_weight[_RIGHT, label, other] = (
+                        self.precedence_weight[_NODE, label, other]
+                        - self.precedence_weight[_LEFT, label, other]
+                    )
+                self.tie_count[_RIGHT, label, other] = (
+                    self.tie_count[_NODE, label, other]
+                    - self.tie_count[_LEFT, label, other]
+                )
+                if self.tie_count[_RIGHT, label, other] == 0:
+                    self.tie_weight[_RIGHT, label, other] = 0.0
+                else:
+                    self.tie_weight[_RIGHT, label, other] = (
+                        self.tie_weight[_NODE, label, other]
+                        - self.tie_weight[_LEFT, label, other]
+                    )
+        impurity_left[0] = self._part_impurity(_LEFT)
+        impurity_right[0] = self._part_impurity(_RIGHT)
+
+    @cython.final
+    cdef float64_t _part_impurity(self, int part) noexcept nogil:
+        """Compute the impurity of a part, zero if its rankings are consistent."""
+        if self._is_consistent(part):
+            return 0.0
+        return self._impurity(part)
+
+    @cython.final
+    cdef float64_t _weight(self, intp_t sample) noexcept nogil:
+        """Return the weight of a sample, ``1`` without weights."""
+        if self.sample_weight is None:
+            return 1.0
+        return self.sample_weight[sample]
+
+    @cython.final
+    cdef void _clear(self, int part) noexcept nogil:
+        """Set the pairwise statistics of a part to zero."""
+        cdef intp_t label, other
+        for label in range(self.n_outputs):
+            for other in range(self.n_outputs):
+                self.precedence_weight[part, label, other] = 0.0
+                self.precedence_count[part, label, other] = 0
+                self.tie_weight[part, label, other] = 0.0
+                self.tie_count[part, label, other] = 0
+
+    @cython.final
+    cdef void _add_pairs(
+        self, intp_t sample, float64_t weight, int part
+    ) noexcept nogil:
+        """Add the pairs of labels ordered by the ranking of a sample to a part."""
+        cdef intp_t label, other
+        cdef float64_t position, other_position
+        # The comparisons with nan are false, so the pairs with an unranked label
+        # are left out
+        for label in range(self.n_outputs):
+            position = self.y[sample, label]
+            for other in range(label + 1, self.n_outputs):
+                other_position = self.y[sample, other]
+                if position < other_position:
+                    self.precedence_weight[part, label, other] += weight
+                    self.precedence_count[part, label, other] += 1
+                elif position > other_position:
+                    self.precedence_weight[part, other, label] += weight
+                    self.precedence_count[part, other, label] += 1
+                elif position == other_position:
+                    self.tie_weight[part, label, other] += weight
+                    self.tie_weight[part, other, label] += weight
+                    self.tie_count[part, label, other] += 1
+                    self.tie_count[part, other, label] += 1
+
+    @cython.final
+    cdef bint _is_consistent(self, int part) noexcept nogil:
+        """Tell whether no two rankings of a part order a pair of labels differently."""
+        cdef intp_t label, other
+        for label in range(self.n_outputs):
+            for other in range(label + 1, self.n_outputs):
+                if (
+                    (self.precedence_count[part, label, other] > 0)
+                    + (self.tie_count[part, label, other] > 0)
+                    + (self.precedence_count[part, other, label] > 0)
+                ) > 1:
+                    return False
+        return True
+
+    @cython.final
+    cdef float64_t _part_weight(self, int part) noexcept nogil:
+        """Return the total weight of the samples of a part."""
+        if part == _NODE:
+            return self.weighted_n_node_samples
+        if part == _LEFT:
+            return self.weighted_n_left
+        return self.weighted_n_right
+
+    cdef void _init_node(self) noexcept nogil:
+        """Initialize the statistics of a subclass once the node pairs are counted."""
+
+    cdef void _reset_left(self) noexcept nogil:
+        """Reset the statistics of a subclass for an empty left child."""
+
+    cdef void _reverse_reset_left(self) noexcept nogil:
+        """Reset the statistics of a subclass for a left child with the whole node."""
+
+    cdef void _add_left(self, intp_t sample, float64_t weight) noexcept nogil:
+        """Add a sample to the statistics of a subclass for the left child."""
+
+    cdef float64_t _impurity(self, int part) noexcept nogil:
+        """Compute the impurity of a part whose rankings are not consistent."""
+        return 0.0
+
+
+# The arrays of the distinct rankings have n_patterns rows, and the node has at most
+# that many distinct rankings, of at most n_labels labels
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.initializedcheck(False)
+cdef class MallowsCriterion(RankingCriterion):
+    """Impurity of the rankings of a node from the spread of their Mallows model.
+
+    As in [cheng_decision_2009], the Mallows model of a node is estimated only on the
+    labels that some of its rankings rank. Its impurity is
+    :math:`1 / (1 + \\hat{\\theta})`, where :math:`\\hat{\\theta}` is the estimated
+    spread of that model, so that it decreases with the spread, is zero when the spread
+    is infinite and one when it is zero. It is also zero when the rankings of the node
+    are consistent, which [cheng_decision_2009] takes as a pure node. The value of a
+    node is its center ranking on those labels, with ``nan`` for the others.
+
+    The model is estimated from the distinct rankings `patterns` of the training
+    set, each weighted by the total weight of its samples in the node, which gives
+    the same estimate as the samples themselves. `pattern_of` holds the index of the
+    ranking of each sample.
+    """
+
+    cdef intp_t max_iter
+    cdef const float64_t[:, ::1] patterns
+    cdef const intp_t[::1] pattern_of
+
+    # The number of node values computed and of their centers that did not converge
+    cdef public intp_t n_values
+    cdef public intp_t n_not_converged
+
+    # The distinct rankings of the node, and the number and weight of their samples
+    # in the node and in the left child, updated as the samples move between the
+    # children, as the pairwise statistics
+    cdef intp_t[::1] node_patterns
+    cdef intp_t n_node_patterns
+    cdef intp_t[::1] pattern_count_total
+    cdef intp_t[::1] pattern_count_left
+    cdef float64_t[::1] pattern_weight_total
+    cdef float64_t[::1] pattern_weight_left
+
+    # The distinct rankings of a node or a child on their ranked labels, their
+    # weights, and the buffers of the estimation of the Mallows model
+    cdef float64_t[:, ::1] node_y
+    cdef float64_t[::1] node_weight
+    cdef intp_t[::1] labels
+    cdef intp_t[::1] center
+    cdef float64_t[:, ::1] completed
+    cdef float64_t[::1] scores
+    cdef intp_t[:, ::1] work
+
+    # Whether the rankings of the node are complete, so that the impurity of each
+    # part follows from its pairwise statistics
+    cdef bint is_complete
+
+    def __cinit__(
+        self,
+        intp_t n_labels,
+        intp_t n_samples,
+        intp_t max_iter,
+        const float64_t[:, ::1] patterns,
+        const intp_t[::1] pattern_of,
+    ):
+        cdef intp_t n_patterns = patterns.shape[0]
+
+        self.max_iter = max_iter
+        self.n_values = 0
+        self.n_not_converged = 0
+        self.patterns = patterns
+        self.pattern_of = pattern_of
+
+        self.node_patterns = np.empty(n_patterns, dtype=np.intp)
+        self.n_node_patterns = 0
+        self.pattern_count_total = np.empty(n_patterns, dtype=np.intp)
+        self.pattern_count_left = np.empty(n_patterns, dtype=np.intp)
+        self.pattern_weight_total = np.empty(n_patterns, dtype=np.float64)
+        self.pattern_weight_left = np.empty(n_patterns, dtype=np.float64)
+
+        self.node_y = np.empty((n_patterns, n_labels), dtype=np.float64)
+        self.node_weight = np.empty(n_patterns, dtype=np.float64)
+        self.labels = np.empty(n_labels, dtype=np.intp)
+        self.center = np.empty(n_labels, dtype=np.intp)
+        self.completed = np.empty((n_patterns, n_labels), dtype=np.float64)
+        self.scores = np.empty(n_labels, dtype=np.float64)
+        self.work = np.empty((4, n_labels), dtype=np.intp)
+
+        self.is_complete = False
+
+    def __reduce__(self):
+        return (
+            type(self),
+            (
+                self.n_outputs,
+                self.n_samples,
+                self.max_iter,
+                np.asarray(self.patterns),
+                np.asarray(self.pattern_of),
+            ),
+        )
+
+    def __deepcopy__(self, memo):
+        # BaseDecisionTree._fit copies the criterion that it receives, which would
+        # lose the convergence counts. Each fit creates its own criterion, so it
+        # does not need to be protected from changes
+        return self
+
+    cdef void node_value(self, float64_t* dest) noexcept nogil:
+        """Write the center ranking of the node, ``nan`` for its unranked labels."""
+        cdef intp_t n_rankings, n_labels, label, n_iter
+        cdef bint converged = True
+
+        n_labels = self._gather(_NODE, &n_rankings)
+        if n_labels > 1:
+            converged = self._estimate_center(n_rankings, n_labels, &n_iter)
+        elif n_labels == 1:
+            self.center[0] = 1
+        for label in range(self.n_outputs):
+            dest[label] = NAN
+        for label in range(n_labels):
+            dest[self.labels[label]] = self.center[label]
+        self.n_values += 1
+        if not converged:
+            self.n_not_converged += 1
+
+    cdef void _init_node(self) noexcept nogil:
+        """Count the distinct rankings of the node and whether they are complete."""
+        cdef intp_t p, label, pattern, sample
+
+        for p in range(self.start, self.end):
+            self.pattern_count_total[self.pattern_of[self.sample_indices[p]]] = 0
+            self.pattern_weight_total[self.pattern_of[self.sample_indices[p]]] = 0.0
+        self.n_node_patterns = 0
+        self.is_complete = True
+        for p in range(self.start, self.end):
+            sample = self.sample_indices[p]
+            pattern = self.pattern_of[sample]
+            if self.pattern_count_total[pattern] == 0:
+                self.node_patterns[self.n_node_patterns] = pattern
+                self.n_node_patterns += 1
+                for label in range(self.n_outputs):
+                    if isnan(self.patterns[pattern, label]):
+                        self.is_complete = False
+            self.pattern_count_total[pattern] += 1
+            self.pattern_weight_total[pattern] += self._weight(sample)
+
+    cdef void _reset_left(self) noexcept nogil:
+        """Remove the distinct rankings of the node from the left child."""
+        cdef intp_t i
+        for i in range(self.n_node_patterns):
+            self.pattern_count_left[self.node_patterns[i]] = 0
+            self.pattern_weight_left[self.node_patterns[i]] = 0.0
+
+    cdef void _reverse_reset_left(self) noexcept nogil:
+        """Put the distinct rankings of the node in the left child."""
+        cdef intp_t i, pattern
+        for i in range(self.n_node_patterns):
+            pattern = self.node_patterns[i]
+            self.pattern_count_left[pattern] = self.pattern_count_total[pattern]
+            self.pattern_weight_left[pattern] = self.pattern_weight_total[pattern]
+
+    cdef void _add_left(self, intp_t sample, float64_t weight) noexcept nogil:
+        """Add the ranking of a sample to the left child."""
+        self.pattern_count_left[self.pattern_of[sample]] += 1
+        self.pattern_weight_left[self.pattern_of[sample]] += weight
+
+    cdef float64_t _impurity(self, int part) noexcept nogil:
+        """Compute the impurity of a part whose rankings are not consistent."""
+        if self.is_complete:
+            return self._complete_impurity(part)
+        return self._incomplete_impurity(part)
+
+    # The parts that are not consistent have rankings, whose samples have positive
+    # weights because the splitter discards the others, so the weight of the part,
+    # the divisor of the mean distance, is positive, up to the rounding of the
+    # subtraction for the right child, as in the criteria of scikit-learn
+    @cython.cdivision(True)
+    cdef float64_t _complete_impurity(self, int part) noexcept nogil:
+        """Compute the impurity of complete rankings from their pairwise statistics.
+
+        The center ranking is that of the Borda count, which Algorithm 1 of
+        [cheng_decision_2009] does not iterate for complete rankings. The Borda
+        score of a label is the weight of the part plus, for each other label, the
+        weight of the rankings that put it ahead of that one, so the labels are
+        ranked by the latter sum.
+        The weighted sum of the Kendall distances to the center adds up, over each
+        pair of labels, the weight of the rankings that order it unlike the center.
+        """
+        cdef intp_t n_labels = self.n_outputs
+        cdef intp_t label, other
+        cdef float64_t distance = 0.0
+
+        for label in range(n_labels):
+            self.scores[label] = 0.0
+            for other in range(n_labels):
+                self.scores[label] += self.precedence_weight[part, label, other]
+        rank_by_scores(self.scores, self.center)
+        for label in range(n_labels):
+            for other in range(n_labels):
+                if self.center[label] < self.center[other]:
+                    distance += self.precedence_weight[part, other, label]
+        return 1.0 / (1.0 + solve_spread(distance / self._part_weight(part), n_labels))
+
+    # The spread is not negative, so the divisor is at least one
+    @cython.cdivision(True)
+    cdef float64_t _incomplete_impurity(self, int part) noexcept nogil:
+        """Compute the impurity of incomplete rankings from their Mallows model."""
+        cdef intp_t n_rankings, n_labels, n_iter
+        cdef bint converged
+        cdef float64_t spread
+
+        n_labels = self._gather(part, &n_rankings)
+        # Only the centers of the nodes, in node_value, count for the convergence
+        # warning, not those of the candidate splits
+        converged = self._estimate_center(n_rankings, n_labels, &n_iter)
+        # The last iteration of a center that converged completed the rankings
+        # with that center, as the estimation of the spread would do again, and
+        # without iterations the rankings of the part are already complete
+        if n_iter == 0:
+            spread = estimate_complete_spread(
+                self.node_y[:n_rankings, :n_labels],
+                self.node_weight[:n_rankings],
+                self.center[:n_labels],
+            )
+        elif converged:
+            spread = estimate_complete_spread(
+                self.completed[:n_rankings, :n_labels],
+                self.node_weight[:n_rankings],
+                self.center[:n_labels],
+            )
+        else:
+            spread = estimate_spread(
+                self.node_y[:n_rankings, :n_labels],
+                self.node_weight[:n_rankings],
+                self.center[:n_labels],
+                self.completed[0, :n_labels],
+                self.work[:2, :n_labels],
+            )
+        # An infinite spread gives exactly zero
+        return 1.0 / (1.0 + spread)
+
+    cdef void _pattern_count(
+        self, int part, intp_t pattern, intp_t* count, float64_t* weight
+    ) noexcept nogil:
+        """Get the number and weight of the samples of a ranking in a part."""
+        if part == _NODE:
+            count[0] = self.pattern_count_total[pattern]
+            weight[0] = self.pattern_weight_total[pattern]
+        elif part == _LEFT:
+            count[0] = self.pattern_count_left[pattern]
+            weight[0] = self.pattern_weight_left[pattern]
+        else:
+            count[0] = (
+                self.pattern_count_total[pattern] - self.pattern_count_left[pattern]
+            )
+            weight[0] = (
+                self.pattern_weight_total[pattern] - self.pattern_weight_left[pattern]
+            )
+
+    cdef intp_t _gather(self, int part, intp_t* n_rankings) noexcept nogil:
+        """Copy the distinct rankings of the node or of a child on their ranked labels.
+
+        Returns the number of labels that some of the rankings rank, whose indices
+        go to the first elements of `labels`, and sets ``n_rankings[0]`` to the
+        number of distinct rankings, whose positions of those labels go to the first
+        rows and columns of `node_y` and whose total weights go to `node_weight`.
+        """
+        cdef intp_t n_labels = 0
+        cdef intp_t i, pattern, label, column, count
+        cdef float64_t weight
+        cdef bint is_ranked
+
+        for label in range(self.n_outputs):
+            is_ranked = False
+            for i in range(self.n_node_patterns):
+                pattern = self.node_patterns[i]
+                self._pattern_count(part, pattern, &count, &weight)
+                if count > 0 and not isnan(self.patterns[pattern, label]):
+                    is_ranked = True
                     break
-                # Update theta parameters for the function
-                # and the derivative of the function
-                f = self.function(theta, distance)
-                df = self.derivative_function(theta)
-                # If the bracket is not in the root,
-                # update the lower and upper theta values
-                if f < 0.0:
-                    xl = theta
-                else:
-                    xh = theta
-
-        # Return the theta parameter as impurity
-        return theta
-
-    cdef DTYPE_t impurity(self, INT64_t_2D Y, DTYPE_t_1D sample_weight,
-                          DTYPE_t weighted_n_samples, DTYPE_t_1D count,
-                          INT64_t_1D consensus) nogil:
-        """Compute the impurity using the Mallows criterion."""
-        # Initialize some values from the input arrays
-        cdef INT64_t n_samples = Y.shape[0]
-
-        # Define some values to be employed
-        cdef DTYPE_t distance
-        cdef DTYPE_t impurity
-
-        # Define the indexes
-        cdef SIZE_t sample
-
-        # Initialize the distance between the
-        # rankings and the consensus ranking to zero
-        distance = 0.0
-
-        # Aggregate the rankings using the MLE to obtain the
-        # completed rankings and also its corresponding consensus
-        self.rank_algorithm.aggregate_mle(
-            Y, sample_weight, consensus, count)
-
-        # Compute the distance between the completed
-        # rankings and its corresponding consensus
-        for sample in range(n_samples):
-            # Kendall
-            if self.distance == KENDALL:
-                distance += ((sample_weight[sample] / weighted_n_samples)
-                             * _kendall_distance_fast(
-                                 y_true=Y[sample],
-                                 y_pred=consensus,
-                                 normalize=False))
-
-        # Compute the impurity using the Netwon-Raphson method
-        # (inverse of theta, the highest value, the lowest uncertainty)
-        impurity = 1 / self.newton_raphson(distance)
-
-        # Return the impurity
-        return impurity
-
-    cdef void node_impurity(self) nogil:
-        """Compute the impurity of the node with the Mallows criterion."""
-        # To compute the impurity in the node, it is
-        # necessary to compute the consensus ranking
-        self.rank_algorithm.aggregate_params(
-            self.consensus_node, self.count_node, self.precedences_matrix_node)
-
-        # Then, compute the impurity in the node
-        self.impurity_node = self.impurity(
-            self.Y_node, self.sample_weight_node,
-            self.weighted_n_node_samples, self.count_node,
-            self.consensus_node)
-
-        # Copy the rankings (since, due to the MLE
-        # process, they may have been modified)
-        self.Y_node[:] = self.Y_node_copy
-
-    cdef void children_impurity(self) nogil:
-        """Compute the impurity of the children with the Mallows criterion."""
-        # Define the indexes
-        cdef SIZE_t start
-        cdef SIZE_t end
-        cdef SIZE_t child
-
-        # Compute the impurity in the children by
-        # computing the theta parameter on each child
-        for child in range(self.n_children):
-            # Initialize the start and end position
-            # of the samples in this child
-            start = self.pos[child]
-            end = self.pos[child + 1]
-            # Compute the consensus ranking in this
-            # child before computing the impurity
-            self.rank_algorithm.aggregate_params(
-                self.consensus_children[child],
-                self.count_children[child],
-                self.precedences_matrix_children[child])
-            # Then, compute the impurity in this child
-            self.impurity_children[child] = self.impurity(
-                self.Y_node[start:end], self.sample_weight_node[start:end],
-                self.weighted_n_children_samples[child],
-                self.count_children[child],
-                self.consensus_children[child])
-
-        # Copy the rankings (since, due to the MLE
-        # process, they may have been modified)
-        self.Y_node[:] = self.Y_node_copy
-
-
-# =============================================================================
-# Partial Label Ranking criterion
-# =============================================================================
-cdef class PartialLabelRankingCriterion(Criterion):
-    """Abstract criterion for Partial Label Ranking."""
-
-    cdef void init_from_rankings(self, INT64_t_2D Y, DTYPE_t_1D sample_weight,
-                                 INT64_t max_children):
-        """Initialize the attributes for this criterion
-        from the rankings and the sample weight."""
-        # Initialize some values from the input arrays
-        cdef INT64_t n_classes = Y.shape[1]
-
-        # Initialize the precedences matrix in the node
-        # and the precedences matrix in the children
-        self.precedences_matrix_node = np.zeros(
-            (n_classes, n_classes, 2),
-            dtype=np.float64)
-        self.precedences_matrix_children = np.zeros(
-            (max_children, n_classes, n_classes, 2),
-            dtype=np.float64)
-
-        # Call to the method of the parent
-        # to initialize the common attributes
-        Criterion.init_from_rankings(self, Y, sample_weight, max_children)
-
-    cdef void init_from_record(self, INT64_t n_samples,
-                               DTYPE_t weighted_n_samples,
-                               DTYPE_t impurity, INT64_t_1D consensus,
-                               DTYPE_t_1D count,
-                               DTYPE_t_3D precedences_matrix):
-        """Initialize the attributes of the
-        criterion from the information of a record."""
-        # Call to the method of the parent
-        # to initialize the common attributes
-        Criterion.init_from_record(
-            self, n_samples, weighted_n_samples,
-            impurity, consensus,
-            count, precedences_matrix)
-
-        # Initialize the precedences matrix in the node
-        self.precedences_matrix_node[:] = precedences_matrix
-
-    cdef void reset(self, SIZE_t_1D samples) nogil:
-        """Reset the criterion to the initial position."""
-        # Call to the method of the parent
-        # to reset the common attributes
-        Criterion.reset(self, samples)
-
-        # Reset the precedences matrix in the children
-        # (setting the precedences matrix of the first
-        # child to the precedences matrix in the node)
-        self.precedences_matrix_children[:] = 0.0
-        self.precedences_matrix_children[0, :] = self.precedences_matrix_node
-
-    cdef void node_children(self) nogil:
-        """Add a new children to the node."""
-        # Call to the method of the parent
-        # to move the common attributes
-        Criterion.node_children(self)
-
-        # Define the indexes
-        cdef SIZE_t left_child
-        cdef SIZE_t right_child
-
-        # Initialize the index of the left child
-        # and the index of the right child
-        left_child = self.n_children - 2
-        right_child = self.n_children - 1
-
-        # Move the precedences matrix in the children
-        # (setting the precedences matrix in the new
-        # right child to the precedences matrix of the
-        # previous left child and the precedences matrix
-        # of the new left child to zero)
-        self.precedences_matrix_children[right_child, :] = (
-            self.precedences_matrix_children[left_child])
-        self.precedences_matrix_children[left_child, :] = 0.0
-
-    cdef DTYPE_t impurity(self, DTYPE_t_3D precedences_matrix,
-                          INT64_t_1D consensus) nogil:
-        """Placeholder for a method that will compute the impurity."""
-
-    cdef void node_impurity(self) nogil:
-        """Compute the impurity of the node
-        with Partial Label Ranking criteria."""
-        # To compute the impurity in the node, it is
-        # necessary to compute the consensus ranking
-        self.rank_algorithm.aggregate_params(
-            self.consensus_node, self.count_node, self.precedences_matrix_node)
-
-        # Then, compute the impurity in the node
-        self.impurity_node = self.impurity(
-            self.precedences_matrix_node, self.consensus_node)
-
-    cdef void children_impurity(self) nogil:
-        """Compute the impurity of the children
-        with Partial Label Ranking criteria."""
-        # Define the indexes
-        cdef SIZE_t start
-        cdef SIZE_t end
-        cdef SIZE_t child
-
-        # Compute the impurity in the children
-        for child in range(self.n_children):
-            # Compute the consensus ranking in this
-            # child before computing the impurity
-            self.rank_algorithm.aggregate_params(
-                self.consensus_children[child],
-                self.count_children[child],
-                self.precedences_matrix_children[child])
-            # Then, compute the impurity in this child
-            self.impurity_children[child] = self.impurity(
-                self.precedences_matrix_children[child],
-                self.consensus_children[child])
-
-
-# =============================================================================
-# Disagreements criterion
-# =============================================================================
-cdef class Disagreements(PartialLabelRankingCriterion):
-    """Disagreements impurity criterion."""
-
-    cdef DTYPE_t impurity(self, DTYPE_t_3D precedences_matrix,
-                          INT64_t_1D consensus) nogil:
-        """Compute the impurity using the disagreements criterion."""
-        # Define some values to be employed
-        cdef DTYPE_t disagreements
-        cdef INT64_t sum_total
-        cdef DTYPE_t f_precedences
-        cdef DTYPE_t ties
-        cdef DTYPE_t s_precedences
-        cdef DTYPE_t total_precedences
-
-        # Define the indexes
-        cdef SIZE_t f_class
-        cdef SIZE_t s_class
-
-        # Initialize the disagreements impurity to zero
-        disagreements = 0.0
-
-        # Initialize the total sum of pairs to zero
-        sum_total = 0
-
-        # Compute the impurity counting the frequency
-        # of disagreements between the rankings
-        # in this node and the consensus ranking
-        for f_class in range(self.n_classes - 1):
-            for s_class in range(f_class + 1, self.n_classes):
-                # Extract the number of times that "f_class"
-                # precedes "s_class", the number of times that
-                # "f_class" is tied with "s_class" and the
-                # number of times that "s_class" precedes
-                # "f_class". Also, obtain the sum of these values
-                f_precedences = precedences_matrix[f_class, s_class, 0]
-                ties = precedences_matrix[f_class, s_class, 1]
-                s_precedences = precedences_matrix[s_class, f_class, 0]
-                total_precedences = f_precedences + ties + s_precedences
-                # Compute the weighted disagreements, taking into account
-                # that if "f_class" precedes "s_class" in the consensus
-                # ranking, then, the number of disagreements is given
-                # by the number of times that "f_class" is tied with
-                # "s_class" plus the number of times that "s_class"
-                # precedes "f_class". The same reasoning applies
-                # for the rest of possibilities
-                if consensus[f_class] < consensus[s_class]:
-                    disagreements += ((ties + s_precedences)
-                                      / total_precedences)
-                elif consensus[f_class] == consensus[s_class]:
-                    disagreements += ((f_precedences+s_precedences)
-                                      / total_precedences)
-                else:
-                    disagreements += ((f_precedences + ties)
-                                      / total_precedences)
-                # Increase the total sum of pairs to
-                # properly reduce the disagreements
-                # by the number of possible
-                # combinations between the classes
-                sum_total += 1
-        disagreements /= sum_total
-
-        # Return the disagreements impurity
-        return disagreements
-
-
-# =============================================================================
-# Distance criterion
-# =============================================================================
-cdef class Distance(PartialLabelRankingCriterion):
-    """Distance impurity criterion."""
-
-    cdef DTYPE_t impurity(self, DTYPE_t_3D precedences_matrix,
-                          INT64_t_1D consensus) nogil:
-        """Compute the impurity using the distance criterion."""
-        # Define some values to be employed
-        cdef DTYPE_t distance
-        cdef DTYPE_t f_precedences
-        cdef DTYPE_t ties
-        cdef DTYPE_t s_precedences
-        cdef DTYPE_t total_precedences
-
-        # Define the indexes
-        cdef SIZE_t f_class
-        cdef SIZE_t s_class
-
-        # Initialize the distance impurity to zero
-        distance = 0.0
-
-        # Compute the impurity counting the distance between the
-        # pair order matrix associated with the consensus ranking
-        # and the pair order matrices associated with the rankings
-        # in this node. In fact, it is not necessary to iterate all
-        # these rankings, since this information can be extracted
-        # from the precedences matrix
-        for f_class in range(self.n_classes - 1):
-            for s_class in range(f_class + 1, self.n_classes):
-                # Extract the number of times that "f_class"
-                # precedes "s_class", the number of times that
-                # "f_class" is tied with "s_class" and the
-                # number of times that "s_class" precedes
-                # "f_class". Also, obtain the sum of these values
-                f_precedences = precedences_matrix[f_class, s_class, 0]
-                ties = precedences_matrix[f_class, s_class, 1]
-                s_precedences = precedences_matrix[s_class, f_class, 0]
-                total_precedences = f_precedences + ties + s_precedences
-                # Compute the weighted distance, taking into account that
-                # if "f_class" precedes "s_class", then, the distance
-                # between the corresponding pair order matrices is
-                # the number of times that "f_class" is tied with
-                # "s_class" plus two times the number of times that
-                # "s_class" precedes "f_class". The same applies
-                # for the rest of possibilities
-                if consensus[f_class] < consensus[s_class]:
-                    distance += ((ties + 2 * s_precedences)
-                                 / total_precedences)
-                elif consensus[f_class] == consensus[s_class]:
-                    distance += ((f_precedences + s_precedences)
-                                 / total_precedences)
-                else:
-                    distance += ((2 * f_precedences + ties)
-                                 / total_precedences)
-
-        # Return the distance impurity
-        return distance
-
-
-# =============================================================================
-# Entropy criterion
-# =============================================================================
-cdef class Entropy(PartialLabelRankingCriterion):
-    """Entropy impurity criterion."""
-
-    cdef DTYPE_t impurity(self, DTYPE_t_3D precedences_matrix,
-                          INT64_t_1D consensus) nogil:
-        """Compute the impurity using the entropy criterion."""
-        # Define some values to be employed
-        cdef DTYPE_t entropy
-        cdef INT64_t sum_total
-        cdef DTYPE_t total_precedences
-        cdef DTYPE_t prob_f_precedes
-        cdef DTYPE_t prob_tied
-        cdef DTYPE_t prob_s_precedes
-
-        # Define the indexes
-        cdef SIZE_t f_class
-        cdef SIZE_t s_class
-
-        # Initialize the entropy impurity to zero
-        entropy = 0.0
-
-        # Initialize the total sum of pairs to zero
-        sum_total = 0
-
-        # Compute the impurity using the entropy
-        # of the probability distribution defined
-        # by the probability that a class precedes,
-        # is tied and is behind another class.
-        # This information is directly obtained
-        # from the precedences matrix
-        for f_class in range(self.n_classes - 1):
-            for s_class in range(f_class + 1, self.n_classes):
-                # Compute the probability that the
-                # first class precedes, is tied
-                # and is behind the second class
-                total_precedences = (precedences_matrix[f_class, s_class, 0]
-                                     + precedences_matrix[f_class, s_class, 1]
-                                     + precedences_matrix[s_class, f_class, 0])
-                prob_f_precedes = (precedences_matrix[f_class, s_class, 0]
-                                   / total_precedences)
-                prob_tied = (precedences_matrix[f_class, s_class, 1]
-                             / total_precedences)
-                prob_s_precedes = (precedences_matrix[s_class, f_class, 0]
-                                   / total_precedences)
-                # Compute the weighted entropy (avoiding zero
-                # probabilities which causes errors with log)
-                if prob_f_precedes >= EPSILON:
-                    entropy -= prob_f_precedes * log2(prob_f_precedes)
-                if prob_tied >= EPSILON:
-                    entropy -= prob_tied * log2(prob_tied)
-                if prob_s_precedes >= EPSILON:
-                    entropy -= prob_s_precedes * log2(prob_s_precedes)
-                # Increase the total sum of pairs to properly
-                # reduce the entropy by the number of
-                # possible combinations between classes
-                sum_total += 1
-        entropy /= sum_total
-
-        # Return the entropy impurity
-        return entropy
-
-
-# =============================================================================
-# Methods
-# =============================================================================
-
-cdef DTYPE_t log2(DTYPE_t x) nogil:
-    """Compute the logarithm in base 2."""
-    return log(x) / log(2.0)
-
-
-cdef DTYPE_t _kendall_distance_fast(INT64_t_1D y_true, INT64_t_1D y_pred,
-                                    BOOL_t normalize) nogil:
-    """Fast version of Kendall distance."""
-    # Initialize some values from the input arrays
-    cdef INT64_t n_classes = y_true.shape[0]
-
-    # Define some variables to be employed
-    cdef DTYPE_t dist
-
-    # Define the indexes
-    cdef SIZE_t f_class
-    cdef SIZE_t s_class
-
-    # Initialize the Kendall distance
-    # between the rankings to zero
-    dist = 0.0
-
-    # Compute the Kendall distance between
-    # this true and predicted ranking
-    for f_class in range(n_classes):
-        for s_class in range(f_class + 1, n_classes):
-            # Disagreement if "f_class" precedes "s_class"
-            # in one ranking and "s_class" precedes "f_class"
-            # in the other (or viceversa)
-            if (y_true[f_class] < y_true[s_class] and
-                    y_pred[f_class] > y_pred[s_class] or
-                    y_true[f_class] > y_true[s_class] and
-                    y_pred[f_class] < y_pred[s_class]):
-                dist += 1
-
-    # Normalize the Kendall distance (using the
-    # number of different possible combinations)
-    if normalize:
-        dist /= (n_classes * (n_classes-1)) / 2
-
-    # Return the Kendall distance
-    return dist
+            if is_ranked:
+                self.labels[n_labels] = label
+                n_labels += 1
+
+        n_rankings[0] = 0
+        for i in range(self.n_node_patterns):
+            pattern = self.node_patterns[i]
+            self._pattern_count(part, pattern, &count, &weight)
+            if count == 0:
+                continue
+            self.node_weight[n_rankings[0]] = weight
+            for column in range(n_labels):
+                self.node_y[n_rankings[0], column] = self.patterns[
+                    pattern, self.labels[column]
+                ]
+            n_rankings[0] += 1
+        return n_labels
+
+    cdef bint _estimate_center(
+        self, intp_t n_rankings, intp_t n_labels, intp_t* n_iter
+    ) noexcept nogil:
+        """Estimate the center of the gathered rankings into `center`.
+
+        Returns whether it converged, and sets ``n_iter[0]`` to the number of
+        iterations.
+        """
+        # The slices keep the row stride of the whole buffers. Cython takes them as
+        # C-contiguous without checking or copying them, since only their last
+        # axis has to be contiguous, and the estimation indexes them by rows
+        return estimate_center(
+            self.node_y[:n_rankings, :n_labels],
+            self.node_weight[:n_rankings],
+            self.max_iter,
+            self.center[:n_labels],
+            n_iter,
+            self.completed[:n_rankings, :n_labels],
+            self.scores[:n_labels],
+            self.work[:, :n_labels],
+        )
+
+
+# The buffers of the consensus are created with the sizes that aggregate_pairs needs
+# for n_labels labels, and the consensus is indexed by the labels
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.initializedcheck(False)
+cdef class PairwiseCriterion(RankingCriterion):
+    """Impurity of the partial rankings of a node from each pair of labels.
+
+    As in [alfaro_learning_2021], the impurity of a part adds up a measure of the
+    disagreement of its rankings on each pair of labels that some of them rank,
+    multiplied by a factor that depends on the subclass. The measure is computed
+    from the weights of the rankings that put the first label ahead, tie them and
+    put the second one ahead, and, for some measures, from the relation of the pair
+    in the consensus bucket order of the part. The value of a node is that
+    consensus, found by the Bucket Pivot Algorithm on the labels that some of its
+    rankings rank together with another label, with the others tied in a last
+    bucket.
+    """
+
+    # Whether the impurity of each pair depends on the consensus of the part, and
+    # the factor of the sum over the pairs
+    cdef bint uses_consensus
+    cdef float64_t scale
+
+    # The consensus bucket order of a part and the buffers of the Bucket Pivot
+    # Algorithm
+    cdef intp_t[::1] consensus
+    cdef float64_t[:, ::1] matrix
+    cdef float64_t[:, ::1] work
+    cdef intp_t[:, ::1] index_work
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples, *args, **kwargs):
+        self.uses_consensus = False
+        self.scale = 1.0
+        self.consensus = np.empty(n_labels, dtype=np.intp)
+        self.matrix = np.empty((n_labels, n_labels), dtype=np.float64)
+        self.work = np.empty((2, n_labels), dtype=np.float64)
+        self.index_work = np.empty((5, n_labels), dtype=np.intp)
+
+    def __reduce__(self):
+        return (type(self), (self.n_outputs, self.n_samples))
+
+    cdef void node_value(self, float64_t* dest) noexcept nogil:
+        """Write the consensus bucket order of the node."""
+        cdef intp_t label
+        self._aggregate(_NODE)
+        for label in range(self.n_outputs):
+            dest[label] = self.consensus[label]
+
+    cdef void _aggregate(self, int part) noexcept nogil:
+        """Find the consensus bucket order of a part into `consensus`."""
+        aggregate_pairs(
+            self.precedence_weight[part],
+            self.tie_weight[part],
+            self.consensus,
+            self.matrix,
+            self.work,
+            self.index_work,
+        )
+
+    # As in MallowsCriterion, the pairs with a positive count have a positive
+    # weight, so the divisor is positive up to the rounding of the subtraction for
+    # the right child
+    @cython.cdivision(True)
+    cdef float64_t _impurity(self, int part) noexcept nogil:
+        """Compute the impurity of a part whose rankings are not consistent."""
+        cdef intp_t label, other
+        cdef float64_t ahead, tied, behind, total, impurity = 0.0
+        cdef int relation = 0
+
+        if self.uses_consensus:
+            self._aggregate(part)
+        for label in range(self.n_outputs):
+            for other in range(label + 1, self.n_outputs):
+                if (
+                    self.precedence_count[part, label, other]
+                    + self.tie_count[part, label, other]
+                    + self.precedence_count[part, other, label]
+                ) == 0:
+                    continue
+                ahead = self.precedence_weight[part, label, other]
+                tied = self.tie_weight[part, label, other]
+                behind = self.precedence_weight[part, other, label]
+                total = ahead + tied + behind
+                if self.uses_consensus:
+                    relation = (self.consensus[label] < self.consensus[other]) - (
+                        self.consensus[label] > self.consensus[other]
+                    )
+                impurity += self._pair_impurity(
+                    ahead / total, tied / total, behind / total, relation
+                )
+        return self.scale * impurity
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the impurity of a pair from the fractions of its relations.
+
+        The fractions are those of the rankings that put the first label ahead,
+        tie them and put the second one ahead. If the impurity uses the consensus,
+        `relation` is that of the pair in it: ``1`` if the first label is ahead,
+        ``0`` if they are tied and ``-1`` otherwise.
+        """
+        return 0.0
+
+
+cdef class DisagreementsCriterion(PairwiseCriterion):
+    """Impurity from the rankings that order each pair unlike the consensus."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.uses_consensus = True
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the fraction of the rankings that disagree with the consensus."""
+        if relation == 1:
+            return tied + behind
+        if relation == 0:
+            return ahead + behind
+        return ahead + tied
+
+
+cdef class DistanceCriterion(PairwiseCriterion):
+    """Impurity from the distance of the rankings to the consensus on each pair."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.uses_consensus = True
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the mean distance of the rankings to the consensus on the pair."""
+        if relation == 1:
+            return tied + 2.0 * behind
+        if relation == 0:
+            return ahead + behind
+        return 2.0 * ahead + tied
+
+
+cdef class EntropyCriterion(PairwiseCriterion):
+    """Impurity from the mean entropy of the relations of each pair."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.scale = _mean_factor(n_labels)
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the entropy in bits of the relations of the pair."""
+        return _plogp(ahead) + _plogp(tied) + _plogp(behind)
+
+
+cdef class GiniCriterion(PairwiseCriterion):
+    """Impurity from the mean Gini index of the relations of each pair."""
+
+    def __cinit__(self, intp_t n_labels, intp_t n_samples):
+        self.scale = _mean_factor(n_labels)
+
+    cdef float64_t _pair_impurity(
+        self, float64_t ahead, float64_t tied, float64_t behind, int relation
+    ) noexcept nogil:
+        """Compute the Gini index of the relations of the pair."""
+        return 1.0 - ahead * ahead - tied * tied - behind * behind
+
+
+# The rankings have at least two labels, so there is at least one pair
+@cython.cdivision(True)
+cdef inline float64_t _mean_factor(intp_t n_labels) noexcept:
+    """Return the inverse of the number of pairs of labels."""
+    return 2.0 / (n_labels * (n_labels - 1.0))
+
+
+cdef inline float64_t _plogp(float64_t probability) noexcept nogil:
+    """Return the term of a probability in its entropy in bits, zero for zero."""
+    if probability == 0.0:
+        return 0.0
+    return -probability * log2(probability)

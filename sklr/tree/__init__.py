@@ -1,24 +1,5 @@
-"""
-The :mod:`sklr.tree` module includes decision tree-based models for
-Label Ranking and Partial Label Ranking.
-"""
+"""Decision tree label rankers and partial label rankers."""
 
-# =============================================================================
-# Imports
-# =============================================================================
+from sklr.tree._classes import DecisionTreeLabelRanker, DecisionTreePartialLabelRanker
 
-# Local application
-from ._classes import (
-    BaseDecisionTree, DecisionTreeLabelRanker, DecisionTreePartialLabelRanker)
-
-
-# =============================================================================
-# Public objects
-# =============================================================================
-
-# Set the classes that are accessible
-# from the module sklr.tree
-__all__ = [
-    "BaseDecisionTree",
-    "DecisionTreeLabelRanker", "DecisionTreePartialLabelRanker"
-]
+__all__ = ["DecisionTreeLabelRanker", "DecisionTreePartialLabelRanker"]

@@ -1,0 +1,115 @@
+# Reproduction of the experiments of the papers whose methods scikit-lr implements.
+# Each job runs one repetition of the cross-validation of a method on a dataset
+# and scenario, and writes its results under the version of scikit-lr, so that
+# a new version recomputes everything without overwriting the results of the
+# previous ones. Snakemake only runs the jobs whose results are missing, so the
+# results of the jobs can also be computed elsewhere, split into batches with
+# --config batch=i/n, and gathered here to write the reports.
+
+import sys
+
+import sklr
+
+sys.path.insert(0, f"{workflow.basedir}/workflow")
+from experiments import PAPERS, n_repetitions
+
+VERSION = sklr.__version__
+# Restricted with --config, for instance to run a single dataset
+PAPER_NAMES = config.get("papers", list(PAPERS))
+BATCH = config.get("batch")
+DATASET_NAMES = config.get("datasets")
+SCENARIO_NAMES = config.get("scenarios")
+N_JOBS = config.get("n_jobs", 1)
+DATA_HOME = config.get("data_home", "")
+RESULTS = "{paper}/results/" + VERSION
+SCRIPTS = f"{workflow.basedir}/workflow"
+
+
+DATASETS = {name for paper in PAPERS.values() for name in paper["datasets"]["names"]}
+SCENARIOS = {name for paper in PAPERS.values() for name in paper["scenarios"]}
+
+
+wildcard_constraints:
+    paper="|".join(PAPERS),
+    dataset="|".join(DATASETS),
+    scenario="|".join(SCENARIOS),
+
+
+def selected(names, restriction):
+    return [name for name in names if restriction is None or name in restriction]
+
+
+def cells(paper):
+    return expand(
+        RESULTS + "/{dataset}/{method}/{scenario}/rep{repetition}.json",
+        paper=paper,
+        dataset=selected(PAPERS[paper]["datasets"]["names"], DATASET_NAMES),
+        method=PAPERS[paper]["methods"],
+        scenario=selected(PAPERS[paper]["scenarios"], SCENARIO_NAMES),
+        repetition=range(n_repetitions(PAPERS[paper]["cross_validation"]["outer"])),
+    )
+
+
+rule all:
+    input:
+        expand(RESULTS + "/report.md", paper=PAPER_NAMES),
+        expand(RESULTS + "/environment.txt", paper=PAPER_NAMES),
+
+
+def batch(files):
+    """Keep the files of batch i of n, every n-th one from the i-th.
+
+    The --batch option of Snakemake is not used, since it only runs its last
+    batch once the others have been run in the same directory. Taking every n-th
+    cell spreads the costly datasets among the batches.
+    """
+    if BATCH is None:
+        return files
+    i, n = map(int, str(BATCH).split("/"))
+    return files[i - 1 :: n]
+
+
+rule cells:
+    input:
+        batch([cell for paper in PAPER_NAMES for cell in cells(paper)]),
+
+
+rule cell:
+    output:
+        RESULTS + "/{dataset}/{method}/{scenario}/rep{repetition}.json",
+    benchmark:
+        RESULTS + "/{dataset}/{method}/{scenario}/rep{repetition}.benchmark.tsv"
+    threads: N_JOBS
+    params:
+        script=f"{SCRIPTS}/run_cell.py",
+        data_home=DATA_HOME,
+    shell:
+        "python {params.script:q}"
+        " --paper {wildcards.paper} --dataset {wildcards.dataset}"
+        " --method {wildcards.method} --scenario {wildcards.scenario}"
+        " --repetition {wildcards.repetition} --n-jobs {threads}"
+        " --data-home {params.data_home:q} --output {output:q}"
+
+
+rule environment:
+    output:
+        RESULTS + "/environment.txt",
+    params:
+        script=f"{SCRIPTS}/machine.py",
+    shell:
+        "python {params.script:q} --output {output:q}"
+
+
+rule report:
+    input:
+        lambda wildcards: cells(wildcards.paper),
+    output:
+        csv=RESULTS + "/results.csv",
+        report=RESULTS + "/report.md",
+    params:
+        script=f"{SCRIPTS}/report.py",
+        results_dir=RESULTS,
+    shell:
+        "python {params.script:q} --paper {wildcards.paper}"
+        f" --version {VERSION} --results-dir {{params.results_dir:q}}"
+        " --csv {output.csv:q} --report {output.report:q}"

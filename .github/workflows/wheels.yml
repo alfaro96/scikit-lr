@@ -1,0 +1,219 @@
+# Build, test and publish the wheels and the source distribution
+name: Wheels and source distribution
+
+# What is checked here is what users install, built as it is released, so the
+# pull requests that target master or a release branch are checked before
+# merging, and the merges again, since the merged commit may differ from the
+# one checked and the dependencies from PyPI may have changed. Publishing a
+# GitHub release builds the distributions of its tag and uploads them to PyPI.
+# It can also be run by hand, to get the wheels of a branch without opening a
+# pull request, or to upload the distributions of a tag to TestPyPI and test
+# them from there before a release
+on:
+  push:
+    branches:
+      - master
+      # Release branches
+      - "[0-9]+.[0-9]+.X"
+  pull_request:
+    branches:
+      - master
+      - "[0-9]+.[0-9]+.X"
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Repository to upload the distributions to, when run from a tag
+        type: choice
+        options:
+          - none
+          - testpypi
+        default: none
+
+permissions:
+  contents: read
+
+concurrency:
+  # The runs of a pull request share a group, named after its number, which
+  # unlike its branch name is not shared with pull requests from other forks,
+  # while every other run gets its own, so only the outdated runs of a pull
+  # request are cancelled
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  wheels:
+    name: Wheels for ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    # Skip the runs in forks, whose changes are checked here
+    # when they open a pull request
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    strategy:
+      # Build every wheel, since a failure on one platform
+      # says nothing about the others
+      fail-fast: false
+      matrix:
+        # The platforms with wheels of the scikit-learn release that the
+        # extension modules are compiled against. Each job builds the wheels
+        # for every supported Python version, selected in [tool.cibuildwheel]
+        # in pyproject.toml
+        include:
+          - os: ubuntu-latest
+            platform: Linux x86_64
+          - os: ubuntu-24.04-arm
+            platform: Linux aarch64
+          - os: macos-15-intel
+            platform: macOS x86_64
+          - os: macos-latest
+            platform: macOS arm64
+          - os: windows-latest
+            platform: Windows AMD64
+          - os: windows-11-arm
+            platform: Windows ARM64
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Configured in [tool.cibuildwheel] in pyproject.toml, which also
+      # runs the tests on every wheel after building it
+      - name: Build and test the wheels
+        uses: pypa/cibuildwheel@e090b81e30c4d855ea63bf4b6e59204c09a101ae # v4.2.1
+        with:
+          output-dir: wheelhouse
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          # Minimum supported version, checked by build_tools/check_versions.py
+          python-version: "3.13"
+
+      - name: Check the wheels
+        env:
+          WHEELS_DIR: wheelhouse
+        run: bash build_tools/github/check_wheels.sh
+
+      - name: Store the wheels
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  sdist:
+    name: Source distribution
+    runs-on: ubuntu-latest
+    if: github.repository == 'alfaro96/scikit-lr'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+
+      - name: Check the files of the source distribution
+        run: bash build_tools/github/check_sdist.sh
+
+      - name: Build the source distribution
+        env:
+          DIST_DIR: dist
+        run: bash build_tools/github/build_sdist.sh
+
+      # The platforms without wheels install the source distribution,
+      # which compiles the extension modules
+      - name: Install the source distribution and pytest
+        env:
+          DIST_DIR: dist
+        run: bash build_tools/github/install_sdist.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
+
+      - name: Store the source distribution
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish:
+    name: Publish to ${{ github.event_name == 'release' && 'PyPI' || 'TestPyPI' }}
+    needs: [wheels, sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || inputs.publish == 'testpypi'
+    # The trusted publisher of the project on PyPI (and on TestPyPI) only
+    # accepts uploads from this workflow in this environment, whose
+    # protection rules on GitHub can restrict who deploys and from which tags
+    environment:
+      name: ${{ github.event_name == 'release' && 'pypi' || 'testpypi' }}
+      url: ${{ github.event_name == 'release' && 'https://pypi.org' || 'https://test.pypi.org' }}/project/scikit-lr/${{ github.ref_name }}/
+    permissions:
+      contents: read
+      # Trusted publishing authenticates with an OpenID Connect token
+      # of the job instead of an API token stored as a secret
+      id-token: write
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+
+      - name: Download the distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Check the distributions
+        env:
+          DIST_DIR: dist
+        run: bash build_tools/github/check_release.sh
+
+      - name: Publish to PyPI
+        if: github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish to TestPyPI
+        if: github.event_name != 'release'
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  test-testpypi:
+    name: Test the release from TestPyPI
+    needs: publish
+    runs-on: ubuntu-latest
+    if: inputs.publish == 'testpypi'
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+
+      - name: Install scikit-lr from TestPyPI and pytest
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: bash build_tools/github/install_testpypi.sh
+
+      - name: Run the tests
+        run: bash build_tools/github/test_script.sh
