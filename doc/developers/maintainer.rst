@@ -12,38 +12,72 @@ workflow of GitHub Actions, from a tag that must be the version of the package,
 workflow checks the tag, and that there is a wheel for every platform and
 Python version.
 
-1. Generate the release history of the version from the :ref:`changelog fragments
-   <changelog>`. ``towncrier`` writes it into the file of its minor release in
-   ``doc/whats_new``, above the previous versions and dated in the current month, and
-   removes the fragments with ``git rm``. Review the generated section and commit it,
-   along with ``__version__`` set to the version and, for the first release of a
-   minor release, its row in the :ref:`compatibility table <sklearn_compatibility>`:
+Every release of a minor release is made from its release branch, named after it
+as ``<major>.<minor>.X``, so that the development branch can go on with the next
+minor release in the meantime. Only the latest minor release receives bug fixes, in
+its patch releases: a fix is merged into the development branch first, and then
+picked onto the release branch with ``git cherry-pick``. The workflows run on the
+pull requests that target a release branch as they do on those that target the
+development branch.
+
+1. For the first release of a minor release, create its release branch from the
+   development branch:
+
+   .. code-block:: console
+
+      $ git switch --create <major>.<minor>.X master
+      $ git push origin <major>.<minor>.X
+
+   Then start the development of the next minor release on the development branch:
+   set ``__version__`` in ``sklr/__init__.py`` to its development version, such as
+   ``X.Y.dev0``, add its file to ``doc/whats_new``, with a header like the one of
+   the previous file, list it in ``doc/whats_new.rst``, and point ``filename`` in
+   ``[tool.towncrier]`` of ``pyproject.toml`` to it, so that the new fragments are
+   written there.
+
+2. On the release branch, generate the release history of the version from the
+   :ref:`changelog fragments <changelog>`. ``towncrier`` writes it into the file of
+   its minor release in ``doc/whats_new``, above the previous versions and dated in
+   the current month, and removes the fragments with ``git rm``. Review the
+   generated section and commit it, along with, for the first release of a minor
+   release, its row in the :ref:`compatibility table <sklearn_compatibility>` and
+   its version in the supported versions of ``SECURITY.md``. Then pick that commit
+   onto the development branch, so that its release history has the version too
+   and the released fragments are removed from it:
 
    .. code-block:: console
 
       $ towncrier build --version <version>
 
-2. Push that commit to its branch and reproduce the experiments of the papers
-   from it with the "Reproducibility" workflow, described in
-   ``reproducibility/README.md``, which stores their results under the version
-   and opens a pull request with them against the branch. Review the reports in
-   ``reproducibility/<paper>/results/<version>`` and merge it, so that the tag
-   and the documentation of the version include the results. A version that does
-   not change the estimators may skip this step: the documentation then shows the
+3. Still on the release branch, set ``__version__`` to the version, and give each
+   build dependency in ``build-system.requires`` of ``pyproject.toml`` an upper
+   bound below its next minor release, such as ``<X.Y+1.0`` when its latest release
+   is ``X.Y.Z``, so that a future release of a dependency cannot break the build of
+   the source distribution. scikit-learn already has one. The ``check-versions``
+   hook of ``pre-commit`` reports the environment files whose build dependencies
+   must follow. Commit these changes, which stay on the release branch.
+
+4. Push the release branch and reproduce the experiments of the papers from it
+   with the "Reproducibility" workflow, described in ``reproducibility/README.md``,
+   which stores their results under the version and opens a pull request with them
+   against the branch. Review the reports in
+   ``reproducibility/<paper>/results/<version>`` and merge it, so that the tag and
+   the documentation of the version include the results. A version that does not
+   change the estimators may skip this step: the documentation then shows the
    results of the latest version that has them.
 
    .. code-block:: console
 
-      $ gh workflow run reproducibility.yml --ref <branch>
+      $ gh workflow run reproducibility.yml --ref <major>.<minor>.X
 
-3. Create the tag on the commit to release and push it:
+5. Create the tag on the last commit of the release branch and push it:
 
    .. code-block:: console
 
       $ git tag -s <version> -m "scikit-lr <version>"
       $ git push origin <version>
 
-4. Run the workflow by hand from the tag, with ``testpypi`` as the repository
+6. Run the workflow by hand from the tag, with ``testpypi`` as the repository
    to upload the distributions to. It builds and tests the wheels and the
    source distribution, uploads them to `TestPyPI <https://test.pypi.org>`_,
    then installs the release from there and runs the tests again. This checks
@@ -55,32 +89,11 @@ Python version.
 
       $ gh workflow run wheels.yml --ref <version> -f publish=testpypi
 
-5. If it passes, publish a GitHub release from the same tag. The workflow
+7. If it passes, publish a GitHub release from the same tag. The workflow
    builds and tests the distributions again, and then waits for a maintainer
    to approve the deployment to the ``pypi`` environment before uploading them
    to PyPI. A version cannot be uploaded again to PyPI, even after deleting
    it, so this is the last chance to stop the release.
-
-6. After the first release of a minor release, create its release branch from the
-   commit of the release, and start the development of the next minor release on
-   the development branch, with ``__version__`` set to its development version,
-   such as ``X.Y.dev0``:
-
-   .. code-block:: console
-
-      $ git branch <major>.<minor>.X <version>
-      $ git push origin <major>.<minor>.X
-
-When the development of a new minor release starts, add its file to
-``doc/whats_new``, with a header like the one of the previous file, list it in
-``doc/whats_new.rst``, and point ``filename`` in ``[tool.towncrier]`` of
-``pyproject.toml`` to it, so that the fragments are written there.
-
-Only the latest minor release receives bug fixes, in patch releases made from its
-release branch, named after it as ``<major>.<minor>.X``. A fix is merged into the
-development branch first, and then picked onto the release branch with
-``git cherry-pick``. The workflows run on the pull requests that target a release
-branch as they do on those that target the development branch.
 
 The project uploads to PyPI and TestPyPI with trusted publishing, so no token
 is stored in the repository: each index only accepts the uploads of this
