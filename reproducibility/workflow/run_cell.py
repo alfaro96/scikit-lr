@@ -164,7 +164,7 @@ def main():
     # it is complete
     args.output.parent.mkdir(parents=True, exist_ok=True)
     partial = args.output.with_suffix(".partial")
-    partial.write_text(json.dumps(result, indent=2, default=str))
+    partial.write_text(json.dumps(result, indent=2, default=str) + "\n")
     os.replace(partial, args.output)
 
 
