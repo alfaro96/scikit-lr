@@ -9,3 +9,124 @@ Version 0.3
 .. include:: changelog_legend.inc
 
 .. towncrier release notes start
+
+.. _changes_0_3_0:
+
+Version 0.3.0
+=============
+
+**October 2026**
+
+* scikit-lr requires Python 3.13 or later, and is built with meson-python.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* The public API has type hints, which type checkers find in the installed package
+  (:pep:`561`).
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* There are wheels for Linux (x86_64 and aarch64), macOS (x86_64 and arm64)
+  and Windows (AMD64 and ARM64).
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* The extension modules extend the internals of scikit-learn, so scikit-lr is
+  built against a single minor release of scikit-learn, 1.9, and importing
+  :mod:`sklr` with another one raises an :class:`ImportError`.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* Every ranker works with the tools of scikit-learn that take an estimator, such
+  as :class:`~sklearn.pipeline.Pipeline`,
+  :class:`~sklearn.model_selection.GridSearchCV` and
+  :func:`~sklearn.model_selection.cross_validate`, and accepts pandas data frames.
+  The trees and the dummy rankers take sample weights in ``fit`` and every ranker
+  takes them in ``score``, which metadata routing passes through pipelines and
+  model selection tools, as described in :ref:`sklearn_integration`.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr`
+-----------
+
+* |Feature| :func:`show_versions` prints the versions of scikit-lr, of the scikit-learn that
+  it was built against and of the dependencies, to include them in bug reports.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr.base`
+----------------
+
+* |Feature| :class:`base.LabelRankerMixin` and :class:`base.PartialLabelRankerMixin` set the
+  tags of the label rankers and of the partial label rankers, and their ``score``
+  method computes :func:`metrics.kendall_tau_score` and :func:`metrics.tau_x_score`
+  on the predictions of the ranker.
+  :func:`base.is_label_ranker` and :func:`base.is_partial_label_ranker` tell them
+  apart from other estimators.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr.dummy`
+-----------------
+
+* |MajorFeature| :class:`dummy.DummyLabelRanker` and :class:`dummy.DummyPartialLabelRanker`
+  predict, for every sample, the consensus of the possibly incomplete training
+  rankings or a given ranking, as baselines to compare with other rankers.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr.metrics`
+-------------------
+
+* |Feature| :func:`metrics.kendall_tau_score` and :func:`metrics.kendall_distance` compare
+  label rankings, and :func:`metrics.tau_x_score` compares partial label rankings,
+  averaging over the samples with optional sample weights.
+  :func:`metrics.get_scorer` gets their scorers by name, to pass them to the
+  ``scoring`` parameter of the model selection tools of scikit-learn, and
+  :func:`metrics.get_scorer_names` lists the names.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr.neighbors`
+---------------------
+
+* |MajorFeature| :class:`neighbors.KNeighborsLabelRanker` predicts the ranking of each sample from
+  the possibly incomplete rankings of its nearest neighbors, with the Mallows or the
+  Plackett-Luce model, and weights the neighbors equally, by the inverse of their
+  distance or by the rule of Dudani.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* |MajorFeature| :class:`neighbors.KNeighborsPartialLabelRanker` predicts the bucket order of each
+  sample from the possibly incomplete partial rankings of its nearest neighbors,
+  with the Bucket Pivot Algorithm, and weights the neighbors equally, by the inverse
+  of their distance or by the rule of Dudani.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* |Efficiency| :class:`neighbors.KNeighborsLabelRanker` and
+  :class:`neighbors.KNeighborsPartialLabelRanker` estimate the rankings of the
+  queries in parallel, with the number of threads set by ``n_jobs``, which also
+  sets those of the neighbor search.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr.tree`
+----------------
+
+* |MajorFeature| :class:`tree.DecisionTreeLabelRanker` grows a decision tree that fits the Mallows
+  model to the possibly incomplete rankings of each node and predicts the center ranking
+  of each leaf, with the parameters, the sample weights, the missing values in the
+  features, the pruning and the export with :func:`sklearn.tree.export_graphviz` of the
+  trees of scikit-learn.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* |MajorFeature| :class:`tree.DecisionTreePartialLabelRanker` grows a decision tree from possibly
+  incomplete partial rankings, with the disagreements, distance, entropy and Gini
+  impurities of the pairs of labels, and predicts the bucket order of each leaf with the
+  Bucket Pivot Algorithm, with the parameters, the sample weights, the missing values in
+  the features, the pruning and the export with :func:`sklearn.tree.export_graphviz` of
+  the trees of scikit-learn.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+:mod:`sklr.utils`
+-----------------
+
+* |Feature| :func:`utils.check_ranking` validates the rankings of a target and converts them
+  to a ``float64`` array, rejecting rankings with ties and incomplete rankings
+  unless they are allowed.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
+
+* |Feature| :func:`utils.type_of_ranking` determines whether a target holds label rankings,
+  partial label rankings or does not encode rankings, following the representation
+  described in :ref:`ranking_representation`.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`99`
