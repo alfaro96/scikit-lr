@@ -16,50 +16,66 @@ Every release of a minor release is made from its release branch, named after it
 as ``<major>.<minor>.X``, so that the development branch can go on with the next
 minor release in the meantime. Only the latest minor release receives bug fixes, in
 its patch releases: a fix is merged into the development branch first, and then
-picked onto the release branch with ``git cherry-pick``. The workflows run on the
-pull requests that target a release branch as they do on those that target the
-development branch.
+picked onto the release branch with ``git cherry-pick``, in a pull request against
+it. The workflows run on the pull requests that target a release branch as they do
+on those that target the development branch.
 
 1. For the first release of a minor release, create its release branch from the
-   development branch:
+   development branch and push it:
 
    .. code-block:: console
 
       $ git switch --create <major>.<minor>.X master
       $ git push origin <major>.<minor>.X
 
-   Then start the development of the next minor release on the development branch:
-   set ``__version__`` in ``sklr/__init__.py`` to its development version, such as
-   ``X.Y.dev0``, add its file to ``doc/whats_new``, with a header like the one of
-   the previous file, list it in ``doc/whats_new.rst``, and point ``filename`` in
-   ``[tool.towncrier]`` of ``pyproject.toml`` to it, so that the new fragments are
-   written there.
+   Then, in a pull request against the development branch, start the development of
+   the next minor release: set ``__version__`` in ``sklr/__init__.py`` to its
+   development version, such as ``X.Y.dev0``, add its file to ``doc/whats_new``,
+   with a header like the one of the previous file, list it in
+   ``doc/whats_new.rst``, and point ``filename`` in ``[tool.towncrier]`` of
+   ``pyproject.toml`` to it, so that the new fragments are written there.
 
-2. On the release branch, generate the release history of the version from the
-   :ref:`changelog fragments <changelog>`. ``towncrier`` writes it into the file of
-   its minor release in ``doc/whats_new``, above the previous versions and dated in
-   the current month, and removes the fragments with ``git rm``. Review the
-   generated section and commit it, along with, for the first release of a minor
-   release, its row in the :ref:`compatibility table <sklearn_compatibility>` and
-   its version in the supported versions of ``SECURITY.md``. Then pick that commit
-   onto the development branch, so that its release history has the version too
-   and the released fragments are removed from it:
+2. Prepare the release in a pull request against the release branch, from a branch
+   created from it, whose description lists these steps as a checklist to follow
+   the progress of the release. Its first commit has the release history of the
+   version, generated from the :ref:`changelog fragments <changelog>`.
+   ``towncrier`` writes it into the file of its minor release in ``doc/whats_new``,
+   above the previous versions and dated in the current month, and removes the
+   fragments with ``git rm``. Review the generated section and commit it, along
+   with, for the first release of a minor release, its row in the
+   :ref:`compatibility table <sklearn_compatibility>` and its version in the
+   supported versions of ``SECURITY.md``:
 
    .. code-block:: console
 
       $ towncrier build --version <version>
 
-3. Still on the release branch, set ``__version__`` to the version, and give each
-   build dependency in ``build-system.requires`` of ``pyproject.toml`` an upper
-   bound below its next minor release, such as ``<X.Y+1.0`` when its latest release
-   is ``X.Y.Z``, so that a future release of a dependency cannot break the build of
+3. Its second commit sets ``__version__`` to the version, and gives each build
+   dependency in ``build-system.requires`` of ``pyproject.toml`` an upper bound
+   below its next minor release, such as ``<X.Y+1.0`` when its latest release is
+   ``X.Y.Z``, so that a future release of a dependency cannot break the build of
    the source distribution. scikit-learn already has one. The ``check-versions``
    hook of ``pre-commit`` reports the environment files whose build dependencies
-   must follow. Commit these changes, which stay on the release branch.
+   must follow. The checks of the pull request build and test the wheels and the
+   source distribution with these bounds.
 
-4. Push the release branch and reproduce the experiments of the papers from it
-   with the "Reproducibility" workflow, described in ``reproducibility/README.md``,
-   which stores their results under the version and opens a pull request with them
+   Once they pass, merge the pull request keeping both commits, so that the commit
+   of the release history can be picked onto the development branch. GitHub does
+   not sign the commits that it rebases, so push the branch of the pull request to
+   the release branch instead, which GitHub also marks as merged:
+
+   .. code-block:: console
+
+      $ git push origin <branch>:<major>.<minor>.X
+
+   Then, in another pull request against the development branch, pick the commit of
+   the release history with ``git cherry-pick``, so that the release history of the
+   development branch has the version too and the released fragments are removed
+   from it.
+
+4. Reproduce the experiments of the papers from the release branch with the
+   "Reproducibility" workflow, described in ``reproducibility/README.md``, which
+   stores their results under the version and opens a pull request with them
    against the branch. Review the reports in
    ``reproducibility/<paper>/results/<version>`` and merge it, so that the tag and
    the documentation of the version include the results. A version that does not
