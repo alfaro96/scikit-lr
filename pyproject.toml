@@ -49,11 +49,13 @@ tracker = "https://github.com/alfaro96/scikit-lr/issues"
 
 [build-system]
 build-backend = "mesonpy"
+# The release branch bounds the build dependencies below their next minor release,
+# so that a later release of one cannot break the build of the source distribution
 requires = [
-    "meson-python>=0.17.1",
-    "cython>=3.1.2",
-    "numpy>=2",  # Extensions built against this version also work with the older runtime versions
-    "scipy>=1.15",
+    "meson-python>=0.17.1,<0.23.0",
+    "cython>=3.1.2,<3.4.0",
+    "numpy>=2,<2.6.0",  # Extensions built against this version also work with the older runtime versions
+    "scipy>=1.15,<1.19.0",
     "scikit-learn~=1.9.0",
 ]
 
