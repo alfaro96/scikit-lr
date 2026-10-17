@@ -4,7 +4,7 @@ import importlib as _importlib
 
 # This line is also parsed by sklr/_build_utils/version.py to set the
 # version of the distribution, so keep it as a single string literal.
-__version__ = "0.3.0"
+__version__ = "0.4.dev0"
 
 # Fail early with a helpful message if the extension modules are not built,
 # or were compiled against another scikit-learn. __check_build can be loaded
