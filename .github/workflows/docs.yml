@@ -4,15 +4,13 @@ name: Documentation
 # The documentation is built for the pull requests that target master or a
 # release branch, so one that breaks it fails before merging, and for the
 # merges, since two pull requests that build on their own can break it once
-# merged. The pushes to the development branches publish it as the development
+# merged. The pushes to the development branch publish it as the development
 # version, and publishing a GitHub release publishes the documentation of its
 # tag as the version of its minor release
 on:
   push:
     branches:
       - master
-      # Development branch until it replaces master
-      - modernize
       # Release branches
       - "[0-9]+.[0-9]+.X"
   pull_request:
@@ -80,8 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.event_name == 'release' ||
-      (github.event_name == 'push' &&
-       (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/modernize'))
+      (github.event_name == 'push' && github.ref == 'refs/heads/master')
 
     permissions:
       # Push the site to the gh-pages branch, which GitHub Pages serves
