@@ -12,12 +12,21 @@ scikit-lr can be installed from PyPI with ``pip``:
 There are wheels for Linux, macOS and Windows, so ``pip`` only compiles the
 package when there is none for the platform, from its source distribution.
 
+.. _install_dependencies:
+
 Dependencies
 ------------
 
 scikit-lr requires Python, NumPy, SciPy and scikit-learn, which ``pip``
 installs along with it. The supported versions are listed in the metadata of
 the package on `PyPI <https://pypi.org/project/scikit-lr>`_.
+
+Following `SPEC 0 <https://scientific-python.org/specs/spec-0000/>`_, each minor
+release of Python is supported for three years after its first release, and each
+minor release of NumPy and SciPy for two years, unless scikit-learn requires a newer
+one. The supported versions only change in the minor releases of scikit-lr, which
+add the new Python versions and raise the minimum versions, while its patch
+releases keep those of their minor release.
 
 The extension modules of scikit-lr extend the internals of scikit-learn, which
 may change between its minor releases, so each release of scikit-lr is built
