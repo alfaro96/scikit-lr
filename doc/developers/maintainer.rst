@@ -3,6 +3,8 @@
 Maintainer information
 ======================
 
+.. _releasing:
+
 Releasing
 ---------
 
@@ -20,7 +22,9 @@ picked onto the release branch with ``git cherry-pick``, in a pull request again
 it. The workflows run on the pull requests that target a release branch as they do
 on those that target the development branch.
 
-1. For the first release of a minor release, create its release branch from the
+1. For the first release of a minor release, raise the minimum supported versions
+   that the policy allows raising by the date of the release, if any (see
+   :ref:`python_numpy_scipy_versions`). Then create its release branch from the
    development branch and push it:
 
    .. code-block:: console
@@ -122,14 +126,49 @@ version, where the root of the site redirects to, unless a newer minor release
 already is. The pushes to the development branch publish the development
 version.
 
+.. _supported_versions:
+
+Supported versions
+------------------
+
+The supported versions of Python, NumPy and SciPy follow the policy described in
+:ref:`install_dependencies`, while scikit-lr supports a single minor release of
+scikit-learn, for the reasons given in :ref:`version_coupling`. The supported
+versions thus depend on the releases of these projects, which the tests do not
+notice while they pass, so the "Supported versions" workflow checks those releases
+every week and keeps an issue, labeled "dependencies", with the changes that are
+due: a new minor release of scikit-learn, a new Python version that NumPy, SciPy
+and the supported scikit-learn have wheels for, and the minimum versions that the
+policy allows raising. The workflow comments on the issue when that list differs
+from the previous one, so that its subscribers are notified, and closes it once
+there is nothing left. The same report is available locally, also for the planned
+date of a release:
+
+.. code-block:: console
+
+   $ python build_tools/github/check_supported_versions.py --date <YYYY-MM-DD>
+
+.. _python_numpy_scipy_versions:
+
+Python, NumPy and SciPy
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The supported versions only change in the development branch, in a pull request,
+and thus with the minor releases: the release branches only receive bug fixes, and
+their patch releases keep the versions of their minor release. A new Python
+version is added as soon as the issue reports it, and is thus supported from the
+next minor release. The minimum versions are raised before the first release of a
+minor release, to those that the policy allows by its date. In both cases, change
+``requires-python``, the classifiers or ``project.dependencies`` in
+``pyproject.toml``: the ``check-versions`` hook of ``pre-commit`` then reports the
+other files that declare them, which must follow.
+
 .. _new_sklearn_release:
 
 Moving to a new minor release of scikit-learn
----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-scikit-lr is built against a single minor release of scikit-learn, for the reasons
-given in :ref:`version_coupling`, so each new minor release of scikit-learn opens a
-new release line of scikit-lr:
+Each new minor release of scikit-learn opens a new release line of scikit-lr:
 
 1. Check the latest run of the "Upcoming scikit-learn" workflow, which builds and
    tests scikit-lr against the latest release of scikit-learn on PyPI, and fix its
@@ -149,9 +188,9 @@ new release line of scikit-lr:
 4. Update the development environment, build scikit-lr again as described in
    :ref:`development_setup_install`, and run the tests.
 
-5. Start a new minor release of scikit-lr, as described above, whose row in the
-   :ref:`compatibility table <sklearn_compatibility>` has the new minor release of
-   scikit-learn.
+5. Start a new minor release of scikit-lr, as described in :ref:`releasing`, whose
+   row in the :ref:`compatibility table <sklearn_compatibility>` has the new minor
+   release of scikit-learn.
 
 Bundled libraries
 -----------------

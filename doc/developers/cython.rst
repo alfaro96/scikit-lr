@@ -68,7 +68,8 @@ moving to a new one. For these reasons:
   scikit-learn of PyPI as in the wheels, with the scikit-learn of conda-forge, which
   is built apart, possibly with another release of Cython.
 
-Each minor release of scikit-learn thus has its own release line of scikit-lr.
+Each minor release of scikit-learn thus has its own release line of scikit-lr (see
+:ref:`new_sklearn_release`).
 
 SciPy keeps the ABI of its public Cython API stable across its releases, so it is
 not restricted to a single minor release, and scikit-lr only sets a minimum version

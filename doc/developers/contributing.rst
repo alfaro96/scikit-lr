@@ -185,7 +185,9 @@ of scikit-lr, so they fail on a deprecation in those releases before it reaches
 users, and also on a change in the Cython code of scikit-learn or SciPy that the
 extension modules cimport, or in the private API of scikit-learn (see
 :ref:`version_coupling`). When one of these workflows fails, it opens an issue,
-which it closes once it passes again.
+which it closes once it passes again. The workflow "Supported versions" runs every
+week, and keeps another issue with the changes to the supported versions that are
+due (see :ref:`supported_versions`).
 
 .. _checks:
 
