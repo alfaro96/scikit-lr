@@ -96,6 +96,19 @@ See the :ref:`neighbors` section of the user guide for further details.
    KNeighborsLabelRanker
    KNeighborsPartialLabelRanker
 
+:mod:`sklr.reduction`: Reduction to classification
+--------------------------------------------------
+
+.. module:: sklr.reduction
+
+See the :ref:`reduction` section of the user guide for further details.
+
+.. autosummary::
+   :toctree: ../modules/generated/
+   :template: base.rst
+
+   LabelwiseLabelRanker
+
 :mod:`sklr.tree`: Decision trees
 --------------------------------
 
