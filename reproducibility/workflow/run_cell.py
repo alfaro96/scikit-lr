@@ -150,7 +150,7 @@ def main():
         "params": ranker.get_params(),
         "search": describe_search(search),
         "outer_cv": repr(outer_cv),
-        "inner_cv": repr(paper["cross_validation"]["inner"]),
+        "inner_cv": repr(paper["cross_validation"].get("inner")),
         "machine": describe(),
         "versions": {
             "sklr": sklr.__version__,
