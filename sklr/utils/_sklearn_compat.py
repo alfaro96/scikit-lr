@@ -15,15 +15,23 @@ from unittest import mock
 from sklearn.base import _fit_context
 from sklearn.neighbors._base import KNeighborsMixin, NeighborsBase, _get_weights
 from sklearn.tree._classes import BaseDecisionTree
-from sklearn.utils._param_validation import Interval, StrOptions, validate_params
+from sklearn.utils._param_validation import (
+    HasMethods,
+    Interval,
+    StrOptions,
+    validate_params,
+)
+from sklearn.utils.optimize import _check_optimize_result
 from sklearn.utils.validation import _check_sample_weight, _num_samples
 
 __all__ = [
     "BaseDecisionTree",
+    "HasMethods",
     "Interval",
     "KNeighborsMixin",
     "NeighborsBase",
     "StrOptions",
+    "_check_optimize_result",
     "_check_sample_weight",
     "_fit_context",
     "_get_weights",
