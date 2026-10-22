@@ -20,8 +20,9 @@ instance, a :class:`~sklearn.compose.ColumnTransformer` can encode the categoric
 features before a ranker, which needs numerical features, as in
 :ref:`sphx_glr_auto_examples_model_selection_plot_data_frames_sample_weight.py`.
 Scaling matters for the nearest neighbors rankers, which find the neighbors with a
-distance between the features, but not for the trees, whose splits only compare
-each feature with a threshold.
+distance between the features, and for :class:`~sklr.reduction.LabelwiseLabelRanker`
+with its default estimator, which penalizes its coefficients, but not for the trees,
+whose splits only compare each feature with a threshold.
 
 Model selection
 ---------------
@@ -61,7 +62,9 @@ Parallelism and randomness
 The ``n_jobs`` parameter of the model selection tools fits the rankers in parallel,
 as described in :ref:`parallelism <sklearn:parallelism>`. The ``n_jobs`` parameter of
 the nearest neighbors rankers is independent: it sets the threads that search the
-neighbors and aggregate their rankings within a single ranker.
+neighbors and aggregate their rankings within a single ranker. Likewise, the
+``n_jobs`` parameter of :class:`~sklr.reduction.LabelwiseLabelRanker` fits the
+classifiers of its labels in parallel.
 
 The trees choose the features of each split at random, as in scikit-learn, so
 their ``random_state`` must be fixed to an integer for the results to be
@@ -74,11 +77,12 @@ ranker only depends on its own ``random_state``.
 Sample weights and metadata routing
 -----------------------------------
 
-The trees and the dummy rankers accept ``sample_weight`` in their ``fit`` method,
-which weighs the training rankings, and every ranker accepts it in its ``score``
-method, which weighs the score of each sample. The nearest neighbors rankers do not
-accept it in ``fit``, as those of scikit-learn, since they weigh the neighbors with
-their ``weights`` parameter.
+The trees, the dummy rankers and :class:`~sklr.reduction.LabelwiseLabelRanker`
+accept ``sample_weight`` in their ``fit`` method, which weighs the training
+rankings, and every ranker accepts it in its ``score`` method, which weighs the
+score of each sample. The nearest neighbors rankers do not accept it in ``fit``, as
+those of scikit-learn, since they weigh the neighbors with their ``weights``
+parameter.
 
 When a ranker is inside a pipeline or a model selection tool, the weights are passed
 to it with :ref:`metadata routing <sklearn:metadata_routing>`, which must be

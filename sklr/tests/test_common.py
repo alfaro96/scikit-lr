@@ -35,6 +35,7 @@ PARAM_GRIDS = {
     "DummyPartialLabelRanker": {"strategy": ["consensus"]},
     "KNeighborsLabelRanker": {"n_neighbors": [3, 7]},
     "KNeighborsPartialLabelRanker": {"n_neighbors": [3, 7]},
+    "LabelwiseLabelRanker": {"loss": ["absolute_error", "squared_error"]},
 }
 
 # The rankers that use the Plackett-Luce model may not converge on random rankings

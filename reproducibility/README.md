@@ -30,6 +30,17 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Published results: Table 2 (p. 7).
   * Not specified: the number of folds of the inner cross-validation, and how the inner cross-validation scores the incomplete validation rankings, as described in the protocol below.
   * Notes: IB-Mal on segment differs from the published score far more than the scores of the folds vary, while IB-PL in the same table and IBLR in `cheng_decision_2009`, with the same model, match theirs on the same data, so the difference does not seem to come from the method or the data.
+* `cheng_labelwise_2013`: W. Cheng, S. Henzgen and E. Hüllermeier, "Labelwise versus pairwise decomposition in label ranking", in Proceedings of the Workshop on Lernen, Wissen & Adaptivität, pp. 129-136, 2013.
+  * Methods:
+    * LWD, `LabelwiseLabelRanker()`, with the ordinal logistic regression of the paper (p. 133) as the model of each label.
+  * Datasets: authorship, glass, iris, pendigits, segment, vehicle, vowel and wine, with the `label ranking` tag, in Table 1 (p. 134). The real-world datasets of the paper, sushi and students, are not reproduced because they could not be obtained: the terms of the sushi data do not allow redistributing it, and the students data is not publicly available.
+  * Scenarios: complete training rankings, and 30% and 60% of the labels of each training ranking removed at random (p. 134). The scenario of the paper that keeps the top labels of each ranking is not reproduced, since scikit-lr assumes that the unranked labels are removed at random.
+  * Metric: Kendall's $\tau$.
+  * Cross-validation: five repetitions of a ten-fold cross-validation (p. 134).
+  * Preprocessing: none, since the paper does not mention any.
+  * Search: none, since the paper does not tune any parameter.
+  * Published results: the upper half of Table 2 (p. 135), only for LWD, since scikit-lr implements neither RPC nor CC.
+  * Not specified: the loss whose expected value the predicted rankings minimize, so it is the absolute difference of the positions, the default; and how the ordinal logistic regression is fitted, so it is fitted by maximum likelihood with the $L_2$ penalty of `LogisticRegression` on its coefficients.
 * `alfaro_learning_2021`: J. C. Alfaro, J. A. Aledo and J. A. Gámez, "Learning decision trees for the partial label ranking problem", International Journal of Intelligent Systems, vol. 36, no. 2, pp. 890-918, 2021.
   * Methods:
     * Zero-R, `DummyPartialLabelRanker()`, which predicts the consensus bucket order of all the training rankings for every sample (p. 906).

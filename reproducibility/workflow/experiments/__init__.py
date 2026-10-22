@@ -6,13 +6,13 @@ tag of its datasets in OpenML and their names there, and its scenarios, each wit
 description and the function that transforms the training rankings in it, which
 receives them and a random state, or ``None`` to train with them as they are. It
 also declares the name of its metric in ``METRICS``, and its cross-validation: the
-outer splitter, whose repetitions, if it has several, are run as separate jobs, and
-the inner splitter that chooses the parameters of the methods in each outer training
-fold. Finally, it declares the estimator of each method, its fixed parameters, those
-that depend on the training data, if any, as a function that receives the samples
-and rankings of each training fold and returns them, and the search that chooses
-the others with the inner cross-validation, if any, as described in
-``experiments.search``.
+outer splitter, whose repetitions, if it has several, are run as separate jobs, and,
+if some method has a search, the inner splitter that chooses its parameters in each
+outer training fold. Finally, it declares the estimator of each method, its fixed
+parameters, those that depend on the training data, if any, as a function that
+receives the samples and rankings of each training fold and returns them, and the
+search that chooses the others with the inner cross-validation, if any, as described
+in ``experiments.search``.
 """
 
 import importlib.util
