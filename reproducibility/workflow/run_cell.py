@@ -66,7 +66,7 @@ def run_fold(paper, ranker, data_params, search, transform, X, y, train, test, s
             ranker,
             search,
             metric["inner_scorer"],
-            paper["cross_validation"]["inner"],
+            paper["cross_validation"].get("inner"),
             X[train],
             y_train,
         )
