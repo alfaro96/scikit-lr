@@ -24,7 +24,7 @@ PAPER = {
     # The labels are removed at random, the scenario of the upper half of Table 2
     # (p. 135)
     "scenarios": missing_labels_scenarios([0, 0.3, 0.6]),
-    "metric": "kendall_tau",
+    "metrics": ["kendall_tau"],
     # Five repetitions of a ten-fold cross-validation (p. 134)
     "cross_validation": {
         "outer": RepeatedKFold(n_splits=10, n_repeats=5, random_state=0),

@@ -5,7 +5,8 @@ declares its protocol in ``PAPER``, collected here in ``PAPERS``. It declares th
 tag of its datasets in OpenML and their names there, and its scenarios, each with a
 description and the function that transforms the training rankings in it, which
 receives them and a random state, or ``None`` to train with them as they are. It
-also declares the name of its metric in ``METRICS``, and its cross-validation: the
+also declares the names of its metrics in ``METRICS``, the first of which chooses
+the parameters in the inner cross-validation, and its cross-validation: the
 outer splitter, whose repetitions, if it has several, are run as separate jobs, and,
 if some method has a search, the inner splitter that chooses its parameters in each
 outer training fold. Finally, it declares the estimator of each method, its fixed

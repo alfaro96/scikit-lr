@@ -31,7 +31,7 @@ PAPER = {
         ],
     },
     "scenarios": missing_labels_scenarios([0, 0.3, 0.6]),
-    "metric": "kendall_tau",
+    "metrics": ["kendall_tau"],
     # Five repetitions of a ten-fold cross-validation (p. 6), and an inner one with
     # five folds and the same seeds as for [cheng_decision_2009]
     "cross_validation": {

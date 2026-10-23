@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import rankdata
 from sklearn.metrics import make_scorer
 
-from sklr.metrics import kendall_tau_score, tau_x_score
+from sklr.metrics import kendall_tau_score, spearman_rho_score, tau_x_score
 
 
 def observed_score(y_true, y_pred, metric):
@@ -41,7 +41,7 @@ def observed_score(y_true, y_pred, metric):
     return total / n_scored if n_scored else 0.0
 
 
-# The metric of each paper, with its name in LaTeX for the report and the figures,
+# Each metric of the papers, with its name in LaTeX for the report and the figures,
 # the function that scores the test rankings and the scorer of the inner
 # cross-validation, whose validation rankings may be incomplete
 METRICS = {
@@ -49,6 +49,11 @@ METRICS = {
         "latex": r"\text{Kendall's }\tau",
         "score": kendall_tau_score,
         "inner_scorer": make_scorer(observed_score, metric=kendall_tau_score),
+    },
+    "spearman_rho": {
+        "latex": r"\text{Spearman's }\rho",
+        "score": spearman_rho_score,
+        "inner_scorer": make_scorer(observed_score, metric=spearman_rho_score),
     },
     "tau_x": {
         "latex": r"\tau_x",
