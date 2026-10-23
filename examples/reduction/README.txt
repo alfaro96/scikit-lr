@@ -1,6 +1,6 @@
 .. _reduction_examples:
 
-Reduction to classification
----------------------------
+Reduction to standard learning problems
+---------------------------------------
 
 Examples concerning the :mod:`sklr.reduction` module.
