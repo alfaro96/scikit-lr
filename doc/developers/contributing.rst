@@ -185,9 +185,25 @@ of scikit-lr, so they fail on a deprecation in those releases before it reaches
 users, and also on a change in the Cython code of scikit-learn or SciPy that the
 extension modules cimport, or in the private API of scikit-learn (see
 :ref:`version_coupling`). When one of these workflows fails, it opens an issue,
-which it closes once it passes again. The workflow "Supported versions" runs every
-week, and keeps another issue with the changes to the supported versions that are
-due (see :ref:`supported_versions`).
+which it closes once it passes again. A pull request also runs one of them, without
+touching the issue, when the message of its latest commit has its marker, to check a
+fix before it is merged:
+
+====================== ==============================================================
+Commit message marker  Workflow that the pull request runs
+====================== ==============================================================
+``[sklearn-dev]``      "Upcoming scikit-learn"
+``[scipy-dev]``        "Upcoming NumPy and SciPy"
+====================== ==============================================================
+
+For instance, an empty commit adds the marker without changing anything:
+
+.. code-block:: console
+
+   $ git commit --allow-empty -m "ci: run the tests [sklearn-dev]"
+
+The workflow "Supported versions" runs every week, and keeps another issue with the
+changes to the supported versions that are due (see :ref:`supported_versions`).
 
 .. _checks:
 
