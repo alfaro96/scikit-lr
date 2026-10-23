@@ -72,6 +72,7 @@ Label ranking metrics
 
    kendall_distance
    kendall_tau_score
+   spearman_rho_score
 
 Partial label ranking metrics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,8 +97,8 @@ See the :ref:`neighbors` section of the user guide for further details.
    KNeighborsLabelRanker
    KNeighborsPartialLabelRanker
 
-:mod:`sklr.reduction`: Reduction to classification
---------------------------------------------------
+:mod:`sklr.reduction`: Reduction to standard learning problems
+--------------------------------------------------------------
 
 .. module:: sklr.reduction
 
@@ -108,6 +109,7 @@ See the :ref:`reduction` section of the user guide for further details.
    :template: base.rst
 
    LabelwiseLabelRanker
+   PairwiseLabelRanker
 
 :mod:`sklr.tree`: Decision trees
 --------------------------------

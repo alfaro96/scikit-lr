@@ -4,7 +4,7 @@ In each fold of the outer cross-validation of the paper, the training rankings a
 transformed as the scenario says, the parameters of the method that depend on the
 training data are set from them, the others are chosen by its search with the
 inner cross-validation of the paper, if it has one, and the method is scored with
-the metric of the paper on the test rankings. The results are written as JSON to
+each metric of the paper on the test rankings. The results are written as JSON to
 the output path.
 """
 
@@ -51,7 +51,7 @@ def run_fold(paper, ranker, data_params, search, transform, X, y, train, test, s
     The parameters that depend on the training data are set from the training fold
     before the inner cross-validation, which keeps them in its own folds.
     """
-    metric = METRICS[paper["metric"]]
+    metrics = paper["metrics"]
     y_train = y[train]
     if transform is not None:
         y_train = transform(y_train, np.random.RandomState(seed))
@@ -65,7 +65,7 @@ def run_fold(paper, ranker, data_params, search, transform, X, y, train, test, s
             choose_params,
             ranker,
             search,
-            metric["inner_scorer"],
+            METRICS[metrics[0]]["inner_scorer"],
             paper["cross_validation"].get("inner"),
             X[train],
             y_train,
@@ -75,7 +75,7 @@ def run_fold(paper, ranker, data_params, search, transform, X, y, train, test, s
         _, fit_wall, fit_cpu = timed(best.fit, X[train], y_train)
         y_pred, predict_wall, predict_cpu = timed(best.predict, X[test])
     return {
-        "score": metric["score"](y[test], y_pred),
+        "scores": {name: METRICS[name]["score"](y[test], y_pred) for name in metrics},
         "data_params": fold_params,
         "best_params": best_params,
         "inner_scores": inner_scores,
@@ -142,7 +142,7 @@ def main():
         "dataset": args.dataset,
         "method": args.method,
         "scenario": args.scenario,
-        "metric": paper["metric"],
+        "metrics": paper["metrics"],
         "repetition": args.repetition,
         "n_samples": len(X),
         "n_features": X.shape[1],

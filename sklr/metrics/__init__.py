@@ -3,6 +3,7 @@
 from sklr.metrics._ranking import (
     kendall_distance,
     kendall_tau_score,
+    spearman_rho_score,
     tau_x_score,
 )
 from sklr.metrics._scorer import get_scorer, get_scorer_names
@@ -12,5 +13,6 @@ __all__ = [
     "get_scorer_names",
     "kendall_distance",
     "kendall_tau_score",
+    "spearman_rho_score",
     "tau_x_score",
 ]

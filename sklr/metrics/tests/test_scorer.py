@@ -11,6 +11,7 @@ from sklr.metrics import (
     get_scorer_names,
     kendall_distance,
     kendall_tau_score,
+    spearman_rho_score,
     tau_x_score,
 )
 from sklr.utils.tests.test_estimator_checks import (
@@ -21,6 +22,7 @@ from sklr.utils.tests.test_estimator_checks import (
 # The metric of each scorer and the sign that the scorer gives to it
 SCORERS = {
     "kendall_tau": (kendall_tau_score, 1),
+    "spearman_rho": (spearman_rho_score, 1),
     "tau_x": (tau_x_score, 1),
     "neg_kendall_distance": (kendall_distance, -1),
 }

@@ -12,7 +12,7 @@ from sklr.tree import DecisionTreePartialLabelRanker
 
 PAPER = {
     "datasets": {
-        "tag": "partial label ranking",
+        "tag": "partial-label-ranking",
         "names": [
             "authorship",
             "blocks",
@@ -34,7 +34,7 @@ PAPER = {
     # Complete training rankings and 30% and 60% of their labels removed, as in
     # [cheng_decision_2009] (p. 907)
     "scenarios": missing_labels_scenarios([0, 0.3, 0.6]),
-    "metric": "tau_x",
+    "metrics": ["tau_x"],
     # Five repetitions of a ten-fold cross-validation (p. 906) and an inner
     # five-fold one (p. 905), with the same seeds as for the other papers
     "cross_validation": {

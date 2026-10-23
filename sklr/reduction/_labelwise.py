@@ -167,6 +167,8 @@ class LabelwiseLabelRanker(MetaEstimatorMixin, LabelRankerMixin, BaseEstimator):
 
     See Also
     --------
+    PairwiseLabelRanker : Label ranker that learns the preference between each pair
+        of labels.
     sklr.neighbors.KNeighborsLabelRanker : Label ranker based on the k-nearest
         neighbors.
     sklr.tree.DecisionTreeLabelRanker : A decision tree label ranker.
@@ -207,10 +209,12 @@ class LabelwiseLabelRanker(MetaEstimatorMixin, LabelRankerMixin, BaseEstimator):
     :meth:`fit` issues a :class:`~sklearn.exceptions.ConvergenceWarning` if it does
     not converge within ``100`` iterations.
 
-    An incomplete ranking :math:`\\sigma` ranks the :math:`m` labels of
-    :math:`\\mathcal{Y}(\\sigma)`, and if the other :math:`n - m` labels were
-    removed at random from a complete ranking, the probability of observing a
-    ranked label :math:`y_j` at position :math:`\\sigma(j)` is
+    An incomplete ranking :math:`\\sigma` only ranks a subset
+    :math:`\\mathcal{Y}(\\sigma) \\subseteq \\mathcal{Y}` of the labels, with
+    :math:`m = |\\mathcal{Y}(\\sigma)| \\leq n` labels, and if the other
+    :math:`n - m` labels were removed at random from a complete ranking, the
+    probability of observing a ranked label :math:`y_j` at position
+    :math:`\\sigma(j)` is
 
     .. math::
 

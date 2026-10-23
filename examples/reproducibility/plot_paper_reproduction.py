@@ -4,9 +4,10 @@ Reproduction of the papers
 ==========================
 
 This example compares the scores of the methods of scikit-lr with those
-published in the papers that propose them, with the metric, the datasets and the
+published in the papers that propose them, with the metrics, the datasets and the
 scenarios of each paper, such as training rankings with some labels removed. Each
-paper is named by its citation key in the user guide.
+paper is named by its citation key in the user guide, followed by the metric if it
+has several.
 
 The experiments take hours, so they are not run here. They are run with the
 workflow of the ``reproducibility`` directory of the repository of scikit-lr, whose
@@ -66,8 +67,8 @@ def version_key(path):
 def load_results(paper):
     """Join the results of the latest version with those published in the paper.
 
-    Returns the version and a row for each dataset, method and scenario, or
-    ``None`` and no rows if no version has results. The published score is
+    Returns the version and a row for each dataset, method, scenario and metric,
+    or ``None`` and no rows if no version has results. The published score is
     ``None`` if the paper does not give it.
     """
     paths = sorted((REPRODUCIBILITY / paper / "results").glob("*/results.csv"))
@@ -75,17 +76,20 @@ def load_results(paper):
         return None, []
     path = max(paths, key=version_key)
     published = {
-        (row["dataset"], row["method"], row["scenario"]): float(row["score"])
+        (row["dataset"], row["method"], row["scenario"], row["metric"]): float(
+            row["score"]
+        )
         for row in read_csv(REPRODUCIBILITY / paper / "paper_results.csv")
     }
     rows = []
     for row in read_csv(path):
-        key = (row["dataset"], row["method"], row["scenario"])
+        key = (row["dataset"], row["method"], row["scenario"], row["metric"])
         rows.append(
             {
                 "dataset": row["dataset"],
                 "method": row["method"],
                 "scenario": row["scenario"],
+                "metric_name": row["metric"],
                 "metric": row["metric_latex"],
                 "paper": published.get(key),
                 "mean": float(row["score_mean"]),
@@ -101,14 +105,25 @@ def load_results(paper):
     return path.parent.name, rows
 
 
+# The results of each paper, or of each metric of a paper that has several, with
+# those of the first metric of each paper in the figure of the times, which are
+# the same for all its metrics
 results = {}
+timed_results = {}
 for paper in PAPERS:
     version, rows = load_results(paper)
     if not rows:
         print(f"{paper}: no results yet")
-    else:
-        print(f"{paper}: results of scikit-lr {version}")
-        results[paper] = rows
+        continue
+    print(f"{paper}: results of scikit-lr {version}")
+    metric_names = list(dict.fromkeys(row["metric_name"] for row in rows))
+    names = [
+        paper if len(metric_names) == 1 else f"{paper}, {metric_name}"
+        for metric_name in metric_names
+    ]
+    for name, metric_name in zip(names, metric_names):
+        results[name] = [row for row in rows if row["metric_name"] == metric_name]
+    timed_results[paper] = names[0]
 
 # Each method keeps its color in every figure
 methods = sorted({row["method"] for rows in results.values() for row in rows})
@@ -125,23 +140,24 @@ def select(rows, published=False, **values):
     ]
 
 
-def scenarios(paper):
-    """List the scenarios of a paper in the order of its results."""
-    return list(dict.fromkeys(row["scenario"] for row in results[paper]))
+def scenarios(name):
+    """List the scenarios of some results in their order."""
+    return list(dict.fromkeys(row["scenario"] for row in results[name]))
 
 
-def metric(paper):
-    """Return the metric of a paper in LaTeX, which Plotly renders with MathJax."""
-    return results[paper][0]["metric"]
+def metric(name):
+    """Return the metric of some results in LaTeX, which Plotly renders with MathJax."""
+    return results[name][0]["metric"]
 
 
-def scenario_titles(paper, n_cols):
-    titles = [f"{paper}, {scenario}" for scenario in scenarios(paper)]
+def scenario_titles(name, n_cols, title=None):
+    """Title the panels of the scenarios of some results, with their name or `title`."""
+    titles = [f"{title or name}, {scenario}" for scenario in scenarios(name)]
     return titles + [""] * (n_cols - len(titles))
 
 
 def max_scenarios():
-    return max(len(scenarios(paper)) for paper in results)
+    return max(len(scenarios(name)) for name in results)
 
 
 # %%
@@ -150,9 +166,10 @@ def max_scenarios():
 #
 # Each mark is a dataset, with the published score on the horizontal axis and that
 # of scikit-lr on the vertical one, with its standard deviation, and each row of
-# panels is a paper. The marks on the diagonal reproduce the published value. The
-# papers do not specify their random splits or every detail of their protocol, so
-# the results are expected to be close to the published ones, not equal.
+# panels is a paper, or a metric of a paper. The marks on the diagonal reproduce
+# the published value. The papers do not specify their random splits or every
+# detail of their protocol, so the results are expected to be close to the
+# published ones, not equal.
 
 
 def plot_published_and_obtained():
@@ -269,8 +286,9 @@ plot_differences()
 #
 # The scores of each dataset across the scenarios of a paper, such as removing
 # more and more labels from the training rankings. Each panel is a method of a
-# paper and each line a dataset, with the result of scikit-lr as a solid line and
-# the published one as a dotted line of the same color.
+# paper, for one of its metrics, and each line a dataset, with the result of
+# scikit-lr as a solid line and the published one as a dotted line of the same
+# color.
 
 
 def plot_scenarios():
@@ -346,14 +364,19 @@ def plot_times():
         return None
     n_cols = max_scenarios()
     fig = make_subplots(
-        rows=len(results),
+        rows=len(timed_results),
         cols=n_cols,
         shared_yaxes=True,
-        subplot_titles=[t for paper in results for t in scenario_titles(paper, n_cols)],
+        subplot_titles=[
+            t
+            for paper, name in timed_results.items()
+            for t in scenario_titles(name, n_cols, title=paper)
+        ],
     )
     shown = set()
-    for i, (paper, rows) in enumerate(results.items(), start=1):
-        for col, scenario in enumerate(scenarios(paper), start=1):
+    for i, name in enumerate(timed_results.values(), start=1):
+        rows = results[name]
+        for col, scenario in enumerate(scenarios(name), start=1):
             for method in sorted({row["method"] for row in rows}):
                 selected = select(rows, method=method, scenario=scenario)
                 fig.add_trace(
@@ -372,7 +395,7 @@ def plot_times():
                 )
                 shown.add(method)
         fig.update_yaxes(title_text="Wall time (s)", type="log", row=i, col=1)
-    fig.update_layout(title="Time", barmode="group", height=400 * len(results))
+    fig.update_layout(title="Time", barmode="group", height=400 * len(timed_results))
     return fig
 
 

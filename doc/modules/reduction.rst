@@ -1,15 +1,15 @@
 .. _reduction:
 
-Reduction to classification
-===========================
+Reduction to standard learning problems
+=======================================
 
 .. currentmodule:: sklr.reduction
 
-The rankers of :mod:`sklr.reduction` decompose label ranking into several
-classification problems, solve each one with a classifier, and combine the
-predictions of the classifiers into a ranking. The rankings follow the
-representation described in :ref:`ranking_representation`, with the notation of
-:ref:`ranking_notation`.
+The rankers of :mod:`sklr.reduction` decompose label ranking into several standard
+learning problems, such as classification or regression problems, solve each one
+with an estimator, and combine the predictions of the estimators into a ranking.
+The rankings follow the representation described in :ref:`ranking_representation`,
+with the notation of :ref:`ranking_notation`.
 
 .. _labelwise_decomposition:
 
@@ -99,13 +99,14 @@ one of the experiments of [cheng_labelwise_2013]_.
 Incomplete rankings
 ~~~~~~~~~~~~~~~~~~~
 
-An incomplete ranking :math:`\sigma` only ranks the :math:`m` labels of
-:math:`\mathcal{Y}(\sigma)`, so the position of a ranked label :math:`y_j` in the
-complete ranking is only known to be between :math:`\sigma(j)` and
-:math:`\sigma(j) + n - m`. :class:`LabelwiseLabelRanker` assumes, as in Section 4.4
-of [cheng_labelwise_2013]_, that the :math:`n - m` unranked labels were removed at
-random from a complete ranking. If :math:`y_j` is at position :math:`r` of the
-complete ranking, it is observed at position :math:`\sigma(j)` when
+An incomplete ranking :math:`\sigma` only ranks a subset
+:math:`\mathcal{Y}(\sigma) \subseteq \mathcal{Y}` of the labels, with
+:math:`m = |\mathcal{Y}(\sigma)| \leq n` labels, so the position of a ranked label
+:math:`y_j` in the complete ranking is only known to be between :math:`\sigma(j)`
+and :math:`\sigma(j) + n - m`. :class:`LabelwiseLabelRanker` assumes, as in
+Section 4.4 of [cheng_labelwise_2013]_, that the :math:`n - m` unranked labels were
+removed at random from a complete ranking. If :math:`y_j` is at position :math:`r`
+of the complete ranking, it is observed at position :math:`\sigma(j)` when
 :math:`r - \sigma(j)` of the :math:`r - 1` labels ahead of it are removed, and the
 other :math:`n - m - r + \sigma(j)` removed labels are among the :math:`n - r`
 behind it. The binomial coefficients count these choices among the
@@ -231,8 +232,167 @@ The example :ref:`sphx_glr_auto_examples_reduction_plot_labelwise_decomposition.
 compares the losses and the estimators of :class:`LabelwiseLabelRanker`, also with
 incomplete training rankings.
 
+.. _pairwise_comparison:
+
+Pairwise comparison
+-------------------
+
+:class:`PairwiseLabelRanker` implements the ranking by pairwise comparison of
+[hullermeier_label_2008]_. Each pair of labels :math:`y_i` and :math:`y_j`, with
+:math:`i < j`, is a binary classification problem: whether :math:`y_i` is ahead of
+:math:`y_j` in the ranking of an instance. The ranker fits a probabilistic
+classifier to each of the :math:`n(n - 1) / 2` pairs, which predicts the probability
+:math:`R_{ij}(\boldsymbol{x})` that :math:`y_i` is ahead of :math:`y_j` for an
+instance :math:`\boldsymbol{x}`, with
+:math:`R_{ji}(\boldsymbol{x}) = 1 - R_{ij}(\boldsymbol{x})`, and ranks the labels by
+the sum of these probabilities:
+
+>>> import numpy as np
+>>> from sklr.reduction import PairwiseLabelRanker
+>>> X = [[0], [1], [2], [3], [4], [5]]
+>>> y = [[1, 2, 3], [2, 1, 3], [1, 3, 2], [np.nan, 1, 2], [2, np.nan, 1], [3, 2, 1]]
+>>> ranker = PairwiseLabelRanker().fit(X, y)
+>>> ranker.predict([[0.4], [2.6], [4.2]])
+array([[1, 2, 3],
+       [2, 1, 3],
+       [3, 2, 1]])
+
+The fitted classifiers are in :attr:`~PairwiseLabelRanker.estimators_`, one per pair
+in the order of :func:`numpy.triu_indices`, so the first one is that of :math:`y_1`
+and :math:`y_2`, whose class ``1`` means that :math:`y_1` is ahead:
+
+>>> ranker.estimators_[0].predict_proba([[0.4], [2.6], [4.2]])[:, 1].round(2)
+array([0.68, 0.42, 0.25])
+
+The training rankings may be incomplete, as described in
+:ref:`pairwise_incomplete_rankings`, but they must not have ties, and the predicted
+rankings are complete and have no ties. The ``n_jobs`` parameter fits the
+classifiers of the pairs in parallel.
+
+Weighted voting
+~~~~~~~~~~~~~~~
+
+The predicted ranking :math:`\hat\pi` sorts the labels by decreasing votes,
+
+.. math::
+
+    S_i(\boldsymbol{x}) = \sum_{j \neq i} R_{ij}(\boldsymbol{x}),
+
+the weighted voting of equations (3.3) and (3.4) of [hullermeier_label_2008]_, with
+the label of smallest index first when two labels have the same votes.
+
+The classifiers are fitted independently, so their probabilities need not be
+consistent with any distribution of the rankings: they may even predict that
+:math:`y_1` is ahead of :math:`y_2`, :math:`y_2` ahead of :math:`y_3` and
+:math:`y_3` ahead of :math:`y_1`. The voting still gives a ranking, and it is the
+optimal one for Spearman's :math:`\rho` when the classifiers are right. If each
+:math:`R_{ij}(\boldsymbol{x})` is the true probability
+:math:`P(y_i \succ y_j \mid \boldsymbol{x})` that :math:`y_i` is ahead of
+:math:`y_j`, the expected position of :math:`y_i` is
+:math:`n - S_i(\boldsymbol{x})` (Lemma 3 of [hullermeier_label_2008]_), and sorting
+the labels by increasing expected position minimizes the expected sum of the squared
+differences between the predicted and the true positions,
+
+.. math::
+
+    \hat\pi = \arg\min_{\pi \in \Omega} \sum_{\sigma \in \Omega}
+    P(\sigma \mid \boldsymbol{x}) \sum_{i=1}^n (\pi(i) - \sigma(i))^2,
+
+where :math:`\Omega` is the set of the rankings of the :math:`n` labels (Theorem 3
+of [hullermeier_label_2008]_). This sum is an affine transformation of Spearman's
+:math:`\rho`, described in :ref:`spearman_rho`, so the voting maximizes its expected
+value. [hullermeier_label_2008]_ also show that, if the probabilities are the
+frequencies with which a set of rankings orders each pair, the voting ranks the
+labels as the Borda count of these rankings.
+
+The same probabilities also give the expected Kendall distance of any ranking, but
+finding the ranking that minimizes it is an NP-complete problem, equivalent to the
+feedback arc set problem of a weighted tournament [hullermeier_label_2008]_, so
+:class:`PairwiseLabelRanker` only implements the weighted voting, as in the
+experiments of [hullermeier_label_2008]_. Kendall's :math:`\tau` is still the
+default score of the ranker, as of every label ranker of scikit-lr.
+
+.. _pairwise_incomplete_rankings:
+
+Incomplete rankings
+~~~~~~~~~~~~~~~~~~~
+
+An incomplete ranking :math:`\sigma` only ranks a subset
+:math:`\mathcal{Y}(\sigma) \subseteq \mathcal{Y}` of the labels, with
+:math:`m = |\mathcal{Y}(\sigma)| \leq n` labels, and it says nothing about the
+preference between two labels unless it ranks both. As in
+[hullermeier_label_2008]_, the classifier of each pair is fitted to the training
+rankings that rank its two labels, and the other rankings are left out. Each
+ranking is weighted by its sample weight, and those of zero weight are left out
+too. A ranking of
+:math:`m` labels is therefore used by :math:`m(m - 1) / 2` classifiers, and a
+ranking of fewer than two labels by none. A ranking that keeps the top labels of a
+complete ranking would also tell that its labels are ahead of the unranked ones,
+but the representation of the rankings does not tell it apart from one with labels
+removed at random, and the ranker does not use these preferences.
+
+A pair that all the rankings left for it order in the same way gives its classifier
+a single class, which some classifiers, such as
+:class:`~sklearn.linear_model.LogisticRegression`, reject. The pair then gets a
+:class:`~sklearn.dummy.DummyClassifier` that predicts that order with probability
+``1``. A pair that no ranking of positive weight ranks has no classifier: its entry
+of :attr:`~PairwiseLabelRanker.estimators_` is ``None``, its labels are predicted
+ahead of each other with probability ``0.5``, and
+:meth:`~PairwiseLabelRanker.fit` warns about it with a :class:`UserWarning`. A label
+that no ranking ranks together with another label thus gets :math:`(n - 1) / 2`
+votes, so it is not necessarily predicted last.
+
+Default estimator
+~~~~~~~~~~~~~~~~~
+
+With ``estimator=None``, the classifier of each pair is a
+:class:`~sklearn.linear_model.LogisticRegression` with its default parameters, since
+the experiments of [hullermeier_label_2008]_ use a logistic regression without
+stating its settings. Its coefficients have an :math:`L_2` penalty, so the features
+should be standardized, as described in :ref:`sklearn_integration`.
+
+Other estimators
+~~~~~~~~~~~~~~~~
+
+The ``estimator`` parameter takes any classifier with :term:`fit` and
+:term:`predict_proba` methods, which is cloned for each pair. The weighted voting
+uses the probabilities of the classifiers, so a classifier without
+:term:`predict_proba`, such as :class:`~sklearn.svm.LinearSVC`, is rejected, and
+:class:`~sklearn.calibration.CalibratedClassifierCV` turns its decisions into
+probabilities. The optimality for Spearman's :math:`\rho` holds when the
+probabilities are right, so well calibrated classifiers suit the ranker best. A
+classifier that predicts probabilities of ``0`` and ``1``, such as a
+:class:`~sklearn.tree.DecisionTreeClassifier` with pure leaves, turns the voting
+into a count of the pairs that each label wins. If ``sample_weight`` is passed to
+:meth:`~PairwiseLabelRanker.fit`, the classifier must accept it in its ``fit``
+method, which :class:`~sklearn.neighbors.KNeighborsClassifier`, for instance, does
+not.
+
+Complexity
+~~~~~~~~~~
+
+The ranker fits :math:`n(n - 1) / 2` classifiers, the one of :math:`y_i` and
+:math:`y_j` on the :math:`N_{ij} \leq N` training rankings that rank both labels.
+In total, they are fitted on :math:`N \bar{P}` samples, where :math:`\bar{P}` is
+the average number of pairs of labels of the training rankings, at most
+:math:`n(n - 1) / 2` (Lemma 1 of [hullermeier_label_2008]_). With a classifier that
+takes :math:`O(N^a)` time on :math:`N` samples, for some :math:`a \geq 1`, fitting
+the ranker takes :math:`O(\bar{P} N^a)` time (Theorem 1 of
+[hullermeier_label_2008]_). For each predicted sample, the :math:`n(n - 1) / 2`
+classifiers predict a probability, the votes take :math:`O(n^2)` time and sorting
+them :math:`O(n \log n)` time. With linear classifiers and :math:`d` features, the
+ranker stores :math:`O(d n^2)` coefficients.
+
+The example :ref:`sphx_glr_auto_examples_reduction_plot_pairwise_comparison.py`
+compares the estimators of :class:`PairwiseLabelRanker` with
+:class:`LabelwiseLabelRanker`, also with incomplete training rankings.
+
 .. rubric:: References
 
 .. [cheng_labelwise_2013] W. Cheng, S. Henzgen and E. Hüllermeier, "Labelwise
    versus pairwise decomposition in label ranking", in Proceedings of the Workshop
    on Lernen, Wissen & Adaptivität, pp. 129-136, 2013.
+
+.. [hullermeier_label_2008] E. Hüllermeier, J. Fürnkranz, W. Cheng and K. Brinker,
+   "Label ranking by learning pairwise preferences", Artificial Intelligence,
+   vol. 172, no. 16-17, pp. 1897-1916, 2008.

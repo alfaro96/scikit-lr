@@ -9,30 +9,30 @@ from sklearn.datasets import fetch_openml
 # The datasets uploaded to OpenML by the authors of scikit-lr, with their identifiers
 # under each of their tags, since a name may have several versions there
 OPENML_DATASETS = {
-    "label ranking": {
+    "label-ranking": {
         "authorship": 42834,
         "bodyfat": 42837,
         "calhousing": 42839,
-        "cold": 42840,
+        "cold": 47586,
         "cpu": 42841,
-        "diau": 42842,
-        "dtt": 42843,
+        "diau": 47587,
+        "dtt": 47585,
         "elevators": 42845,
         "fried": 42846,
         "glass": 42847,
-        "heat": 42849,
+        "heat": 47584,
         "housing": 42850,
         "iris": 42851,
         "pendigits": 42856,
         "segment": 42859,
-        "spo": 42861,
+        "spo": 47583,
         "stock": 42862,
         "vehicle": 42863,
         "vowel": 42865,
         "wine": 42867,
         "wisconsin": 42869,
     },
-    "partial label ranking": {
+    "partial-label-ranking": {
         "authorship": 42835,
         "blocks": 42836,
         "breast": 42838,

@@ -11,7 +11,7 @@ from sklr.tree import DecisionTreeLabelRanker
 
 PAPER = {
     "datasets": {
-        "tag": "label ranking",
+        "tag": "label-ranking",
         "names": [
             "authorship",
             "bodyfat",
@@ -32,7 +32,7 @@ PAPER = {
         ],
     },
     "scenarios": missing_labels_scenarios([0, 0.3, 0.6]),
-    "metric": "kendall_tau",
+    "metrics": ["kendall_tau"],
     # Five repetitions of a ten-fold cross-validation (p. 7). The paper does not
     # say how many folds the inner cross-validation has, so it has five, and the
     # splits have fixed seeds

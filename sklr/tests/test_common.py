@@ -5,6 +5,7 @@ import pytest
 from numpy.testing import assert_allclose, assert_array_equal
 from sklearn import config_context
 from sklearn.base import clone
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import (
     GridSearchCV,
     KFold,
@@ -36,6 +37,9 @@ PARAM_GRIDS = {
     "KNeighborsLabelRanker": {"n_neighbors": [3, 7]},
     "KNeighborsPartialLabelRanker": {"n_neighbors": [3, 7]},
     "LabelwiseLabelRanker": {"loss": ["absolute_error", "squared_error"]},
+    "PairwiseLabelRanker": {
+        "estimator": [LogisticRegression(fit_intercept=False), None]
+    },
 }
 
 # The rankers that use the Plackett-Luce model may not converge on random rankings
