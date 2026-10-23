@@ -158,7 +158,7 @@ learns from incomplete rankings by maximizing the likelihood of the previous
 section directly, as described in :ref:`labelwise_other_estimators`.
 [cheng_labelwise_2013]_ do not say how they fit it: here, the coefficients have the
 :math:`L_2` penalty of :class:`~sklearn.linear_model.LogisticRegression` with
-``C=1.0``, the thresholds are not penalized, and the likelihood is maximized by
+its default strength, the thresholds are not penalized, and the likelihood is maximized by
 L-BFGS-B, with a :class:`~sklearn.exceptions.ConvergenceWarning` from
 :meth:`~LabelwiseLabelRanker.fit` if it does not converge within ``100``
 iterations. Because of the penalty, the scale of the features matters, and they
