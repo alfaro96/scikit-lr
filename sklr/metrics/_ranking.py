@@ -150,6 +150,105 @@ def kendall_tau_score(
     },
     prefer_skip_nested_validation=True,
 )
+def spearman_rho_score(
+    y_true: ArrayLike, y_pred: ArrayLike, *, sample_weight: ArrayLike | None = None
+) -> float:
+    """Compute Spearman's :math:`\\rho` between label rankings.
+
+    Spearman's rank correlation coefficient :math:`\\rho` [spearman_proof_1904]_ is
+    the product-moment correlation between the positions that two rankings of the
+    same labels give to each label, which only depends on the sum of the squared
+    differences between them. It ranges from ``-1``, when one ranking is the
+    reverse of the other, to ``1``, when both rankings are equal. The score of the
+    rankings is the average of the coefficients of their samples.
+
+    Read more in the :ref:`User Guide <spearman_rho>`.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples, n_labels)
+        The true rankings, complete and without ties, as described in
+        :ref:`ranking_representation`.
+
+    y_pred : array-like of shape (n_samples, n_labels)
+        The predicted rankings, complete and without ties.
+
+    sample_weight : array-like of shape (n_samples,), default=None
+        Non-negative weights of the samples in the average. If ``None``, the
+        samples are equally weighted.
+
+    Returns
+    -------
+    score : float
+        The average Spearman's :math:`\\rho` of the samples, between ``-1`` and
+        ``1``.
+
+    See Also
+    --------
+    kendall_tau_score : Compute Kendall's :math:`\\tau` between label rankings.
+    scipy.stats.spearmanr : Spearman's :math:`\\rho` between two variables.
+
+    Notes
+    -----
+    Given a ranking :math:`\\pi` of the labels :math:`y_1, \\dots, y_n`, where
+    :math:`\\pi(i)` is the position of :math:`y_i`, Spearman's :math:`\\rho`
+    between the predicted ranking :math:`\\hat{\\pi}` and the true ranking
+    :math:`\\sigma` is the product-moment correlation of their positions, with
+    the deviations taken from their median [spearman_proof_1904]_, which is
+    :math:`m = (n + 1) / 2` for both rankings:
+
+    .. math::
+
+        \\rho(\\hat{\\pi}, \\sigma) = \\frac{\\sum_{i=1}^n
+        (\\hat{\\pi}(i) - m) (\\sigma(i) - m)}{\\sqrt{\\sum_{i=1}^n
+        (\\hat{\\pi}(i) - m)^2 \\sum_{i=1}^n (\\sigma(i) - m)^2}}.
+
+    Without ties, both sums of squares are :math:`n(n^2 - 1) / 12`, and the sum
+    of the products is that value minus half the sum of the squared differences
+    of the positions, so
+
+    .. math::
+
+        \\rho(\\hat{\\pi}, \\sigma) = 1 - \\frac{6 \\sum_{i=1}^n
+        (\\hat{\\pi}(i) - \\sigma(i))^2}{n(n^2 - 1)},
+
+    which is how it is computed. It is equal to the coefficient computed by
+    :func:`scipy.stats.spearmanr`. Rankings with ties are rejected, because the
+    second formula only holds without them.
+
+    References
+    ----------
+    .. [spearman_proof_1904] C. Spearman, "The proof and measurement of
+       association between two things", The American Journal of Psychology,
+       vol. 15, no. 1, pp. 72-101, 1904.
+
+    Examples
+    --------
+    >>> from sklr.metrics import spearman_rho_score
+    >>> y_true = [[1, 2, 3], [3, 2, 1]]
+    >>> y_pred = [[1, 2, 3], [1, 3, 2]]
+    >>> spearman_rho_score(y_true, y_pred)
+    0.25
+    >>> spearman_rho_score(y_true, y_pred, sample_weight=[3, 1])
+    0.625
+    """
+    y_true, y_pred, sample_weight = _check_targets(
+        y_true, y_pred, sample_weight, allow_ties=False
+    )
+    n_labels = y_true.shape[1]
+    squared_differences = np.sum((y_true - y_pred) ** 2, axis=1)
+    scores = 1 - 6 * squared_differences / (n_labels * (n_labels**2 - 1))
+    return float(np.average(scores, weights=sample_weight))
+
+
+@validate_params(
+    {
+        "y_true": ["array-like"],
+        "y_pred": ["array-like"],
+        "sample_weight": ["array-like", None],
+    },
+    prefer_skip_nested_validation=True,
+)
 def tau_x_score(
     y_true: ArrayLike, y_pred: ArrayLike, *, sample_weight: ArrayLike | None = None
 ) -> float:

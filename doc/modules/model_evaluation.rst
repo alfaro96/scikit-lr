@@ -37,6 +37,7 @@ from their names:
 Name                           Function
 =============================  ===============================
 ``"kendall_tau"``              :func:`kendall_tau_score`
+``"spearman_rho"``             :func:`spearman_rho_score`
 ``"tau_x"``                    :func:`tau_x_score`
 ``"neg_kendall_distance"``     :func:`kendall_distance`
 =============================  ===============================
@@ -46,7 +47,7 @@ distance returns it negated. :func:`get_scorer_names` lists the names:
 
 >>> from sklr.metrics import get_scorer, get_scorer_names
 >>> get_scorer_names()
-['kendall_tau', 'neg_kendall_distance', 'tau_x']
+['kendall_tau', 'neg_kendall_distance', 'spearman_rho', 'tau_x']
 >>> get_scorer("neg_kendall_distance")
 make_scorer(kendall_distance, greater_is_better=False, response_method='predict')
 
@@ -116,6 +117,35 @@ into the other. By default, it is divided by the number of pairs,
 0.333...
 >>> kendall_distance(y_true, y_pred, normalize=False)
 1.0
+
+.. _spearman_rho:
+
+Spearman's :math:`\rho`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:func:`spearman_rho_score` computes Spearman's rank correlation coefficient
+:math:`\rho` [spearman_proof_1904]_, the product-moment correlation between the
+positions that the true and the predicted ranking give to each label. Without
+ties, it is
+
+.. math::
+
+    \rho(\hat{\pi}, \sigma) = 1 - \frac{6 \sum_{i=1}^n
+    (\hat{\pi}(i) - \sigma(i))^2}{n(n^2 - 1)},
+
+an affine transformation of the sum of the squared differences of the
+positions, and it ranges from ``-1``, when one ranking is the reverse of the other,
+to ``1``, when both rankings are equal:
+
+>>> from sklr.metrics import spearman_rho_score
+>>> spearman_rho_score(y_true, y_pred)
+0.25
+
+:func:`scipy.stats.spearmanr` computes the same coefficient. It penalizes long
+moves of a label more than Kendall's :math:`\tau`: moving a label :math:`k`
+positions, which shifts the :math:`k` labels in between by one position, makes
+:math:`k` discordant pairs, but adds :math:`k^2 + k` to the sum of the squared
+differences.
 
 .. _partial_label_ranking_metrics:
 
@@ -214,6 +244,10 @@ not be well tuned.
 
 .. [kendall_new_1938] M. G. Kendall, "A new measure of rank correlation",
    Biometrika, vol. 30, no. 1/2, pp. 81-93, 1938.
+
+.. [spearman_proof_1904] C. Spearman, "The proof and measurement of association
+   between two things", The American Journal of Psychology, vol. 15, no. 1,
+   pp. 72-101, 1904.
 
 .. [emond_new_2002] E. J. Emond and D. W. Mason, "A new rank correlation
    coefficient with application to the consensus ranking problem", Journal of

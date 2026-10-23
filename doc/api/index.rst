@@ -72,6 +72,7 @@ Label ranking metrics
 
    kendall_distance
    kendall_tau_score
+   spearman_rho_score
 
 Partial label ranking metrics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

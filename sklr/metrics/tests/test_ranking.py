@@ -2,12 +2,18 @@ import itertools
 
 import numpy as np
 import pytest
-from scipy.stats import kendalltau
+from scipy.stats import kendalltau, spearmanr
 
-from sklr.metrics import kendall_distance, kendall_tau_score, tau_x_score
+from sklr.metrics import (
+    kendall_distance,
+    kendall_tau_score,
+    spearman_rho_score,
+    tau_x_score,
+)
 
 METRICS = {
     "kendall_tau_score": kendall_tau_score,
+    "spearman_rho_score": spearman_rho_score,
     "tau_x_score": tau_x_score,
     "kendall_distance": kendall_distance,
     "unnormalized_kendall_distance": lambda *args, **kwargs: kendall_distance(
@@ -18,6 +24,7 @@ METRICS = {
 # The metrics that reject rankings with ties
 LABEL_RANKING_METRICS = [
     "kendall_tau_score",
+    "spearman_rho_score",
     "kendall_distance",
     "unnormalized_kendall_distance",
 ]
@@ -125,6 +132,25 @@ def test_kendall_tau_score_all_linear_orderings(n_labels):
         assert expected == pytest.approx(kendalltau(y_true, y_pred).statistic)
 
 
+def _naive_spearman_rho(y_true, y_pred):
+    """Spearman's rho of two rankings, as the product moments of their positions.
+
+    Spearman (1904), p. 77: the deviations are taken from the median of each
+    ranking, and pp. 79-80: the positions are used as the measurements.
+    """
+    x = y_true - np.median(y_true)
+    y = y_pred - np.median(y_pred)
+    return np.sum(x * y) / np.sqrt(np.sum(x**2) * np.sum(y**2))
+
+
+@pytest.mark.parametrize("n_labels", [2, 3, 4])
+def test_spearman_rho_score_all_linear_orderings(n_labels):
+    for y_true, y_pred in itertools.product(_linear_orderings(n_labels), repeat=2):
+        expected = _naive_spearman_rho(y_true, y_pred)
+        assert spearman_rho_score([y_true], [y_pred]) == pytest.approx(expected)
+        assert expected == pytest.approx(spearmanr(y_true, y_pred).statistic)
+
+
 @pytest.mark.parametrize("n_labels", [2, 3, 4])
 def test_tau_x_score_all_weak_orderings(n_labels):
     for y_true, y_pred in itertools.product(_weak_orderings(n_labels), repeat=2):
@@ -219,6 +245,7 @@ def test_bounds(name):
     reverse = y_true.max(axis=1, keepdims=True) + 1 - y_true
     best, worst = {
         "kendall_tau_score": (1, -1),
+        "spearman_rho_score": (1, -1),
         "tau_x_score": (1, -1),
         "kendall_distance": (0, 1),
         "unnormalized_kendall_distance": (0, 6),
@@ -315,6 +342,7 @@ def test_single_sample_two_labels(name):
     metric = METRICS[name]
     expected = {
         "kendall_tau_score": (1, -1),
+        "spearman_rho_score": (1, -1),
         "tau_x_score": (1, -1),
         "kendall_distance": (0, 1),
         "unnormalized_kendall_distance": (0, 1),
@@ -388,7 +416,9 @@ def test_invalid_sample_weight(name, sample_weight, msg):
         metric([[1, 2], [2, 1]], [[1, 2], [1, 2]], sample_weight=sample_weight)
 
 
-@pytest.mark.parametrize("metric", [kendall_tau_score, tau_x_score, kendall_distance])
+@pytest.mark.parametrize(
+    "metric", [kendall_tau_score, spearman_rho_score, tau_x_score, kendall_distance]
+)
 def test_invalid_params(metric):
     with pytest.raises(ValueError, match="The 'y_true' parameter"):
         metric("rankings", [[1, 2]])
