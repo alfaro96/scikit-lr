@@ -40,10 +40,10 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Preprocessing: none, since the paper does not mention any.
   * Search: none, since the paper does not tune any parameter.
   * Published results: the upper half of Table 2 (p. 135), only for LWD, since scikit-lr implements neither RPC nor CC.
-  * Not specified: the loss whose expected value the predicted rankings minimize, so it is the absolute difference of the positions, the default; and how the ordinal logistic regression is fitted, so it is fitted by maximum likelihood with the $L_2$ penalty of `LogisticRegression` on its coefficients.
+  * Not specified: the loss whose expected value the predicted rankings minimize, so it is the absolute difference of the positions, the default; and how the ordinal logistic regression is fitted, so it is fitted by maximum likelihood until it converges, with the ridge of the default logistic regression of Weka, $10^{-8}$, on its coefficients, as the logistic regression of `hullermeier_label_2008`.
 * `hullermeier_label_2008`: E. Hüllermeier, J. Fürnkranz, W. Cheng and K. Brinker, "Label ranking by learning pairwise preferences", Artificial Intelligence, vol. 172, no. 16-17, pp. 1897-1916, 2008.
   * Methods:
-    * RPC, `PairwiseLabelRanker()`, with a logistic regression as the model of each pair of labels, as in the paper (p. 1908).
+    * RPC, `PairwiseLabelRanker()`, with the default logistic regression of Weka as the model of each pair of labels, as in the paper (p. 1908): the features are standardized and the coefficients have a ridge of $10^{-8}$, but not the intercept, which is `LogisticRegression` with an $L_2$ penalty of `alpha` $= 2 \cdot 10^{-8}$, fitted until it converges.
   * Datasets: cold, diau, dtt, glass, heat, iris, spo, vehicle, vowel and wine, with the `label-ranking` tag, in Table 2 (p. 1908).
   * Scenarios: complete training rankings, and from 10% to 70% of the labels of each training ranking removed at random (p. 1910).
   * Metrics: Kendall's $\tau$ and Spearman's $\rho$.
@@ -51,7 +51,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Preprocessing: none, since the paper does not mention any.
   * Search: none, since the paper does not tune any parameter.
   * Published results: the RPC column of Tables 3 and 4 (p. 1909), for the complete training rankings. Fig. 4 (p. 1911), with the scenarios that remove labels, only plots its scores, so they are not compared, and Table 5 (p. 1910), with the classification rate of the top label, is not reproduced, since it needs the original classes of the semi-synthetic datasets, which OpenML does not have.
-  * Not specified: the settings of the logistic regression, which comes from Weka in the paper, so it is `LogisticRegression` with its default parameters, an $L_2$ penalty of its default strength and an intercept; and whether the yeast datasets of OpenML, whose ties were broken at random, are the same as those of the paper.
+  * Not specified: whether the yeast datasets of OpenML, whose ties were broken at random, are the same as those of the paper.
 * `alfaro_learning_2021`: J. C. Alfaro, J. A. Aledo and J. A. Gámez, "Learning decision trees for the partial label ranking problem", International Journal of Intelligent Systems, vol. 36, no. 2, pp. 890-918, 2021.
   * Methods:
     * Zero-R, `DummyPartialLabelRanker()`, which predicts the consensus bucket order of all the training rankings for every sample (p. 906).
