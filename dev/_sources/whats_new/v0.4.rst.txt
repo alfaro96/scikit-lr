@@ -1,0 +1,44 @@
+.. currentmodule:: sklr
+
+.. _release_notes_0_4:
+
+===========
+Version 0.4
+===========
+
+.. include:: changelog_legend.inc
+
+.. towncrier release notes start
+
+.. _changes_0_4_0:
+
+Version 0.4.0
+=============
+
+**In development**
+
+:mod:`sklr.metrics`
+-------------------
+
+* |Feature| :func:`metrics.spearman_rho_score` computes Spearman's :math:`\rho` between label
+  rankings, and the ``"spearman_rho"`` scorer of :func:`metrics.get_scorer` brings
+  it to the model selection tools.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`109`
+
+:mod:`sklr.reduction`
+---------------------
+
+* |MajorFeature| :class:`reduction.LabelwiseLabelRanker` fits a probabilistic classifier to the
+  positions of each label, by default an ordinal logistic regression, and predicts
+  the ranking that minimizes the expected absolute or squared error of the
+  positions. It learns from incomplete rankings with the default classifier or any
+  other with a ``fit_likelihood`` method.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`107`
+
+* |MajorFeature| :class:`reduction.PairwiseLabelRanker` fits a probabilistic classifier to each
+  pair of labels, by default a logistic regression, and ranks the labels by the sum
+  of the probabilities that each one is ahead of the others, which minimizes the
+  expected squared error of the positions when the probabilities are right. It
+  learns from incomplete rankings, fitting the classifier of each pair to the
+  rankings that rank both of its labels.
+  By :user:`Juan Carlos Alfaro Jiménez <alfaro96>`. :pr:`109`

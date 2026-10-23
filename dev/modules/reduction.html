@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4. Reduction to standard learning problems &#8212; scikit-lr 0.4.dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
+
+    <script src="../_static/documentation_options.js?v=414d5694"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'modules/reduction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.23.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://alfaro96.github.io/scikit-lr/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/plotly_resize.js?v=55604e49"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Metrics and scoring: evaluating the rankers" href="model_evaluation.html" />
+    <link rel="prev" title="3. Decision trees" href="tree.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-lr 0.4.dev0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../whats_new.html">
+    Release history
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../developers/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/alfaro96/scikit-lr" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/scikit-lr" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    Release history
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developers/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/alfaro96/scikit-lr" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/scikit-lr" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="ranking_representation.html">1. Ranking representation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="neighbors.html">2. Nearest neighbors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tree.html">3. Decision trees</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">4. Reduction to standard learning problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_evaluation.html">5. Metrics and scoring: evaluating the rankers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sklearn_integration.html">6. Using the rankers with scikit-learn</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">4. </span>Reduction to standard learning problems</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="reduction-to-standard-learning-problems">
+<span id="reduction"></span><h1><span class="section-number">4. </span>Reduction to standard learning problems<a class="headerlink" href="#reduction-to-standard-learning-problems" title="Link to this heading">#</a></h1>
+<p>The rankers of <a class="reference internal" href="../api/index.html#module-sklr.reduction" title="sklr.reduction"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sklr.reduction</span></code></a> decompose label ranking into several standard
+learning problems, such as classification or regression problems, solve each one
+with an estimator, and combine the predictions of the estimators into a ranking.
+The rankings follow the representation described in <a class="reference internal" href="ranking_representation.html#ranking-representation"><span class="std std-ref">Ranking representation</span></a>,
+with the notation of <a class="reference internal" href="ranking_representation.html#ranking-notation"><span class="std std-ref">Notation</span></a>.</p>
+<section id="labelwise-decomposition">
+<span id="id1"></span><h2><span class="section-number">4.1. </span>Labelwise decomposition<a class="headerlink" href="#labelwise-decomposition" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker" title="sklr.reduction.LabelwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabelwiseLabelRanker</span></code></a> implements the labelwise decomposition of
+<a class="reference internal" href="#cheng-labelwise-2013" id="id2"><span>[cheng_labelwise_2013]</span></a>. The position of each label <span class="math notranslate nohighlight">\(y_j\)</span> in the training
+rankings is a class, from <code class="docutils literal notranslate"><span class="pre">1</span></code> to <span class="math notranslate nohighlight">\(n\)</span>, so learning it is a classification
+problem whose classes are ordered, an ordinal classification problem. The ranker fits
+a probabilistic classifier to the positions of each label, which predicts the
+probability <span class="math notranslate nohighlight">\(P_j(r \mid \boldsymbol{x})\)</span> that <span class="math notranslate nohighlight">\(y_j\)</span> is at position
+<span class="math notranslate nohighlight">\(r\)</span> for an instance <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>, and predicts the ranking that
+minimizes the expected loss under these probabilities, as if the positions of the
+labels were independent:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklr.reduction</span><span class="w"> </span><span class="kn">import</span> <span class="n">LabelwiseLabelRanker</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">LabelwiseLabelRanker</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [3, 1, 2],</span>
+<span class="go">       [3, 2, 1]])</span>
+</pre></div>
+</div>
+<p>The training rankings may be incomplete, as described in
+<a class="reference internal" href="#labelwise-incomplete-rankings"><span class="std std-ref">Incomplete rankings</span></a>, with the default estimator or any other of
+<a class="reference internal" href="#labelwise-other-estimators"><span class="std std-ref">Other estimators</span></a> that learns from them, but they must not have
+ties, and the predicted rankings are complete and have no ties. The <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>
+parameter fits the classifiers of the labels in parallel.</p>
+<section id="expected-loss">
+<h3><span class="section-number">4.1.1. </span>Expected loss<a class="headerlink" href="#expected-loss" title="Link to this heading">#</a></h3>
+<p>The loss between the true ranking <span class="math notranslate nohighlight">\(\sigma\)</span> and the predicted ranking
+<span class="math notranslate nohighlight">\(\hat\pi\)</span> is a sum over the labels of a loss
+<span class="math notranslate nohighlight">\(\ell(\sigma(j), \hat\pi(j))\)</span> between the true and the predicted position of
+each label, chosen by the <code class="docutils literal notranslate"><span class="pre">loss</span></code> parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;absolute_error&quot;</span></code>, the default, is <span class="math notranslate nohighlight">\(\ell(r', r) = |r' - r|\)</span>, whose sum is
+an affine transformation of Spearman’s footrule.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;squared_error&quot;</span></code> is <span class="math notranslate nohighlight">\(\ell(r', r) = (r' - r)^2\)</span>, whose sum is an affine
+transformation of Spearman’s <span class="math notranslate nohighlight">\(\rho\)</span>.</p></li>
+</ul>
+<p>As the loss is a sum over the labels, its expected value is the sum of the expected
+losses of the positions of the labels <a class="reference internal" href="#cheng-labelwise-2013" id="id3"><span>[cheng_labelwise_2013]</span></a>, where putting
+<span class="math notranslate nohighlight">\(y_j\)</span> at position <span class="math notranslate nohighlight">\(r\)</span> costs</p>
+<div class="math notranslate nohighlight">
+\[L_j(r) = \sum_{r'=1}^n \ell(r', r) P_j(r' \mid \boldsymbol{x}).\]</div>
+<p>Choosing the best position of each label separately may put two labels at the same
+position, so the predicted ranking is the permutation that minimizes the total cost,</p>
+<div class="math notranslate nohighlight">
+\[\hat\pi = \arg\min_{\pi \in \Omega} \sum_{j=1}^n L_j(\pi(j)),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Omega\)</span> is the set of the rankings of the <span class="math notranslate nohighlight">\(n\)</span> labels, the
+solution of an assignment problem of the labels to the positions
+<a class="reference internal" href="#cheng-labelwise-2013" id="id4"><span>[cheng_labelwise_2013]</span></a>. With <code class="docutils literal notranslate"><span class="pre">loss=&quot;absolute_error&quot;</span></code>, it is solved by
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.linear_sum_assignment.html#scipy.optimize.linear_sum_assignment" title="(in SciPy v1.18.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.linear_sum_assignment()</span></code></a>. With <code class="docutils literal notranslate"><span class="pre">loss=&quot;squared_error&quot;</span></code>, the
+sum <span class="math notranslate nohighlight">\(\sum_{j=1}^n \pi(j)^2\)</span> is the same for every permutation, so
+<span class="math notranslate nohighlight">\(\hat\pi\)</span> sorts the labels by increasing expected position
+<span class="math notranslate nohighlight">\(\sum_{r=1}^n r P_j(r \mid \boldsymbol{x})\)</span>, without solving the assignment
+problem. The two losses may predict different rankings, as for the second sample of
+the first example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">LabelwiseLabelRanker</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s2">"squared_error"</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [2, 1, 3],</span>
+<span class="go">       [3, 2, 1]])</span>
+</pre></div>
+</div>
+<p>When several rankings have the minimum expected loss, the predicted one gives the
+smallest position to the first label, then to the second one, and so on.
+<a class="reference internal" href="#cheng-labelwise-2013" id="id5"><span>[cheng_labelwise_2013]</span></a> note that the ranker cannot minimize the expected Kendall
+distance, since the probabilities of the positions of each label do not determine
+how likely each pair of labels is to be inverted. Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span> is still
+the default score of the ranker, as of every label ranker of scikit-lr, and the
+one of the experiments of <a class="reference internal" href="#cheng-labelwise-2013" id="id6"><span>[cheng_labelwise_2013]</span></a>.</p>
+</section>
+<section id="incomplete-rankings">
+<span id="labelwise-incomplete-rankings"></span><h3><span class="section-number">4.1.2. </span>Incomplete rankings<a class="headerlink" href="#incomplete-rankings" title="Link to this heading">#</a></h3>
+<p>An incomplete ranking <span class="math notranslate nohighlight">\(\sigma\)</span> only ranks a subset
+<span class="math notranslate nohighlight">\(\mathcal{Y}(\sigma) \subseteq \mathcal{Y}\)</span> of the labels, with
+<span class="math notranslate nohighlight">\(m = |\mathcal{Y}(\sigma)| \leq n\)</span> labels, so the position of a ranked label
+<span class="math notranslate nohighlight">\(y_j\)</span> in the complete ranking is only known to be between <span class="math notranslate nohighlight">\(\sigma(j)\)</span>
+and <span class="math notranslate nohighlight">\(\sigma(j) + n - m\)</span>. <a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker" title="sklr.reduction.LabelwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabelwiseLabelRanker</span></code></a> assumes, as in
+Section 4.4 of <a class="reference internal" href="#cheng-labelwise-2013" id="id7"><span>[cheng_labelwise_2013]</span></a>, that the <span class="math notranslate nohighlight">\(n - m\)</span> unranked labels were
+removed at random from a complete ranking. If <span class="math notranslate nohighlight">\(y_j\)</span> is at position <span class="math notranslate nohighlight">\(r\)</span>
+of the complete ranking, it is observed at position <span class="math notranslate nohighlight">\(\sigma(j)\)</span> when
+<span class="math notranslate nohighlight">\(r - \sigma(j)\)</span> of the <span class="math notranslate nohighlight">\(r - 1\)</span> labels ahead of it are removed, and the
+other <span class="math notranslate nohighlight">\(n - m - r + \sigma(j)\)</span> removed labels are among the <span class="math notranslate nohighlight">\(n - r\)</span>
+behind it. The binomial coefficients count these choices among the
+<span class="math notranslate nohighlight">\(\binom{n}{m}\)</span> choices of the ranked labels, so the probability of observing
+<span class="math notranslate nohighlight">\(y_j\)</span> at position <span class="math notranslate nohighlight">\(\sigma(j)\)</span> is equation (16) of
+<a class="reference internal" href="#cheng-labelwise-2013" id="id8"><span>[cheng_labelwise_2013]</span></a>,</p>
+<div class="math notranslate nohighlight">
+\[\sum_{r=\sigma(j)}^{\sigma(j) + n - m} P_j(r \mid \boldsymbol{x})
+\frac{\binom{r - 1}{r - \sigma(j)}
+\binom{n - r}{n - m - r + \sigma(j)}}{\binom{n}{m}}.\]</div>
+<p>The classifier of each label maximizes the log-likelihood of the rankings that rank
+that label under this probability, equation (17) of <a class="reference internal" href="#cheng-labelwise-2013" id="id9"><span>[cheng_labelwise_2013]</span></a>, each
+ranking weighted by its sample weight. With a complete ranking, <span class="math notranslate nohighlight">\(m = n\)</span> and
+the sum only has the term <span class="math notranslate nohighlight">\(r = \sigma(j)\)</span>, with a binomial weight of <code class="docutils literal notranslate"><span class="pre">1</span></code>, so
+the likelihood is the usual one of a classifier. The rankings that do not rank the
+label, or rank it alone, observe it with the same probability whatever the
+classifier, so they are left out, as are those of zero weight.</p>
+<p>A label that no ranking of positive weight ranks together with another label has
+no classifier: its positions are predicted as equally likely, and
+<a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker.fit" title="sklr.reduction.LabelwiseLabelRanker.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> warns about it with a <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#UserWarning" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></a>. Its
+expected loss is then lowest in the middle positions, so such a label is not
+necessarily predicted last.</p>
+<p><a class="reference internal" href="#cheng-labelwise-2013" id="id10"><span>[cheng_labelwise_2013]</span></a> also consider rankings that keep the top labels of the
+complete ranking, equations (18) and (19), which the representation of the rankings
+does not tell apart from those with labels removed at random, and which
+<a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker" title="sklr.reduction.LabelwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabelwiseLabelRanker</span></code></a> does not model.</p>
+</section>
+<section id="default-estimator">
+<h3><span class="section-number">4.1.3. </span>Default estimator<a class="headerlink" href="#default-estimator" title="Link to this heading">#</a></h3>
+<p>With <code class="docutils literal notranslate"><span class="pre">estimator=None</span></code>, the classifier of each label is the cumulative logit model
+of equation (20) of <a class="reference internal" href="#cheng-labelwise-2013" id="id11"><span>[cheng_labelwise_2013]</span></a>, an ordinal logistic regression. The
+probability that the position of <span class="math notranslate nohighlight">\(y_j\)</span> is at most <span class="math notranslate nohighlight">\(r\)</span>, for
+<span class="math notranslate nohighlight">\(r = 1, \dots, n - 1\)</span>, is</p>
+<div class="math notranslate nohighlight">
+\[\sum_{s=1}^r P_j(s \mid \boldsymbol{x}) =
+\frac{1}{1 + \exp(-\beta_r - \boldsymbol{w}^\top \boldsymbol{x})},\]</div>
+<p>with coefficients <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> and thresholds
+<span class="math notranslate nohighlight">\(\beta_1 \leq \dots \leq \beta_{n - 1}\)</span> of its own, and the probability of
+each position is the difference of two consecutive cumulative probabilities. It
+learns from incomplete rankings by maximizing the likelihood of the previous
+section directly, as described in <a class="reference internal" href="#labelwise-other-estimators"><span class="std std-ref">Other estimators</span></a>.
+<a class="reference internal" href="#cheng-labelwise-2013" id="id12"><span>[cheng_labelwise_2013]</span></a> do not say how they fit it: here, the coefficients have the
+<span class="math notranslate nohighlight">\(L_2\)</span> penalty of <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a> with
+its default strength, the thresholds are not penalized, and the likelihood is maximized by
+L-BFGS-B, with a <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.exceptions.ConvergenceWarning.html#sklearn.exceptions.ConvergenceWarning" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceWarning</span></code></a> from
+<a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker.fit" title="sklr.reduction.LabelwiseLabelRanker.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> if it does not converge within <code class="docutils literal notranslate"><span class="pre">100</span></code>
+iterations. Because of the penalty, the scale of the features matters, and they
+should be standardized as for <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a>, as
+described in <a class="reference internal" href="sklearn_integration.html#sklearn-integration"><span class="std std-ref">Using the rankers with scikit-learn</span></a>.</p>
+</section>
+<section id="other-estimators">
+<span id="labelwise-other-estimators"></span><h3><span class="section-number">4.1.4. </span>Other estimators<a class="headerlink" href="#other-estimators" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">estimator</span></code> parameter takes any classifier with <a class="reference external" href="https://scikit-learn.org/1.9/glossary.html#term-fit" title="(in scikit-learn v1.9)"><span class="xref std std-term">fit</span></a> and
+<a class="reference external" href="https://scikit-learn.org/1.9/glossary.html#term-predict_proba" title="(in scikit-learn v1.9)"><span class="xref std std-term">predict_proba</span></a> methods, which is cloned for each label. To learn from
+incomplete rankings, the classifier also has to maximize the likelihood of
+<a class="reference internal" href="#labelwise-incomplete-rankings"><span class="std std-ref">Incomplete rankings</span></a> with a method of this signature, as the
+default estimator does:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">fit_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">likelihood[i,</span> <span class="pre">k]</span></code> is the probability of what is observed of sample <code class="docutils literal notranslate"><span class="pre">i</span></code> if its
+class is <code class="docutils literal notranslate"><span class="pre">classes[k]</span></code>, and the method maximizes the sum over the samples, weighted
+by <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code>, of the logarithm of <code class="docutils literal notranslate"><span class="pre">likelihood[i]</span> <span class="pre">&#64;</span> <span class="pre">proba[i]</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">proba[i]</span></code> holds the probabilities of the classes of sample <code class="docutils literal notranslate"><span class="pre">i</span></code> that
+<a class="reference external" href="https://scikit-learn.org/1.9/glossary.html#term-predict_proba" title="(in scikit-learn v1.9)"><span class="xref std std-term">predict_proba</span></a> predicts afterwards, with <code class="docutils literal notranslate"><span class="pre">classes_</span></code> set to <code class="docutils literal notranslate"><span class="pre">classes</span></code>.
+<a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker" title="sklr.reduction.LabelwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabelwiseLabelRanker</span></code></a> calls it for each label with the positions from <code class="docutils literal notranslate"><span class="pre">1</span></code>
+to <span class="math notranslate nohighlight">\(n\)</span> as <code class="docutils literal notranslate"><span class="pre">classes</span></code>, and with the binomial weights of
+<a class="reference internal" href="#labelwise-incomplete-rankings"><span class="std std-ref">Incomplete rankings</span></a> as <code class="docutils literal notranslate"><span class="pre">likelihood</span></code>, which are one for the
+observed position and zero for the others in a complete ranking. With complete
+rankings only, the method maximizes the usual likelihood of a classifier.</p>
+<p>A classifier without <code class="docutils literal notranslate"><span class="pre">fit_likelihood</span></code> is fitted with <code class="docutils literal notranslate"><span class="pre">fit</span></code> and only learns from
+complete rankings, so <a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker.fit" title="sklr.reduction.LabelwiseLabelRanker.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> raises an error with
+incomplete ones:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">LabelwiseLabelRanker</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [3, 1, 2],</span>
+<span class="go">       [3, 2, 1]])</span>
+</pre></div>
+</div>
+<p>The classifier sees the positions as classes, and most classifiers ignore their
+order, as <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a> does. A position that a
+label never takes in the training rankings is not a class of its classifier, so it
+gets a zero probability, and a label that always takes the same position leaves its
+classifier with a single class, which some classifiers, such as
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a>, reject. If <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> is
+passed to <a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker.fit" title="sklr.reduction.LabelwiseLabelRanker.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, the classifier must accept it in the
+method that fits it.</p>
+</section>
+<section id="complexity">
+<h3><span class="section-number">4.1.5. </span>Complexity<a class="headerlink" href="#complexity" title="Link to this heading">#</a></h3>
+<p>The ranker fits <span class="math notranslate nohighlight">\(n\)</span> classifiers on at most <span class="math notranslate nohighlight">\(N\)</span> samples each. With the
+default estimator and <span class="math notranslate nohighlight">\(d\)</span> features, each iteration of L-BFGS-B takes
+<span class="math notranslate nohighlight">\(O(N(d + n))\)</span> time for each label. For each predicted sample,
+<code class="docutils literal notranslate"><span class="pre">loss=&quot;squared_error&quot;</span></code> takes <span class="math notranslate nohighlight">\(O(n^2)\)</span> time after the classifiers predict the
+probabilities, plus a sort of the labels. <code class="docutils literal notranslate"><span class="pre">loss=&quot;absolute_error&quot;</span></code> takes
+<span class="math notranslate nohighlight">\(O(n^3)\)</span> time to compute the costs and solve the assignment problem, and
+choosing the ranking of the smallest positions among those of minimum cost solves at
+most <span class="math notranslate nohighlight">\(O(n^2)\)</span> smaller assignment problems, which takes <span class="math notranslate nohighlight">\(O(n^5)\)</span> time in
+the worst case.</p>
+<p>The example <a class="reference internal" href="../auto_examples/reduction/plot_labelwise_decomposition.html#sphx-glr-auto-examples-reduction-plot-labelwise-decomposition-py"><span class="std std-ref">Labelwise decomposition of rankings</span></a>
+compares the losses and the estimators of <a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker" title="sklr.reduction.LabelwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabelwiseLabelRanker</span></code></a>, also with
+incomplete training rankings.</p>
+</section>
+</section>
+<section id="pairwise-comparison">
+<span id="id13"></span><h2><span class="section-number">4.2. </span>Pairwise comparison<a class="headerlink" href="#pairwise-comparison" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="generated/sklr.reduction.PairwiseLabelRanker.html#sklr.reduction.PairwiseLabelRanker" title="sklr.reduction.PairwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairwiseLabelRanker</span></code></a> implements the ranking by pairwise comparison of
+<a class="reference internal" href="#hullermeier-label-2008" id="id14"><span>[hullermeier_label_2008]</span></a>. Each pair of labels <span class="math notranslate nohighlight">\(y_i\)</span> and <span class="math notranslate nohighlight">\(y_j\)</span>, with
+<span class="math notranslate nohighlight">\(i &lt; j\)</span>, is a binary classification problem: whether <span class="math notranslate nohighlight">\(y_i\)</span> is ahead of
+<span class="math notranslate nohighlight">\(y_j\)</span> in the ranking of an instance. The ranker fits a probabilistic
+classifier to each of the <span class="math notranslate nohighlight">\(n(n - 1) / 2\)</span> pairs, which predicts the probability
+<span class="math notranslate nohighlight">\(R_{ij}(\boldsymbol{x})\)</span> that <span class="math notranslate nohighlight">\(y_i\)</span> is ahead of <span class="math notranslate nohighlight">\(y_j\)</span> for an
+instance <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>, with
+<span class="math notranslate nohighlight">\(R_{ji}(\boldsymbol{x}) = 1 - R_{ij}(\boldsymbol{x})\)</span>, and ranks the labels by
+the sum of these probabilities:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklr.reduction</span><span class="w"> </span><span class="kn">import</span> <span class="n">PairwiseLabelRanker</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">PairwiseLabelRanker</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [2, 1, 3],</span>
+<span class="go">       [3, 2, 1]])</span>
+</pre></div>
+</div>
+<p>The fitted classifiers are in <code class="xref py py-attr docutils literal notranslate"><span class="pre">estimators_</span></code>, one per pair
+in the order of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.triu_indices.html#numpy.triu_indices" title="(in NumPy v2.5)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.triu_indices()</span></code></a>, so the first one is that of <span class="math notranslate nohighlight">\(y_1\)</span>
+and <span class="math notranslate nohighlight">\(y_2\)</span>, whose class <code class="docutils literal notranslate"><span class="pre">1</span></code> means that <span class="math notranslate nohighlight">\(y_1\)</span> is ahead:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">estimators_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">array([0.68, 0.42, 0.25])</span>
+</pre></div>
+</div>
+<p>The training rankings may be incomplete, as described in
+<a class="reference internal" href="#pairwise-incomplete-rankings"><span class="std std-ref">Incomplete rankings</span></a>, but they must not have ties, and the predicted
+rankings are complete and have no ties. The <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> parameter fits the
+classifiers of the pairs in parallel.</p>
+<section id="weighted-voting">
+<h3><span class="section-number">4.2.1. </span>Weighted voting<a class="headerlink" href="#weighted-voting" title="Link to this heading">#</a></h3>
+<p>The predicted ranking <span class="math notranslate nohighlight">\(\hat\pi\)</span> sorts the labels by decreasing votes,</p>
+<div class="math notranslate nohighlight">
+\[S_i(\boldsymbol{x}) = \sum_{j \neq i} R_{ij}(\boldsymbol{x}),\]</div>
+<p>the weighted voting of equations (3.3) and (3.4) of <a class="reference internal" href="#hullermeier-label-2008" id="id15"><span>[hullermeier_label_2008]</span></a>, with
+the label of smallest index first when two labels have the same votes.</p>
+<p>The classifiers are fitted independently, so their probabilities need not be
+consistent with any distribution of the rankings: they may even predict that
+<span class="math notranslate nohighlight">\(y_1\)</span> is ahead of <span class="math notranslate nohighlight">\(y_2\)</span>, <span class="math notranslate nohighlight">\(y_2\)</span> ahead of <span class="math notranslate nohighlight">\(y_3\)</span> and
+<span class="math notranslate nohighlight">\(y_3\)</span> ahead of <span class="math notranslate nohighlight">\(y_1\)</span>. The voting still gives a ranking, and it is the
+optimal one for Spearman’s <span class="math notranslate nohighlight">\(\rho\)</span> when the classifiers are right. If each
+<span class="math notranslate nohighlight">\(R_{ij}(\boldsymbol{x})\)</span> is the true probability
+<span class="math notranslate nohighlight">\(P(y_i \succ y_j \mid \boldsymbol{x})\)</span> that <span class="math notranslate nohighlight">\(y_i\)</span> is ahead of
+<span class="math notranslate nohighlight">\(y_j\)</span>, the expected position of <span class="math notranslate nohighlight">\(y_i\)</span> is
+<span class="math notranslate nohighlight">\(n - S_i(\boldsymbol{x})\)</span> (Lemma 3 of <a class="reference internal" href="#hullermeier-label-2008" id="id16"><span>[hullermeier_label_2008]</span></a>), and sorting
+the labels by increasing expected position minimizes the expected sum of the squared
+differences between the predicted and the true positions,</p>
+<div class="math notranslate nohighlight">
+\[\hat\pi = \arg\min_{\pi \in \Omega} \sum_{\sigma \in \Omega}
+P(\sigma \mid \boldsymbol{x}) \sum_{i=1}^n (\pi(i) - \sigma(i))^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Omega\)</span> is the set of the rankings of the <span class="math notranslate nohighlight">\(n\)</span> labels (Theorem 3
+of <a class="reference internal" href="#hullermeier-label-2008" id="id17"><span>[hullermeier_label_2008]</span></a>). This sum is an affine transformation of Spearman’s
+<span class="math notranslate nohighlight">\(\rho\)</span>, described in <a class="reference internal" href="model_evaluation.html#spearman-rho"><span class="std std-ref">Spearman’s \rho</span></a>, so the voting maximizes its expected
+value. <a class="reference internal" href="#hullermeier-label-2008" id="id18"><span>[hullermeier_label_2008]</span></a> also show that, if the probabilities are the
+frequencies with which a set of rankings orders each pair, the voting ranks the
+labels as the Borda count of these rankings.</p>
+<p>The same probabilities also give the expected Kendall distance of any ranking, but
+finding the ranking that minimizes it is an NP-complete problem, equivalent to the
+feedback arc set problem of a weighted tournament <a class="reference internal" href="#hullermeier-label-2008" id="id19"><span>[hullermeier_label_2008]</span></a>, so
+<a class="reference internal" href="generated/sklr.reduction.PairwiseLabelRanker.html#sklr.reduction.PairwiseLabelRanker" title="sklr.reduction.PairwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairwiseLabelRanker</span></code></a> only implements the weighted voting, as in the
+experiments of <a class="reference internal" href="#hullermeier-label-2008" id="id20"><span>[hullermeier_label_2008]</span></a>. Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span> is still the
+default score of the ranker, as of every label ranker of scikit-lr.</p>
+</section>
+<section id="pairwise-incomplete-rankings">
+<span id="id21"></span><h3><span class="section-number">4.2.2. </span>Incomplete rankings<a class="headerlink" href="#pairwise-incomplete-rankings" title="Link to this heading">#</a></h3>
+<p>An incomplete ranking <span class="math notranslate nohighlight">\(\sigma\)</span> only ranks a subset
+<span class="math notranslate nohighlight">\(\mathcal{Y}(\sigma) \subseteq \mathcal{Y}\)</span> of the labels, with
+<span class="math notranslate nohighlight">\(m = |\mathcal{Y}(\sigma)| \leq n\)</span> labels, and it says nothing about the
+preference between two labels unless it ranks both. As in
+<a class="reference internal" href="#hullermeier-label-2008" id="id22"><span>[hullermeier_label_2008]</span></a>, the classifier of each pair is fitted to the training
+rankings that rank its two labels, and the other rankings are left out. Each
+ranking is weighted by its sample weight, and those of zero weight are left out
+too. A ranking of
+<span class="math notranslate nohighlight">\(m\)</span> labels is therefore used by <span class="math notranslate nohighlight">\(m(m - 1) / 2\)</span> classifiers, and a
+ranking of fewer than two labels by none. A ranking that keeps the top labels of a
+complete ranking would also tell that its labels are ahead of the unranked ones,
+but the representation of the rankings does not tell it apart from one with labels
+removed at random, and the ranker does not use these preferences.</p>
+<p>A pair that all the rankings left for it order in the same way gives its classifier
+a single class, which some classifiers, such as
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a>, reject. The pair then gets a
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.dummy.DummyClassifier.html#sklearn.dummy.DummyClassifier" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DummyClassifier</span></code></a> that predicts that order with probability
+<code class="docutils literal notranslate"><span class="pre">1</span></code>. A pair that no ranking of positive weight ranks has no classifier: its entry
+of <code class="xref py py-attr docutils literal notranslate"><span class="pre">estimators_</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, its labels are predicted
+ahead of each other with probability <code class="docutils literal notranslate"><span class="pre">0.5</span></code>, and
+<a class="reference internal" href="generated/sklr.reduction.PairwiseLabelRanker.html#sklr.reduction.PairwiseLabelRanker.fit" title="sklr.reduction.PairwiseLabelRanker.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> warns about it with a <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#UserWarning" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></a>. A label
+that no ranking ranks together with another label thus gets <span class="math notranslate nohighlight">\((n - 1) / 2\)</span>
+votes, so it is not necessarily predicted last.</p>
+</section>
+<section id="id23">
+<h3><span class="section-number">4.2.3. </span>Default estimator<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
+<p>With <code class="docutils literal notranslate"><span class="pre">estimator=None</span></code>, the classifier of each pair is a
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogisticRegression</span></code></a> with its default parameters, since
+the experiments of <a class="reference internal" href="#hullermeier-label-2008" id="id24"><span>[hullermeier_label_2008]</span></a> use a logistic regression without
+stating its settings. Its coefficients have an <span class="math notranslate nohighlight">\(L_2\)</span> penalty, so the features
+should be standardized, as described in <a class="reference internal" href="sklearn_integration.html#sklearn-integration"><span class="std std-ref">Using the rankers with scikit-learn</span></a>.</p>
+</section>
+<section id="id25">
+<h3><span class="section-number">4.2.4. </span>Other estimators<a class="headerlink" href="#id25" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">estimator</span></code> parameter takes any classifier with <a class="reference external" href="https://scikit-learn.org/1.9/glossary.html#term-fit" title="(in scikit-learn v1.9)"><span class="xref std std-term">fit</span></a> and
+<a class="reference external" href="https://scikit-learn.org/1.9/glossary.html#term-predict_proba" title="(in scikit-learn v1.9)"><span class="xref std std-term">predict_proba</span></a> methods, which is cloned for each pair. The weighted voting
+uses the probabilities of the classifiers, so a classifier without
+<a class="reference external" href="https://scikit-learn.org/1.9/glossary.html#term-predict_proba" title="(in scikit-learn v1.9)"><span class="xref std std-term">predict_proba</span></a>, such as <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.svm.LinearSVC.html#sklearn.svm.LinearSVC" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVC</span></code></a>, is rejected, and
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.calibration.CalibratedClassifierCV.html#sklearn.calibration.CalibratedClassifierCV" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CalibratedClassifierCV</span></code></a> turns its decisions into
+probabilities. The optimality for Spearman’s <span class="math notranslate nohighlight">\(\rho\)</span> holds when the
+probabilities are right, so well calibrated classifiers suit the ranker best. A
+classifier that predicts probabilities of <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>, such as a
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code></a> with pure leaves, turns the voting
+into a count of the pairs that each label wins. If <code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> is passed to
+<a class="reference internal" href="generated/sklr.reduction.PairwiseLabelRanker.html#sklr.reduction.PairwiseLabelRanker.fit" title="sklr.reduction.PairwiseLabelRanker.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a>, the classifier must accept it in its <code class="docutils literal notranslate"><span class="pre">fit</span></code>
+method, which <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.neighbors.KNeighborsClassifier.html#sklearn.neighbors.KNeighborsClassifier" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsClassifier</span></code></a>, for instance, does
+not.</p>
+</section>
+<section id="id26">
+<h3><span class="section-number">4.2.5. </span>Complexity<a class="headerlink" href="#id26" title="Link to this heading">#</a></h3>
+<p>The ranker fits <span class="math notranslate nohighlight">\(n(n - 1) / 2\)</span> classifiers, the one of <span class="math notranslate nohighlight">\(y_i\)</span> and
+<span class="math notranslate nohighlight">\(y_j\)</span> on the <span class="math notranslate nohighlight">\(N_{ij} \leq N\)</span> training rankings that rank both labels.
+In total, they are fitted on <span class="math notranslate nohighlight">\(N \bar{P}\)</span> samples, where <span class="math notranslate nohighlight">\(\bar{P}\)</span> is
+the average number of pairs of labels of the training rankings, at most
+<span class="math notranslate nohighlight">\(n(n - 1) / 2\)</span> (Lemma 1 of <a class="reference internal" href="#hullermeier-label-2008" id="id27"><span>[hullermeier_label_2008]</span></a>). With a classifier that
+takes <span class="math notranslate nohighlight">\(O(N^a)\)</span> time on <span class="math notranslate nohighlight">\(N\)</span> samples, for some <span class="math notranslate nohighlight">\(a \geq 1\)</span>, fitting
+the ranker takes <span class="math notranslate nohighlight">\(O(\bar{P} N^a)\)</span> time (Theorem 1 of
+<a class="reference internal" href="#hullermeier-label-2008" id="id28"><span>[hullermeier_label_2008]</span></a>). For each predicted sample, the <span class="math notranslate nohighlight">\(n(n - 1) / 2\)</span>
+classifiers predict a probability, the votes take <span class="math notranslate nohighlight">\(O(n^2)\)</span> time and sorting
+them <span class="math notranslate nohighlight">\(O(n \log n)\)</span> time. With linear classifiers and <span class="math notranslate nohighlight">\(d\)</span> features, the
+ranker stores <span class="math notranslate nohighlight">\(O(d n^2)\)</span> coefficients.</p>
+<p>The example <a class="reference internal" href="../auto_examples/reduction/plot_pairwise_comparison.html#sphx-glr-auto-examples-reduction-plot-pairwise-comparison-py"><span class="std std-ref">Ranking by pairwise comparison</span></a>
+compares the estimators of <a class="reference internal" href="generated/sklr.reduction.PairwiseLabelRanker.html#sklr.reduction.PairwiseLabelRanker" title="sklr.reduction.PairwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairwiseLabelRanker</span></code></a> with
+<a class="reference internal" href="generated/sklr.reduction.LabelwiseLabelRanker.html#sklr.reduction.LabelwiseLabelRanker" title="sklr.reduction.LabelwiseLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">LabelwiseLabelRanker</span></code></a>, also with incomplete training rankings.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="cheng-labelwise-2013" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>cheng_labelwise_2013<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>,<a role="doc-backlink" href="#id5">4</a>,<a role="doc-backlink" href="#id6">5</a>,<a role="doc-backlink" href="#id7">6</a>,<a role="doc-backlink" href="#id8">7</a>,<a role="doc-backlink" href="#id9">8</a>,<a role="doc-backlink" href="#id10">9</a>,<a role="doc-backlink" href="#id11">10</a>,<a role="doc-backlink" href="#id12">11</a>)</span>
+<p>W. Cheng, S. Henzgen and E. Hüllermeier, “Labelwise
+versus pairwise decomposition in label ranking”, in Proceedings of the Workshop
+on Lernen, Wissen &amp; Adaptivität, pp. 129-136, 2013.</p>
+</div>
+<div class="citation" id="hullermeier-label-2008" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>hullermeier_label_2008<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id14">1</a>,<a role="doc-backlink" href="#id15">2</a>,<a role="doc-backlink" href="#id16">3</a>,<a role="doc-backlink" href="#id17">4</a>,<a role="doc-backlink" href="#id18">5</a>,<a role="doc-backlink" href="#id19">6</a>,<a role="doc-backlink" href="#id20">7</a>,<a role="doc-backlink" href="#id22">8</a>,<a role="doc-backlink" href="#id24">9</a>,<a role="doc-backlink" href="#id27">10</a>,<a role="doc-backlink" href="#id28">11</a>)</span>
+<p>E. Hüllermeier, J. Fürnkranz, W. Cheng and K. Brinker,
+“Label ranking by learning pairwise preferences”, Artificial Intelligence,
+vol. 172, no. 16-17, pp. 1897-1916, 2008.</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tree.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Decision trees</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="model_evaluation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>Metrics and scoring: evaluating the rankers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#labelwise-decomposition">4.1. Labelwise decomposition</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#expected-loss">4.1.1. Expected loss</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-rankings">4.1.2. Incomplete rankings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#default-estimator">4.1.3. Default estimator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-estimators">4.1.4. Other estimators</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity">4.1.5. Complexity</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pairwise-comparison">4.2. Pairwise comparison</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weighted-voting">4.2.1. Weighted voting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pairwise-incomplete-rankings">4.2.2. Incomplete rankings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">4.2.3. Default estimator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">4.2.4. Other estimators</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">4.2.5. Complexity</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/modules/reduction.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2019-2026, Juan Carlos Alfaro Jiménez.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
