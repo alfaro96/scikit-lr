@@ -43,13 +43,13 @@ def _unpack(params, n_features):
     return coef, thresholds
 
 
-def _loss_grad(params, X, likelihood, log_likelihood, sample_weight, alpha):
+def _loss_grad(params, X, likelihood, log_likelihood, sample_weight, l2_reg_strength):
     """Compute the penalized negative log-likelihood and its gradient."""
     n_features = X.shape[1]
     coef, thresholds = _unpack(params, n_features)
     log_proba, z = _log_proba(X, coef, thresholds, params[n_features + 1 :])
     log_mixture = logsumexp(log_proba + log_likelihood, axis=1)
-    loss = -sample_weight @ log_mixture + 0.5 * alpha * coef @ coef
+    loss = -sample_weight @ log_mixture + 0.5 * l2_reg_strength * coef @ coef
     # Each threshold only moves the cumulative probability of its class, which
     # adds to the probability of its class and subtracts from that of the next one
     derivative = np.exp(log_expit(z) + log_expit(-z) - log_mixture[:, np.newaxis])
@@ -58,7 +58,7 @@ def _loss_grad(params, X, likelihood, log_likelihood, sample_weight, alpha):
     )
     grad_thresholds = grad_z.sum(axis=0)
     grad = np.empty_like(params)
-    grad[:n_features] = X.T @ grad_z.sum(axis=1) + alpha * coef
+    grad[:n_features] = X.T @ grad_z.sum(axis=1) + l2_reg_strength * coef
     grad[n_features] = grad_thresholds.sum()
     grad[n_features + 1 :] = np.cumsum(grad_thresholds[::-1])[::-1][1:]
     return loss, grad
@@ -79,13 +79,13 @@ class OrdinalLogisticRegression(ClassifierMixin, BaseEstimator):
     """
 
     _parameter_constraints: dict = {
-        "C": [Interval(Real, 0, None, closed="right")],
+        "alpha": [Interval(Real, 0, None, closed="left")],
         "tol": [Interval(Real, 0, None, closed="left")],
         "max_iter": [Interval(Integral, 0, None, closed="left")],
     }
 
-    def __init__(self, *, C=1.0, tol=1e-4, max_iter=100):
-        self.C = C
+    def __init__(self, *, alpha=1.0, tol=1e-4, max_iter=100):
+        self.alpha = alpha
         self.tol = tol
         self.max_iter = max_iter
 
@@ -137,7 +137,7 @@ class OrdinalLogisticRegression(ClassifierMixin, BaseEstimator):
         # As in LogisticRegression, the loss is the mean over the samples, so the
         # penalty is divided by their total weight
         sum_weight = sample_weight.sum()
-        alpha = 1.0 / (self.C * sum_weight)
+        l2_reg_strength = self.alpha / sum_weight
         with np.errstate(divide="ignore"):
             log_likelihood = np.log(likelihood)
         result = minimize(
@@ -145,7 +145,13 @@ class OrdinalLogisticRegression(ClassifierMixin, BaseEstimator):
             params,
             method="L-BFGS-B",
             jac=True,
-            args=(X, likelihood, log_likelihood, sample_weight / sum_weight, alpha),
+            args=(
+                X,
+                likelihood,
+                log_likelihood,
+                sample_weight / sum_weight,
+                l2_reg_strength,
+            ),
             # The increments between consecutive thresholds keep them ordered. They
             # stay above zero because the solver may try a step on the bound, where
             # an observed class would have a zero probability and an infinite loss

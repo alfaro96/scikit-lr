@@ -11,7 +11,7 @@ from sklr.utils._estimator_checks import parametrize_with_checks
 
 
 @parametrize_with_checks(
-    [OrdinalLogisticRegression(), OrdinalLogisticRegression(C=np.inf)]
+    [OrdinalLogisticRegression(), OrdinalLogisticRegression(alpha=0.0)]
 )
 def test_estimators(estimator, check):
     check(estimator)
@@ -27,14 +27,14 @@ def _naive_proba(X, coef, thresholds):
     )
 
 
-def _naive_loss(X, coef, thresholds, likelihood, sample_weight, C):
+def _naive_loss(X, coef, thresholds, likelihood, sample_weight, alpha):
     """Compute the penalized mean negative log-likelihood sample by sample."""
     proba = _naive_proba(X, coef, thresholds)
     log_likelihood = sum(
         weight * np.log(row @ p)
         for weight, row, p in zip(sample_weight, likelihood, proba)
     )
-    return (-log_likelihood + 0.5 * coef @ coef / C) / np.sum(sample_weight)
+    return (-log_likelihood + 0.5 * alpha * coef @ coef) / np.sum(sample_weight)
 
 
 def _random_problem(n_samples, n_features, n_classes, *, incomplete, random_state):
@@ -63,7 +63,7 @@ def test_loss_grad(n_classes, incomplete):
     X, likelihood, sample_weight = _random_problem(
         20, 3, n_classes, incomplete=incomplete, random_state=0
     )
-    C = 0.7
+    alpha = 1.4
     rng = np.random.RandomState(1)
     coef = rng.normal(size=3)
     thresholds = np.sort(rng.normal(size=n_classes - 1))
@@ -75,10 +75,10 @@ def test_loss_grad(n_classes, incomplete):
         likelihood,
         log_likelihood,
         sample_weight / sample_weight.sum(),
-        1 / (C * sample_weight.sum()),
+        alpha / sample_weight.sum(),
     )
     loss, _ = _loss_grad(params, *args)
-    expected = _naive_loss(X, coef, thresholds, likelihood, sample_weight, C)
+    expected = _naive_loss(X, coef, thresholds, likelihood, sample_weight, alpha)
     assert_allclose(loss, expected, rtol=1e-12)
     error = check_grad(
         lambda p: _loss_grad(p, *args)[0], lambda p: _loss_grad(p, *args)[1], params
@@ -88,16 +88,27 @@ def test_loss_grad(n_classes, incomplete):
     assert error < 1e-6
 
 
-@pytest.mark.parametrize("C", [0.1, 1.0, 100.0])
-def test_two_classes_is_logistic_regression(C):
+def _logistic_regression(alpha, **params):
+    """Build the logistic regression whose regularization strength is `alpha`.
+
+    The older releases of scikit-learn have no `alpha`, but its inverse, `C`, and
+    the newer ones warn when `C` is set.
+    """
+    if "alpha" in LogisticRegression().get_params():
+        return LogisticRegression(alpha=alpha, **params)
+    return LogisticRegression(C=1 / alpha, **params)
+
+
+@pytest.mark.parametrize("alpha", [10.0, 1.0, 0.01])
+def test_two_classes_is_logistic_regression(alpha):
     """With two classes, the model is the binary logistic regression."""
     rng = np.random.RandomState(0)
     X = rng.normal(size=(50, 3))
     y = (X @ [1.0, -2.0, 0.5] + rng.normal(size=50) > 0).astype(int)
     sample_weight = rng.uniform(0.5, 2.0, size=50)
-    model = OrdinalLogisticRegression(C=C, tol=1e-10, max_iter=1000)
+    model = OrdinalLogisticRegression(alpha=alpha, tol=1e-10, max_iter=1000)
     model.fit(X, y, sample_weight)
-    expected = LogisticRegression(C=C, tol=1e-10, max_iter=1000)
+    expected = _logistic_regression(alpha, tol=1e-10, max_iter=1000)
     expected.fit(X, y, sample_weight)
     # P(y <= 0) = expit(threshold + coef @ x) = 1 - expit(coef_ @ x + intercept_)
     assert_allclose(model.coef_, -expected.coef_[0], rtol=1e-6)
