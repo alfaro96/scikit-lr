@@ -10,10 +10,13 @@ name: Upcoming scikit-learn
 # The nightly wheels of scikit-learn are built from its main branch, which
 # moves on to the following minor release when the first release candidate of
 # the next one is prepared, so the latest release on PyPI, release candidates
-# included, is tested too. The runs of the pull requests that change the
-# workflow or its scripts check them before they reach master, where the
-# schedule runs. A failure of the scheduled or manual runs opens an issue,
-# since nobody may look at them, and the issue is closed once they pass again
+# included, is tested too. A pull request runs it when the message of its
+# latest commit has the "[sklearn-dev]" marker, to check a fix before it is
+# merged, as scikit-learn does with the markers of its own workflows, and when
+# it changes the workflow or its scripts, to check them before they reach
+# master, where the schedule runs. A failure of the scheduled or manual runs
+# opens an issue, since nobody may look at them, and the issue is closed once
+# they pass again
 on:
   schedule:
     # After the nightly wheels of scikit-learn are uploaded
@@ -24,11 +27,6 @@ on:
       - master
       # Release branches
       - "[0-9]+.[0-9]+.X"
-    paths:
-      - .github/workflows/upcoming-sklearn.yml
-      - build_tools/github/build_requirements.py
-      - build_tools/github/install_upcoming_sklearn.sh
-      - build_tools/github/test_script.sh
 
 permissions:
   contents: read
@@ -42,12 +40,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  upcoming-sklearn:
-    name: scikit-learn ${{ matrix.sklearn }}
+  check-trigger:
+    name: Check the trigger
     runs-on: ubuntu-latest
     # Skip the runs in forks, whose changes are tested here
     # when they open a pull request
     if: github.repository == 'alfaro96/scikit-lr'
+    outputs:
+      run: ${{ steps.trigger.outputs.run }}
+
+    steps:
+      - name: Checkout scikit-lr
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The whole history, to read the latest commit of the pull request and
+          # compare it with its base branch
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check whether to run the tests
+        id: trigger
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          MARKER: "[sklearn-dev]"
+          PATHS: >-
+            .github/workflows/upcoming-sklearn.yml
+            build_tools/github/build_requirements.py
+            build_tools/github/check_upcoming_trigger.sh
+            build_tools/github/install_upcoming_sklearn.sh
+            build_tools/github/test_script.sh
+        run: bash build_tools/github/check_upcoming_trigger.sh
+
+  upcoming-sklearn:
+    name: scikit-learn ${{ matrix.sklearn }}
+    runs-on: ubuntu-latest
+    needs: check-trigger
+    if: needs.check-trigger.outputs.run == 'true'
 
     strategy:
       # Run every job to completion, since a failure in one of them

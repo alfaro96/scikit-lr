@@ -203,9 +203,9 @@ class LabelwiseLabelRanker(MetaEstimatorMixin, LabelRankerMixin, BaseEstimator):
     :math:`\\sum_{r=1}^n r P_j(r \\mid \\boldsymbol{x})`.
 
     The default estimator is the cumulative logit model of equation (20) of
-    [cheng_labelwise_2013]_, whose coefficients have an :math:`L_2` penalty as in
-    :class:`~sklearn.linear_model.LogisticRegression` with ``C=1.0``, and whose
-    thresholds are not penalized. Its likelihood is maximized by L-BFGS-B, and
+    [cheng_labelwise_2013]_, whose coefficients have the :math:`L_2` penalty of
+    :class:`~sklearn.linear_model.LogisticRegression` with its default strength,
+    and whose thresholds are not penalized. Its likelihood is maximized by L-BFGS-B, and
     :meth:`fit` issues a :class:`~sklearn.exceptions.ConvergenceWarning` if it does
     not converge within ``100`` iterations.
 
