@@ -51,7 +51,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Preprocessing: none, since the paper does not mention any.
   * Search: none, since the paper does not tune any parameter.
   * Published results: the RPC column of Tables 3 and 4 (p. 1909), for the complete training rankings. Fig. 4 (p. 1911), with the scenarios that remove labels, only plots its scores, so they are not compared, and Table 5 (p. 1910), with the classification rate of the top label, is not reproduced, since it needs the original classes of the semi-synthetic datasets, which OpenML does not have.
-  * Not specified: the settings of the logistic regression, which comes from Weka in the paper, so it is `LogisticRegression` with its default parameters, an $L_2$ penalty with `C=1` and an intercept; and whether the yeast datasets of OpenML, whose ties were broken at random, are the same as those of the paper.
+  * Not specified: the settings of the logistic regression, which comes from Weka in the paper, so it is `LogisticRegression` with its default parameters, an $L_2$ penalty of its default strength and an intercept; and whether the yeast datasets of OpenML, whose ties were broken at random, are the same as those of the paper.
 * `alfaro_learning_2021`: J. C. Alfaro, J. A. Aledo and J. A. Gámez, "Learning decision trees for the partial label ranking problem", International Journal of Intelligent Systems, vol. 36, no. 2, pp. 890-918, 2021.
   * Methods:
     * Zero-R, `DummyPartialLabelRanker()`, which predicts the consensus bucket order of all the training rankings for every sample (p. 906).

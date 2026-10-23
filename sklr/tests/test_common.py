@@ -37,7 +37,9 @@ PARAM_GRIDS = {
     "KNeighborsLabelRanker": {"n_neighbors": [3, 7]},
     "KNeighborsPartialLabelRanker": {"n_neighbors": [3, 7]},
     "LabelwiseLabelRanker": {"loss": ["absolute_error", "squared_error"]},
-    "PairwiseLabelRanker": {"estimator": [LogisticRegression(C=0.1), None]},
+    "PairwiseLabelRanker": {
+        "estimator": [LogisticRegression(fit_intercept=False), None]
+    },
 }
 
 # The rankers that use the Plackett-Luce model may not converge on random rankings
