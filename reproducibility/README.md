@@ -8,7 +8,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Methods:
     * IBLR, `KNeighborsLabelRanker(model="mallows", weights="dudani")`.
     * LRT, `DecisionTreeLabelRanker()`, with a fixed `random_state` and `min_samples_split` twice the number of labels.
-  * Datasets: authorship, bodyfat, calhousing, cpu (cpu-small in the paper), elevators, fried, glass, housing, iris, pendigits, segment, stock, vehicle, vowel, wine and wisconsin, with the `label ranking` tag, in Table 1 (p. 6), whose numbers of samples are about 1.8 times those of OpenML and of `cheng_label_2010`, as the report shows.
+  * Datasets: authorship, bodyfat, calhousing, cpu (cpu-small in the paper), elevators, fried, glass, housing, iris, pendigits, segment, stock, vehicle, vowel, wine and wisconsin, with the `label-ranking` tag, in Table 1 (p. 6), whose numbers of samples are about 1.8 times those of OpenML and of `cheng_label_2010`, as the report shows.
   * Scenarios: complete training rankings, and 30% and 60% of the labels of each training ranking removed at random.
   * Metric: Kendall's $\tau$.
   * Cross-validation: five repetitions of a ten-fold cross-validation (p. 7), and an inner five-fold cross-validation, since the paper does not specify it.
@@ -21,7 +21,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
   * Methods:
     * IB-PL, `KNeighborsLabelRanker(model="plackett_luce")`.
     * IB-Mal, `KNeighborsLabelRanker(model="mallows")`, without distance weights, as the paper does for a fair comparison with IB-PL.
-  * Datasets: authorship, bodyfat, calhousing, cpu (cpu-small in the paper), elevators, fried, glass, housing, iris, pendigits, segment, stock, vehicle, vowel, wine and wisconsin, with the `label ranking` tag, in Table 1 (p. 6).
+  * Datasets: authorship, bodyfat, calhousing, cpu (cpu-small in the paper), elevators, fried, glass, housing, iris, pendigits, segment, stock, vehicle, vowel, wine and wisconsin, with the `label-ranking` tag, in Table 1 (p. 6).
   * Scenarios: complete training rankings, and 30% and 60% of the labels of each training ranking removed at random.
   * Metric: Kendall's $\tau$.
   * Cross-validation: five repetitions of a ten-fold cross-validation (p. 6), and an inner five-fold cross-validation, since the paper does not specify it.
@@ -33,7 +33,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
 * `cheng_labelwise_2013`: W. Cheng, S. Henzgen and E. Hüllermeier, "Labelwise versus pairwise decomposition in label ranking", in Proceedings of the Workshop on Lernen, Wissen & Adaptivität, pp. 129-136, 2013.
   * Methods:
     * LWD, `LabelwiseLabelRanker()`, with the ordinal logistic regression of the paper (p. 133) as the model of each label.
-  * Datasets: authorship, glass, iris, pendigits, segment, vehicle, vowel and wine, with the `label ranking` tag, in Table 1 (p. 134). The real-world datasets of the paper, sushi and students, are not reproduced because they could not be obtained: the terms of the sushi data do not allow redistributing it, and the students data is not publicly available.
+  * Datasets: authorship, glass, iris, pendigits, segment, vehicle, vowel and wine, with the `label-ranking` tag, in Table 1 (p. 134). The real-world datasets of the paper, sushi and students, are not reproduced because they could not be obtained: the terms of the sushi data do not allow redistributing it, and the students data is not publicly available.
   * Scenarios: complete training rankings, and 30% and 60% of the labels of each training ranking removed at random (p. 134). The scenario of the paper that keeps the top labels of each ranking is not reproduced, since scikit-lr assumes that the unranked labels are removed at random.
   * Metric: Kendall's $\tau$.
   * Cross-validation: five repetitions of a ten-fold cross-validation (p. 134).
@@ -44,7 +44,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
 * `hullermeier_label_2008`: E. Hüllermeier, J. Fürnkranz, W. Cheng and K. Brinker, "Label ranking by learning pairwise preferences", Artificial Intelligence, vol. 172, no. 16-17, pp. 1897-1916, 2008.
   * Methods:
     * RPC, `PairwiseLabelRanker()`, with a logistic regression as the model of each pair of labels, as in the paper (p. 1908).
-  * Datasets: cold, diau, dtt, glass, heat, iris, spo, vehicle, vowel and wine, with the `label ranking` tag, in Table 2 (p. 1908).
+  * Datasets: cold, diau, dtt, glass, heat, iris, spo, vehicle, vowel and wine, with the `label-ranking` tag, in Table 2 (p. 1908).
   * Scenarios: complete training rankings, and from 10% to 70% of the labels of each training ranking removed at random (p. 1910).
   * Metrics: Kendall's $\tau$ and Spearman's $\rho$.
   * Cross-validation: five repetitions of a ten-fold cross-validation (p. 1909).
@@ -57,7 +57,7 @@ This directory reproduces the experiments of the papers whose methods scikit-lr 
     * Zero-R, `DummyPartialLabelRanker()`, which predicts the consensus bucket order of all the training rankings for every sample (p. 906).
     * IBPLR (KNN-E-D in the tables), `KNeighborsPartialLabelRanker(weights="distance")`, with the Euclidean distance and the neighbors weighted by the inverse of their distance (p. 905).
     * PLRT-A, PLRT-D, PLRT-E and PLRT-G, `DecisionTreePartialLabelRanker()` with `criterion` set to `"disagreements"`, `"distance"`, `"entropy"` and `"gini"` (p. 906), with a fixed `random_state` and `min_samples_split` twice the number of labels, the rule of the label ranking trees that the paper keeps (pp. 897 and 901).
-  * Datasets: authorship, blocks, breast, ecoli, glass, iris, letter, libras, pendigits, satimage, segment, vehicle, vowel, wine and yeast, with the `partial label ranking` tag, in Table 5 (p. 905). They match the table in their numbers of samples, features, labels and distinct bucket orders and in their mean number of buckets, except breast, with 106 samples in OpenML and 109 in the table, but the same 62 bucket orders and mean number of buckets.
+  * Datasets: authorship, blocks, breast, ecoli, glass, iris, letter, libras, pendigits, satimage, segment, vehicle, vowel, wine and yeast, with the `partial-label-ranking` tag, in Table 5 (p. 905). They match the table in their numbers of samples, features, labels and distinct bucket orders and in their mean number of buckets, except breast, with 106 samples in OpenML and 109 in the table, but the same 62 bucket orders and mean number of buckets.
   * Scenarios: complete training rankings, and 30% and 60% of the labels of each training ranking removed at random, as in `cheng_decision_2009` (p. 907).
   * Metric: the $\tau_x$ coefficient.
   * Cross-validation: five repetitions of a ten-fold cross-validation (p. 906), and an inner five-fold cross-validation (p. 905).
@@ -71,7 +71,7 @@ Each directory holds the protocol of its paper (`experiment.py`), which declares
 
 ## Datasets
 
-The datasets are downloaded from OpenML, where the authors of scikit-lr uploaded them with the `label ranking` or the `partial label ranking` tag, and they are named as there. `OPENML_DATASETS` in `workflow/experiments/datasets.py` lists their identifiers under each tag, since a name may have several versions in OpenML. Each paper uses some of the datasets of a tag, and `paper_datasets.csv` gives the name of each one in the paper.
+The datasets are downloaded from OpenML, where the authors of scikit-lr uploaded them with the `label-ranking` or the `partial-label-ranking` tag, and they are named as there. `OPENML_DATASETS` in `workflow/experiments/datasets.py` lists their identifiers under each tag, since a name may have several versions in OpenML. Each paper uses some of the datasets of a tag, and `paper_datasets.csv` gives the name of each one in the paper.
 
 ## Protocol
 

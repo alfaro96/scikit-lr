@@ -9,7 +9,7 @@ from sklearn.datasets import fetch_openml
 # The datasets uploaded to OpenML by the authors of scikit-lr, with their identifiers
 # under each of their tags, since a name may have several versions there
 OPENML_DATASETS = {
-    "label ranking": {
+    "label-ranking": {
         "authorship": 42834,
         "bodyfat": 42837,
         "calhousing": 42839,
@@ -32,7 +32,7 @@ OPENML_DATASETS = {
         "wine": 42867,
         "wisconsin": 42869,
     },
-    "partial label ranking": {
+    "partial-label-ranking": {
         "authorship": 42835,
         "blocks": 42836,
         "breast": 42838,

@@ -10,7 +10,7 @@ from sklr.neighbors import KNeighborsLabelRanker
 
 PAPER = {
     "datasets": {
-        "tag": "label ranking",
+        "tag": "label-ranking",
         "names": [
             "authorship",
             "bodyfat",

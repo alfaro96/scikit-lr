@@ -11,7 +11,7 @@ from sklr.tree import DecisionTreeLabelRanker
 
 PAPER = {
     "datasets": {
-        "tag": "label ranking",
+        "tag": "label-ranking",
         "names": [
             "authorship",
             "bodyfat",

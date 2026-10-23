@@ -8,7 +8,7 @@ from sklr.reduction import PairwiseLabelRanker
 PAPER = {
     # The semi-synthetic and the yeast datasets of Table 2 (p. 1908)
     "datasets": {
-        "tag": "label ranking",
+        "tag": "label-ranking",
         "names": [
             "cold",
             "diau",

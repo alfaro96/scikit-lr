@@ -9,7 +9,7 @@ PAPER = {
     # The semi-synthetic datasets of Table 1 (p. 134). Its real-world datasets,
     # sushi and students, could not be obtained
     "datasets": {
-        "tag": "label ranking",
+        "tag": "label-ranking",
         "names": [
             "authorship",
             "glass",

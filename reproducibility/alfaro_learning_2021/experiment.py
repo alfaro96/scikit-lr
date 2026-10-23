@@ -12,7 +12,7 @@ from sklr.tree import DecisionTreePartialLabelRanker
 
 PAPER = {
     "datasets": {
-        "tag": "partial label ranking",
+        "tag": "partial-label-ranking",
         "names": [
             "authorship",
             "blocks",
