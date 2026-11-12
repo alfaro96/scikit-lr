@@ -14,13 +14,13 @@
   "labels": ["dependencies"],
   "customManagers": [
     {
-      "description": "The tools pinned in environment.yml, whose versions build_tools/check_versions.py checks against their pre-commit hooks. The version ranges are changed by hand, so only the exact pins are matched.",
+      "description": "The tools pinned in environment.yml, whose versions build_tools/check_versions.py checks against their pre-commit hooks. The version ranges are changed by hand, so only the exact pins are matched. Their versions are compared as PEP 440 ones, since the conda versioning takes the pins for ranges and writes the updates with \"==\", which environment.yml does not use.",
       "customType": "regex",
       "managerFilePatterns": ["/^environment\\.yml$/"],
       "matchStrings": ["\\n\\s*-\\s*(?<depName>[\\w.-]+)=(?<currentValue>\\d[^\\s#]*)"],
       "datasourceTemplate": "conda",
       "packageNameTemplate": "conda-forge/{{depName}}",
-      "versioningTemplate": "conda"
+      "versioningTemplate": "pep440"
     }
   ],
   "packageRules": [
