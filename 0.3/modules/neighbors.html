@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. Nearest neighbors &#8212; scikit-lr 0.3.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
+
+    <script src="../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'modules/neighbors';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.23.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://alfaro96.github.io/scikit-lr/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/plotly_resize.js?v=55604e49"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Decision trees" href="tree.html" />
+    <link rel="prev" title="1. Ranking representation" href="ranking_representation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.3" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">scikit-lr 0.3.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../whats_new.html">
+    Release history
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../developers/index.html">
+    Development
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/alfaro96/scikit-lr" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/scikit-lr" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../user_guide.html">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    Release history
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../developers/index.html">
+    Development
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/alfaro96/scikit-lr" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/scikit-lr" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="ranking_representation.html">1. Ranking representation</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">2. Nearest neighbors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tree.html">3. Decision trees</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_evaluation.html">4. Metrics and scoring: evaluating the rankers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sklearn_integration.html">5. Using the rankers with scikit-learn</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../user_guide.html" class="nav-link">User guide</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis"><span class="section-number">2. </span>Nearest neighbors</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nearest-neighbors">
+<span id="neighbors"></span><h1><span class="section-number">2. </span>Nearest neighbors<a class="headerlink" href="#nearest-neighbors" title="Link to this heading">#</a></h1>
+<p>The nearest neighbors rankers predict for each instance <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> a
+ranking that aggregates the rankings <span class="math notranslate nohighlight">\(\sigma_1, \dots, \sigma_k\)</span> of its
+<span class="math notranslate nohighlight">\(k\)</span> nearest training samples <span class="math notranslate nohighlight">\(\boldsymbol{x}_1, \dots, \boldsymbol{x}_k\)</span>,
+numbered from the nearest one, with the notation of <a class="reference internal" href="ranking_representation.html#ranking-notation"><span class="std std-ref">Notation</span></a>. There is
+one for each problem:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker" title="sklr.neighbors.KNeighborsLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsLabelRanker</span></code></a>, for label ranking, estimates a probability model
+of the rankings from those of the neighbors, which have no ties, and predicts its
+most probable ranking, as described in <a class="reference internal" href="#label-ranking-neighbors"><span class="std std-ref">Label ranking</span></a>.</p></li>
+<li><p><a class="reference internal" href="generated/sklr.neighbors.KNeighborsPartialLabelRanker.html#sklr.neighbors.KNeighborsPartialLabelRanker" title="sklr.neighbors.KNeighborsPartialLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsPartialLabelRanker</span></code></a>, for partial label ranking, aggregates the
+rankings of the neighbors, which may have ties, into a consensus bucket order, as
+described in <a class="reference internal" href="#partial-label-ranking-neighbors"><span class="std std-ref">Partial label ranking</span></a>.</p></li>
+</ul>
+<p>Both find and weigh the neighbors as the next section describes. The rankings follow
+the representation described in <a class="reference internal" href="ranking_representation.html#ranking-representation"><span class="std std-ref">Ranking representation</span></a>; the training rankings
+of both estimators may be incomplete, and their predictions are always complete.</p>
+<section id="neighbor-search-and-weights">
+<span id="neighbors-weights"></span><span id="neighbor-search"></span><h2><span class="section-number">2.1. </span>Neighbor search and weights<a class="headerlink" href="#neighbor-search-and-weights" title="Link to this heading">#</a></h2>
+<p>The neighbors are found by <a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NearestNeighbors</span></code></a>, which
+receives the parameters <code class="docutils literal notranslate"><span class="pre">n_neighbors</span></code>, <code class="docutils literal notranslate"><span class="pre">algorithm</span></code>, <code class="docutils literal notranslate"><span class="pre">leaf_size</span></code>, <code class="docutils literal notranslate"><span class="pre">metric</span></code>,
+<code class="docutils literal notranslate"><span class="pre">p</span></code>, <code class="docutils literal notranslate"><span class="pre">metric_params</span></code> and <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code>, so the search algorithms, the metrics,
+<code class="docutils literal notranslate"><span class="pre">metric=&quot;precomputed&quot;</span></code> and the <code class="docutils literal notranslate"><span class="pre">kneighbors</span></code> and <code class="docutils literal notranslate"><span class="pre">kneighbors_graph</span></code> methods are
+those described in the <a class="reference external" href="https://scikit-learn.org/1.9/modules/neighbors.html#neighbors" title="(in scikit-learn v1.9)"><span class="xref std std-ref">nearest neighbors</span></a> section of the
+scikit-learn user guide. The <code class="docutils literal notranslate"><span class="pre">n_jobs</span></code> threads also aggregate the rankings of the
+neighbors of the samples in parallel.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">weights</span></code> parameter weighs the rankings of the neighbors of each sample in
+their aggregation. <code class="docutils literal notranslate"><span class="pre">&quot;uniform&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;distance&quot;</span></code> and a callable weigh them as in
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/neighbors.html#classification" title="(in scikit-learn v1.9)"><span class="xref std std-ref">nearest neighbors classification</span></a>. <code class="docutils literal notranslate"><span class="pre">&quot;dudani&quot;</span></code>
+follows equation (1) of <a class="reference internal" href="#dudani-distance-1976" id="id1"><span>[dudani_distance_1976]</span></a>, which <a class="reference internal" href="#cheng-decision-2009" id="id2"><span>[cheng_decision_2009]</span></a> use:
+if <span class="math notranslate nohighlight">\(d_{(1)} \leq \dots \leq d_{(k)}\)</span> are the sorted distances
+<span class="math notranslate nohighlight">\(d(\boldsymbol{x}, \boldsymbol{x}_i)\)</span> of the neighbors <span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span>
+to the instance <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>, the <span class="math notranslate nohighlight">\(i\)</span>-th nearest neighbor weighs</p>
+<div class="math notranslate nohighlight">
+\[w_i = \frac{d_{(k)} - d_{(i)}}{d_{(k)} - d_{(1)}},\]</div>
+<p>from <code class="docutils literal notranslate"><span class="pre">1</span></code> for the nearest neighbor to <code class="docutils literal notranslate"><span class="pre">0</span></code> for the farthest one, or <code class="docutils literal notranslate"><span class="pre">1</span></code> if
+<span class="math notranslate nohighlight">\(d_{(k)} = d_{(1)}\)</span>.</p>
+<p>A callable may give a zero weight to all the neighbors of a sample. Then, the
+neighbors are weighted equally, except with the Mallows model of
+<a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker" title="sklr.neighbors.KNeighborsLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsLabelRanker</span></code></a>, which first tries the weights described in
+<a class="reference internal" href="#label-ranking-neighbors-weights"><span class="std std-ref">Weights</span></a>.</p>
+</section>
+<section id="label-ranking">
+<span id="label-ranking-neighbors"></span><h2><span class="section-number">2.2. </span>Label ranking<a class="headerlink" href="#label-ranking" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker" title="sklr.neighbors.KNeighborsLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsLabelRanker</span></code></a> implements the instance-based label rankers of
+<a class="reference internal" href="#cheng-decision-2009" id="id3"><span>[cheng_decision_2009]</span></a> and <a class="reference internal" href="#cheng-label-2010" id="id4"><span>[cheng_label_2010]</span></a>. They assume that the probability
+distribution of the rankings is approximately constant around each instance
+<span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>, so the rankings of its <span class="math notranslate nohighlight">\(k\)</span> nearest neighbors are taken
+as a sample of a probability model of the rankings. The parameters of the model are
+estimated from these rankings, and the predicted ranking is the mode of the model, its
+most probable ranking:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklr.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNeighborsLabelRanker</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">KNeighborsLabelRanker</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [1, 3, 2],</span>
+<span class="go">       [3, 2, 1]])</span>
+</pre></div>
+</div>
+<p>The training rankings may be incomplete, even without any ranked label, but they
+must not have ties, and the predicted rankings have no ties either. The <code class="docutils literal notranslate"><span class="pre">model</span></code>
+parameter chooses the probability model of the rankings of the neighbors,
+<code class="docutils literal notranslate"><span class="pre">&quot;mallows&quot;</span></code> for the Mallows model and <code class="docutils literal notranslate"><span class="pre">&quot;plackett_luce&quot;</span></code> for the Plackett-Luce
+model. In both cases, ties between labels in the predicted ranking go to the label
+with the smaller index. The neighbors are found and weighted as described in
+<a class="reference internal" href="#neighbor-search"><span class="std std-ref">Neighbor search and weights</span></a>.</p>
+<section id="mallows-model">
+<span id="mallows-neighbors"></span><h3><span class="section-number">2.2.1. </span>Mallows model<a class="headerlink" href="#mallows-model" title="Link to this heading">#</a></h3>
+<p>The Mallows model is a distance-based model whose mode is a center ranking
+<span class="math notranslate nohighlight">\(\pi\)</span>: the probability of a ranking decreases with its distance to
+<span class="math notranslate nohighlight">\(\pi\)</span>, at a rate given by a spread parameter <span class="math notranslate nohighlight">\(\theta \geq 0\)</span>
+<a class="reference internal" href="#cheng-label-2010" id="id5"><span>[cheng_label_2010]</span></a>. With <code class="docutils literal notranslate"><span class="pre">model=&quot;mallows&quot;</span></code>, the predicted ranking is the
+estimate <span class="math notranslate nohighlight">\(\hat{\pi}\)</span> of <span class="math notranslate nohighlight">\(\pi\)</span>, found as in Algorithm 1 of
+<a class="reference internal" href="#cheng-decision-2009" id="id6"><span>[cheng_decision_2009]</span></a>.</p>
+<p>When the rankings of the neighbors are complete, <span class="math notranslate nohighlight">\(\hat{\pi}\)</span> is found by the
+weighted Borda count <a class="reference internal" href="#ho-decision-1994" id="id7"><span>[ho_decision_1994]</span></a>. Each ranking <span class="math notranslate nohighlight">\(\sigma_i\)</span> gives
+<span class="math notranslate nohighlight">\(n - \sigma_i(j) + 1\)</span> votes to each label <span class="math notranslate nohighlight">\(y_j\)</span>, that is, <span class="math notranslate nohighlight">\(n\)</span> votes to
+its first label, <span class="math notranslate nohighlight">\(n - 1\)</span> to the second one and so on, each vote is multiplied by
+the weight <span class="math notranslate nohighlight">\(w_i\)</span> of the neighbor, and the labels are ranked by decreasing total
+votes. When some rankings are incomplete, the initial center is found by the generalized
+Borda count of Proposition 2 of <a class="reference internal" href="#cheng-decision-2009" id="id8"><span>[cheng_decision_2009]</span></a>: if <span class="math notranslate nohighlight">\(\sigma_i\)</span> ranks
+<span class="math notranslate nohighlight">\(m = |\mathcal{Y}(\sigma_i)| \leq n\)</span> labels, each ranked label <span class="math notranslate nohighlight">\(y_j\)</span>
+receives <span class="math notranslate nohighlight">\((m - \sigma_i(j) + 1)(n + 1) / (m + 1)\)</span> votes and each unranked label
+receives <span class="math notranslate nohighlight">\((n + 1) / 2\)</span>, its expected votes when the ranking is completed uniformly
+at random. Then, each incomplete ranking is completed with its closest extension to the
+center in Kendall distance, found as in Proposition 1 of <a class="reference internal" href="#cheng-decision-2009" id="id9"><span>[cheng_decision_2009]</span></a>, and the
+center is found again by the Borda count of the completed rankings. These two steps are
+repeated until the center no longer changes.</p>
+<p><a class="reference internal" href="#cheng-decision-2009" id="id10"><span>[cheng_decision_2009]</span></a> also estimate <span class="math notranslate nohighlight">\(\theta\)</span> as a measure of the reliability
+of the prediction, which <a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker" title="sklr.neighbors.KNeighborsLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsLabelRanker</span></code></a> does not compute.</p>
+</section>
+<section id="plackett-luce-model">
+<h3><span class="section-number">2.2.2. </span>Plackett-Luce model<a class="headerlink" href="#plackett-luce-model" title="Link to this heading">#</a></h3>
+<p>The Plackett-Luce model has a positive parameter <span class="math notranslate nohighlight">\(v_j\)</span> for each label
+<span class="math notranslate nohighlight">\(y_j\)</span>, which form the vector <span class="math notranslate nohighlight">\(\boldsymbol{v} = (v_1, \dots, v_n)\)</span>. If a
+ranking <span class="math notranslate nohighlight">\(\pi\)</span> ranks <span class="math notranslate nohighlight">\(m = |\mathcal{Y}(\pi)|\)</span> labels and
+<span class="math notranslate nohighlight">\(\pi^{-1}(i)\)</span> denotes the index of the label at position <span class="math notranslate nohighlight">\(i\)</span>, its
+probability is</p>
+<div class="math notranslate nohighlight">
+\[P(\pi \mid \boldsymbol{v}) = \prod_{i=1}^{m}
+\frac{v_{\pi^{-1}(i)}}{\sum_{l=i}^{m} v_{\pi^{-1}(l)}},\]</div>
+<p>which has the same form for complete and incomplete rankings <a class="reference internal" href="#cheng-label-2010" id="id11"><span>[cheng_label_2010]</span></a>.
+With <code class="docutils literal notranslate"><span class="pre">model=&quot;plackett_luce&quot;</span></code>, the parameters are the maximum likelihood estimate
+from the rankings of the neighbors, which maximizes
+<span class="math notranslate nohighlight">\(\sum_{i=1}^{k} w_i \log P(\sigma_i \mid \boldsymbol{v})\)</span> for the rankings
+<span class="math notranslate nohighlight">\(\sigma_i\)</span> and the weights <span class="math notranslate nohighlight">\(w_i\)</span> of the neighbors, the log-likelihood of
+<a class="reference internal" href="#cheng-label-2010" id="id12"><span>[cheng_label_2010]</span></a> when the weights are uniform. It is found by the MM algorithm
+of <a class="reference internal" href="#hunter-mm-2004" id="id13"><span>[hunter_mm_2004]</span></a>, which starts from equal parameters, scales them to add up to
+one after each iteration and stops when no parameter changes by more than <code class="docutils literal notranslate"><span class="pre">tol</span></code>.
+The predicted ranking, the mode of the model, sorts the labels by decreasing
+parameter <a class="reference internal" href="#cheng-label-2010" id="id14"><span>[cheng_label_2010]</span></a>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">KNeighborsLabelRanker</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"plackett_luce"</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [1, 3, 2],</span>
+<span class="go">       [3, 1, 2]])</span>
+</pre></div>
+</div>
+<p>A label that no neighbor with a positive weight ranks above another label gets a
+zero parameter, so it goes after the other labels, and all the labels get the same
+parameter, which predicts them in the order of their indices, if no such neighbor
+ranks two labels.</p>
+</section>
+<section id="weights">
+<span id="label-ranking-neighbors-weights"></span><h3><span class="section-number">2.2.3. </span>Weights<a class="headerlink" href="#weights" title="Link to this heading">#</a></h3>
+<p>Weighting the neighbors changes the prediction of the second sample of the first
+example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">KNeighborsLabelRanker</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s2">"distance"</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3],</span>
+<span class="go">       [1, 2, 3],</span>
+<span class="go">       [3, 2, 1]])</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">model=&quot;mallows&quot;</span></code>, the weight of each neighbor is also multiplied by the
+fraction <span class="math notranslate nohighlight">\(|\mathcal{Y}(\sigma_i)| / n\)</span> of the <span class="math notranslate nohighlight">\(n\)</span> labels that its
+ranking <span class="math notranslate nohighlight">\(\sigma_i\)</span> ranks, where <span class="math notranslate nohighlight">\(\mathcal{Y}(\sigma_i)\)</span> is the set of
+those labels, as in <a class="reference internal" href="#cheng-decision-2009" id="id15"><span>[cheng_decision_2009]</span></a>: a ranking completed by the estimation is
+less reliable than an observed one. If these products are zero for all the neighbors
+of a sample, as with <code class="docutils literal notranslate"><span class="pre">weights=&quot;dudani&quot;</span></code> when only the farthest neighbor ranks some
+label, the neighbors are weighted by that fraction alone, and equally if it is also
+zero, because no neighbor ranks any label. The Plackett-Luce model does not complete
+the rankings, so its weights are not multiplied by that fraction.</p>
+</section>
+<section id="convergence">
+<h3><span class="section-number">2.2.4. </span>Convergence<a class="headerlink" href="#convergence" title="Link to this heading">#</a></h3>
+<p>The estimation of both models is iterative, and <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> bounds the number of
+iterations for each sample. By default, it is <code class="docutils literal notranslate"><span class="pre">100</span></code> with <code class="docutils literal notranslate"><span class="pre">model=&quot;mallows&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">1000</span></code> with <code class="docutils literal notranslate"><span class="pre">model=&quot;plackett_luce&quot;</span></code>. If the estimation of some sample does not
+converge, <a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker.predict" title="sklr.neighbors.KNeighborsLabelRanker.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a> issues a single
+<a class="reference external" href="https://scikit-learn.org/1.9/modules/generated/sklearn.exceptions.ConvergenceWarning.html#sklearn.exceptions.ConvergenceWarning" title="(in scikit-learn v1.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceWarning</span></code></a> and returns the rankings reached.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">model=&quot;mallows&quot;</span></code>, the estimation only iterates when some neighbor has an
+incomplete ranking, and it does not converge when the center still changes after
+<code class="docutils literal notranslate"><span class="pre">max_iter</span></code> iterations or comes back to an earlier center, which the algorithm
+would repeat forever.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">model=&quot;plackett_luce&quot;</span></code>, the maximum likelihood estimate exists, and the MM
+algorithm converges to it, if, for every split of the labels into two groups, some
+label of the second group is ranked above some label of the first one
+<a class="reference internal" href="#hunter-mm-2004" id="id16"><span>[hunter_mm_2004]</span></a>. Otherwise, as when the rankings of the neighbors agree or a label
+is never ranked above another one, the parameters slowly approach a limit where
+some of them are zero, and the warning is common when the neighbors are few. The
+predicted ranking then sorts the labels by the parameters reached after
+<code class="docutils literal notranslate"><span class="pre">max_iter</span></code> iterations. A larger <code class="docutils literal notranslate"><span class="pre">tol</span></code> lets the estimation stop earlier, and a
+larger <code class="docutils literal notranslate"><span class="pre">max_iter</span></code> lets it get closer to that limit.</p>
+</section>
+<section id="complexity">
+<h3><span class="section-number">2.2.5. </span>Complexity<a class="headerlink" href="#complexity" title="Link to this heading">#</a></h3>
+<p>After the neighbor search, for each sample with <span class="math notranslate nohighlight">\(k\)</span> neighbors and <span class="math notranslate nohighlight">\(n\)</span>
+labels, the Borda count takes <span class="math notranslate nohighlight">\(O(kn)\)</span> time plus a sort of the labels, each
+iteration of the Mallows model with incomplete rankings takes at most
+<span class="math notranslate nohighlight">\(O(kn^2)\)</span> time to complete them, and each iteration of the MM algorithm takes
+<span class="math notranslate nohighlight">\(O(kn)\)</span> time.</p>
+</section>
+</section>
+<section id="partial-label-ranking">
+<span id="partial-label-ranking-neighbors"></span><h2><span class="section-number">2.3. </span>Partial label ranking<a class="headerlink" href="#partial-label-ranking" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="generated/sklr.neighbors.KNeighborsPartialLabelRanker.html#sklr.neighbors.KNeighborsPartialLabelRanker" title="sklr.neighbors.KNeighborsPartialLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsPartialLabelRanker</span></code></a> implements the instance-based partial label
+ranker of <a class="reference internal" href="#alfaro-learning-2021" id="id17"><span>[alfaro_learning_2021]</span></a>. The training rankings may have ties, and the
+prediction for an instance <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> is a bucket order, an ordered
+partition of the labels into buckets of tied labels, that aggregates the rankings of
+its <span class="math notranslate nohighlight">\(k\)</span> nearest neighbors:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">sklr.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNeighborsPartialLabelRanker</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span> <span class="o">=</span> <span class="n">KNeighborsPartialLabelRanker</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ranker</span><span class="o">.</span><span class="n">predict</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">]])</span>
+<span class="go">array([[1, 2, 3, 4],</span>
+<span class="go">       [3, 1, 1, 2]])</span>
+</pre></div>
+</div>
+<p>No neighbor of the first sample ranks the fourth label, so it goes alone to a last
+bucket, as explained in <a class="reference internal" href="#labels-without-information"><span class="std std-ref">Labels without information</span></a>. The neighbors are found
+and weighted as described in <a class="reference internal" href="#neighbor-search"><span class="std std-ref">Neighbor search and weights</span></a>.</p>
+<section id="consensus-bucket-order">
+<h3><span class="section-number">2.3.1. </span>Consensus bucket order<a class="headerlink" href="#consensus-bucket-order" title="Link to this heading">#</a></h3>
+<p>Here, the neighbors are indexed by <span class="math notranslate nohighlight">\(l\)</span>, since <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> index the
+labels. For each pair of labels <span class="math notranslate nohighlight">\(y_i\)</span> and <span class="math notranslate nohighlight">\(y_j\)</span>, the entry
+<span class="math notranslate nohighlight">\(C(y_i, y_j)\)</span> of the pair order matrix of the neighbors is the weighted
+fraction of their rankings ranking both labels that put <span class="math notranslate nohighlight">\(y_i\)</span> ahead of
+<span class="math notranslate nohighlight">\(y_j\)</span>, with a ranking that ties them counting one half, as in equation (3) of
+<a class="reference internal" href="#alfaro-learning-2021" id="id18"><span>[alfaro_learning_2021]</span></a> with the weights <span class="math notranslate nohighlight">\(w_l\)</span> of the neighbors:</p>
+<div class="math notranslate nohighlight">
+\[C(y_i, y_j) = \frac{\sum_{l} w_l \, [\sigma_l(i) &lt; \sigma_l(j)]
++ \frac{1}{2} \sum_{l} w_l \, [\sigma_l(i) = \sigma_l(j)]}{\sum_{l} w_l},\]</div>
+<p>where the sums run over the neighbors whose rankings rank both labels, a condition
+in brackets is <code class="docutils literal notranslate"><span class="pre">1</span></code> when it holds and <code class="docutils literal notranslate"><span class="pre">0</span></code> otherwise, and
+<span class="math notranslate nohighlight">\(C(y_i, y_j) = 1/2\)</span> if no neighbor of positive weight ranks both labels.
+Thus, <span class="math notranslate nohighlight">\(C(y_i, y_j) + C(y_j, y_i) = 1\)</span>. The weights are not multiplied by the
+fraction of the labels that each ranking ranks, since the consensus does not
+complete the rankings. A bucket order <span class="math notranslate nohighlight">\(\pi\)</span> has the bucket matrix <span class="math notranslate nohighlight">\(B\)</span>
+with <span class="math notranslate nohighlight">\(B(y_i, y_j)\)</span> equal to <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">1/2</span></code> or <code class="docutils literal notranslate"><span class="pre">0</span></code> when <span class="math notranslate nohighlight">\(\pi\)</span> puts
+<span class="math notranslate nohighlight">\(y_i\)</span> ahead of <span class="math notranslate nohighlight">\(y_j\)</span>, ties them or puts <span class="math notranslate nohighlight">\(y_j\)</span> ahead, and the
+optimal bucket order problem looks for the bucket order whose bucket matrix
+minimizes <span class="math notranslate nohighlight">\(\sum_{i, j} |B(y_i, y_j) - C(y_i, y_j)|\)</span>, as in equation (1) of
+<a class="reference internal" href="#aledo-utopia-2017" id="id19"><span>[aledo_utopia_2017]</span></a>.</p>
+<p>The predicted bucket order <span class="math notranslate nohighlight">\(\hat\pi\)</span> is an approximate solution found by the
+Bucket Pivot Algorithm. It chooses a pivot label <span class="math notranslate nohighlight">\(y_p\)</span> and puts each other
+label <span class="math notranslate nohighlight">\(y_j\)</span> in a group of labels ahead of the pivot if
+<span class="math notranslate nohighlight">\(C(y_p, y_j) &lt; 1/2 - \beta\)</span>, in the bucket of the pivot if
+<span class="math notranslate nohighlight">\(1/2 - \beta \leq C(y_p, y_j) \leq 1/2 + \beta\)</span>, and in a group of labels
+behind the pivot otherwise, with the threshold <span class="math notranslate nohighlight">\(\beta = 0.25\)</span>. Then, it
+applies itself to the labels ahead and to the labels behind, and the bucket order is
+the one of the labels ahead, followed by the bucket of the pivot and by the one of
+the labels behind. <a class="reference internal" href="generated/sklr.neighbors.KNeighborsPartialLabelRanker.html#sklr.neighbors.KNeighborsPartialLabelRanker" title="sklr.neighbors.KNeighborsPartialLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsPartialLabelRanker</span></code></a> uses the variant
+<span class="math notranslate nohighlight">\(\mathrm{LIA}_G^{\mathrm{MP2}}\)</span> of <a class="reference internal" href="#aledo-utopia-2017" id="id20"><span>[aledo_utopia_2017]</span></a>, which
+<a class="reference internal" href="#alfaro-learning-2021" id="id21"><span>[alfaro_learning_2021]</span></a> chose for its trade-off between accuracy and efficiency:</p>
+<ul class="simple">
+<li><p>With the least indecision assumption, the pivot is the label with the least DANI
+(Distance to Achieve the Nearest Idealization) index. The utopian matrix rounds
+each entry <span class="math notranslate nohighlight">\(C(y_i, y_j)\)</span> to <code class="docutils literal notranslate"><span class="pre">1</span></code> if it is above <code class="docutils literal notranslate"><span class="pre">0.75</span></code>, to <code class="docutils literal notranslate"><span class="pre">0</span></code> if it is
+below <code class="docutils literal notranslate"><span class="pre">0.25</span></code> and to <code class="docutils literal notranslate"><span class="pre">1/2</span></code> otherwise, and the DANI index of <span class="math notranslate nohighlight">\(y_i\)</span> is the
+mean absolute difference between <span class="math notranslate nohighlight">\(C(y_i, y_j)\)</span> and its rounded value over
+the other labels <span class="math notranslate nohighlight">\(y_j\)</span>, which is small when the neighbors agree on how
+<span class="math notranslate nohighlight">\(y_i\)</span> compares with the rest. The rounding follows Example 1 of
+<a class="reference internal" href="#aledo-utopia-2017" id="id22"><span>[aledo_utopia_2017]</span></a>, since its Definition 1 rounds <span class="math notranslate nohighlight">\(C(y_j, y_i)\)</span> instead.</p></li>
+<li><p>The DANI indices are computed once, among all the labels being ordered, and not
+again for the labels ahead and behind (the subscript <span class="math notranslate nohighlight">\(G\)</span>, for global).</p></li>
+<li><p>With multiple pivots, each label placed in the bucket of the pivot joins it as a
+pivot, and the next labels are compared with the mean of <span class="math notranslate nohighlight">\(C(y_l, y_j)\)</span> over
+the pivots <span class="math notranslate nohighlight">\(y_l\)</span> instead of with <span class="math notranslate nohighlight">\(C(y_p, y_j)\)</span>. In a second stage, the
+labels ahead and behind are placed again with the mean over the final pivots.</p></li>
+</ul>
+<p><a class="reference internal" href="#aledo-utopia-2017" id="id23"><span>[aledo_utopia_2017]</span></a> choose at random among the labels with the least DANI index.
+<a class="reference internal" href="generated/sklr.neighbors.KNeighborsPartialLabelRanker.html#sklr.neighbors.KNeighborsPartialLabelRanker" title="sklr.neighbors.KNeighborsPartialLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsPartialLabelRanker</span></code></a> chooses the one with the smaller index, and
+places the other labels in the order of their indices, which matters because the
+pivots grow, so its predictions are deterministic.</p>
+</section>
+<section id="labels-without-information">
+<span id="id24"></span><h3><span class="section-number">2.3.2. </span>Labels without information<a class="headerlink" href="#labels-without-information" title="Link to this heading">#</a></h3>
+<p>A label that no neighbor of positive weight ranks together with another label has
+all its entries of <span class="math notranslate nohighlight">\(C\)</span> equal to <code class="docutils literal notranslate"><span class="pre">1/2</span></code>, hence the least DANI index, and as
+the first pivot it would draw all the labels into its bucket. Neither
+<a class="reference internal" href="#alfaro-learning-2021" id="id25"><span>[alfaro_learning_2021]</span></a> nor <a class="reference internal" href="#aledo-utopia-2017" id="id26"><span>[aledo_utopia_2017]</span></a> consider this case. Therefore, only
+the other labels are ordered by the algorithm, with their DANI indices computed
+among them, and the labels without information are tied in a last bucket. If no
+neighbor of positive weight ranks two labels, all the labels are tied.</p>
+</section>
+<section id="id27">
+<h3><span class="section-number">2.3.3. </span>Complexity<a class="headerlink" href="#id27" title="Link to this heading">#</a></h3>
+<p>After the neighbor search, for each sample with <span class="math notranslate nohighlight">\(k\)</span> neighbors and <span class="math notranslate nohighlight">\(n\)</span>
+labels, the pair order matrix takes <span class="math notranslate nohighlight">\(O(kn^2)\)</span> time, and the DANI indices and
+the Bucket Pivot Algorithm take <span class="math notranslate nohighlight">\(O(n^2)\)</span> time, since each label becomes a
+pivot once and then updates the sums of at most <span class="math notranslate nohighlight">\(n\)</span> labels.</p>
+</section>
+</section>
+<section id="practical-use">
+<span id="neighbors-practical-use"></span><h2><span class="section-number">2.4. </span>Practical use<a class="headerlink" href="#practical-use" title="Link to this heading">#</a></h2>
+<p>Both estimators are evaluated and tuned with the tools of scikit-learn, as shown in
+<a class="reference internal" href="../getting_started.html#getting-started"><span class="std std-ref">Getting started</span></a>, with the scorers described in <a class="reference internal" href="model_evaluation.html#model-evaluation"><span class="std std-ref">Metrics and scoring: evaluating the rankers</span></a>:
+<code class="docutils literal notranslate"><span class="pre">&quot;kendall_tau&quot;</span></code> for <a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker" title="sklr.neighbors.KNeighborsLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsLabelRanker</span></code></a> and <code class="docutils literal notranslate"><span class="pre">&quot;tau_x&quot;</span></code> for
+<a class="reference internal" href="generated/sklr.neighbors.KNeighborsPartialLabelRanker.html#sklr.neighbors.KNeighborsPartialLabelRanker" title="sklr.neighbors.KNeighborsPartialLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsPartialLabelRanker</span></code></a>. <a class="reference internal" href="#cheng-decision-2009" id="id28"><span>[cheng_decision_2009]</span></a>,
+<a class="reference internal" href="#cheng-label-2010" id="id29"><span>[cheng_label_2010]</span></a> and <a class="reference internal" href="#alfaro-learning-2021" id="id30"><span>[alfaro_learning_2021]</span></a> use the Euclidean distance and
+choose the number of neighbors by cross-validation on the training data. The first
+two normalize the attributes, as <a class="reference external" href="https://scikit-learn.org/1.9/modules/preprocessing.html#preprocessing-scaler" title="(in scikit-learn v1.9)"><span class="xref std std-ref">feature scaling</span></a>
+does, and the last one weighs the neighbors by the inverse of their distance, which
+is <code class="docutils literal notranslate"><span class="pre">weights=&quot;distance&quot;</span></code>.</p>
+<p>The examples
+<a class="reference internal" href="../auto_examples/neighbors/plot_label_ranking_neighbors.html#sphx-glr-auto-examples-neighbors-plot-label-ranking-neighbors-py"><span class="std std-ref">Label ranking with the k-nearest neighbors</span></a> and
+<a class="reference internal" href="../auto_examples/neighbors/plot_partial_label_ranking_neighbors.html#sphx-glr-auto-examples-neighbors-plot-partial-label-ranking-neighbors-py"><span class="std std-ref">Partial label ranking with the k-nearest neighbors</span></a>
+compare the models and the weights of each estimator for several numbers of
+neighbors, also with incomplete training rankings, and
+<a class="reference internal" href="../auto_examples/reproducibility/plot_paper_reproduction.html#sphx-glr-auto-examples-reproducibility-plot-paper-reproduction-py"><span class="std std-ref">Reproduction of the papers</span></a>
+compares the results of <a class="reference internal" href="generated/sklr.neighbors.KNeighborsLabelRanker.html#sklr.neighbors.KNeighborsLabelRanker" title="sklr.neighbors.KNeighborsLabelRanker"><code class="xref py py-class docutils literal notranslate"><span class="pre">KNeighborsLabelRanker</span></code></a> with those published in
+<a class="reference internal" href="#cheng-decision-2009" id="id31"><span>[cheng_decision_2009]</span></a> and <a class="reference internal" href="#cheng-label-2010" id="id32"><span>[cheng_label_2010]</span></a>.</p>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="aledo-utopia-2017" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>aledo_utopia_2017<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id19">1</a>,<a role="doc-backlink" href="#id20">2</a>,<a role="doc-backlink" href="#id22">3</a>,<a role="doc-backlink" href="#id23">4</a>,<a role="doc-backlink" href="#id26">5</a>)</span>
+<p>J. A. Aledo, J. A. Gámez and A. Rosete, “Utopia in the
+solution of the bucket order problem”, Decision Support Systems, vol. 97,
+pp. 69-80, 2017.</p>
+</div>
+<div class="citation" id="alfaro-learning-2021" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>alfaro_learning_2021<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id17">1</a>,<a role="doc-backlink" href="#id18">2</a>,<a role="doc-backlink" href="#id21">3</a>,<a role="doc-backlink" href="#id25">4</a>,<a role="doc-backlink" href="#id30">5</a>)</span>
+<p>J. C. Alfaro, J. A. Aledo and J. A. Gámez, “Learning
+decision trees for the partial label ranking problem”, International Journal of
+Intelligent Systems, vol. 36, no. 2, pp. 890-918, 2021.</p>
+</div>
+<div class="citation" id="cheng-decision-2009" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>cheng_decision_2009<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id6">3</a>,<a role="doc-backlink" href="#id8">4</a>,<a role="doc-backlink" href="#id9">5</a>,<a role="doc-backlink" href="#id10">6</a>,<a role="doc-backlink" href="#id15">7</a>,<a role="doc-backlink" href="#id28">8</a>,<a role="doc-backlink" href="#id31">9</a>)</span>
+<p>W. Cheng, J. Hühn and E. Hüllermeier, “Decision tree and
+instance-based learning for label ranking”, in Proceedings of the 26th
+International Conference on Machine Learning, Montreal, Canada, pp. 161-168,
+2009.</p>
+</div>
+<div class="citation" id="cheng-label-2010" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>cheng_label_2010<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id5">2</a>,<a role="doc-backlink" href="#id11">3</a>,<a role="doc-backlink" href="#id12">4</a>,<a role="doc-backlink" href="#id14">5</a>,<a role="doc-backlink" href="#id29">6</a>,<a role="doc-backlink" href="#id32">7</a>)</span>
+<p>W. Cheng, K. Dembczyński and E. Hüllermeier, “Label ranking
+methods based on the Plackett-Luce model”, in Proceedings of the 27th
+International Conference on Machine Learning, Haifa, Israel, pp. 215-222, 2010.</p>
+</div>
+<div class="citation" id="dudani-distance-1976" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">dudani_distance_1976</a><span class="fn-bracket">]</span></span>
+<p>S. A. Dudani, “The distance-weighted k-nearest-neighbor
+rule”, IEEE Transactions on Systems, Man, and Cybernetics, vol. SMC-6, no. 4,
+pp. 325-327, 1976.</p>
+</div>
+<div class="citation" id="ho-decision-1994" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">ho_decision_1994</a><span class="fn-bracket">]</span></span>
+<p>T. K. Ho, J. J. Hull and S. N. Srihari, “Decision combination
+in multiple classifier systems”, IEEE Transactions on Pattern Analysis and
+Machine Intelligence, vol. 16, no. 1, pp. 66-75, 1994.</p>
+</div>
+<div class="citation" id="hunter-mm-2004" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>hunter_mm_2004<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id13">1</a>,<a role="doc-backlink" href="#id16">2</a>)</span>
+<p>D. R. Hunter, “MM algorithms for generalized Bradley-Terry
+models”, The Annals of Statistics, vol. 32, no. 1, pp. 384-406, 2004.</p>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ranking_representation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>Ranking representation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tree.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Decision trees</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neighbor-search-and-weights">2.1. Neighbor search and weights</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#label-ranking">2.2. Label ranking</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mallows-model">2.2.1. Mallows model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plackett-luce-model">2.2.2. Plackett-Luce model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weights">2.2.3. Weights</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">2.2.4. Convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#complexity">2.2.5. Complexity</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-label-ranking">2.3. Partial label ranking</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consensus-bucket-order">2.3.1. Consensus bucket order</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#labels-without-information">2.3.2. Labels without information</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">2.3.3. Complexity</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-use">2.4. Practical use</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/modules/neighbors.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2019-2026, Juan Carlos Alfaro Jiménez.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
