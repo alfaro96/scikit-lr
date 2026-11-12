@@ -120,6 +120,10 @@ doctest_optionflags = "NORMALIZE_WHITESPACE ELLIPSIS"  # Ignore whitespace diffe
 xfail_strict = true  # An expected failure that passes is an error
 filterwarnings = [
     "error",  # Every warning is an error; add exceptions only for specific, documented third-party warnings
+    # SciPy deprecates the sparse matrices in favour of the sparse arrays, but the
+    # common checks of scikit-learn still build them to test that they are supported,
+    # as long as SciPy has them; scikit-learn ignores this warning in its own tests
+    "ignore:(?s).*All sparse matrix classes.+deprecated:DeprecationWarning",
 ]
 
 [tool.coverage.run]
